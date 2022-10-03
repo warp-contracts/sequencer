@@ -2,7 +2,7 @@ package db
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/warp-contracts/gateway/_testcontainers"
+	"github.com/warp-contracts/gateway/_tests/_testcontainers"
 	"github.com/warp-contracts/gateway/config"
 	"testing"
 )

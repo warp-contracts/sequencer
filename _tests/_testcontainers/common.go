@@ -1,11 +1,9 @@
 package _testcontainers
 
 import (
-	"log"
+	"github.com/sirupsen/logrus"
 	"sync"
 )
-
-var cwg = &countWaitGroup{}
 
 // Use this struct for close containers in go routines
 type countWaitGroup struct {
@@ -21,7 +19,7 @@ func (g *countWaitGroup) Add(count int) int {
 
 func (g *countWaitGroup) Done() bool {
 	if g.count == 0 {
-		log.Fatalf("Can't call Done when count is 0.")
+		logrus.Panic("Can't call Done when count is 0.")
 	}
 	g.wg.Done()
 	g.count--

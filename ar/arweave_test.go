@@ -2,11 +2,17 @@ package ar
 
 import (
 	"github.com/stretchr/testify/assert"
+	"github.com/warp-contracts/gateway/config"
 	"testing"
 )
 
 func TestGetArweaveClient(t *testing.T) {
-	info, err := GetArweaveClient().GetInfo()
-	assert.NoError(t, err)
-	assert.NotNil(t, info)
+	config.Init("../")
+	client := GetArweaveClient()
+	assert.NotNil(t, client)
+	t.Run("should return info", func(t *testing.T) {
+		info, err := client.GetInfo()
+		assert.NoError(t, err)
+		assert.NotEmpty(t, info)
+	})
 }

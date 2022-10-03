@@ -8,3 +8,8 @@ postgres:
 arweave:
     url: "http://localhost:1984"
 #     url: "https://arweave.net"
+    bundlrUrls:
+      - https://node2.bundlr.network
+
+log:
+    level: info

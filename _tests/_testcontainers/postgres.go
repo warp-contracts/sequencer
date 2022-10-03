@@ -43,7 +43,7 @@ func runPostgresContainer(t *testing.T) testcontainers.Container {
 	containerRequest := testcontainers.ContainerRequest{
 		Image:        "postgres:13.7",
 		ExposedPorts: []string{"5432/tcp"},
-		WaitingFor:   wait.ForLog("database system is ready to accept connections"),
+		WaitingFor:   wait.ForLog("UTC [1] LOG:  database system is ready to accept connections"),
 		Env: map[string]string{
 			"POSTGRES_PASSWORD": passwd,
 		},
