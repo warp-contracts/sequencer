@@ -36,5 +36,6 @@ func GetPostgresConnection() *sql.DB {
 			connection = conn
 		}
 	}
+
 	return connection
 }

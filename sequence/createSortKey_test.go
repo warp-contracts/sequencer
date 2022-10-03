@@ -1,9 +1,8 @@
 package sequence
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/everFinance/goar"
+	"github.com/everFinance/goar/utils"
 	"github.com/lestrrat-go/jwx/v2/jwk"
 	"github.com/stretchr/testify/assert"
 	"math"
@@ -89,29 +88,29 @@ func TestCreateSortKey(t *testing.T) {
 		})
 	})
 
-	//t.Run("should be able to generate same key with js implementations", func(t *testing.T) {
-	//	originKey := "000001020352,1663684217401,1e8f524466584f490d9ca865a357e53b49ed064fe9416afe2ba338102c568509"
-	//	blockHeight := 1020352
-	//	blockId, err := utils.Base64Decode("KFOkPVliGG-KnunORRQVc1hj-OBQOIvc2g4tmaWmWYpz7jC9BwDlz4a7WD8ylqaU")
-	//	assert.NoError(t, err)
-	//	//blockId := []byte("KFOkPVliGG-KnunORRQVc1hj-OBQOIvc2g4tmaWmWYpz7jC9BwDlz4a7WD8ylqaU")
-	//	var mills int64 = 1663684217401
-	//	transactionId, err := utils.Base64Decode("6kPEEwd0GW_i1FVa6nA0hYYDFMYYckswkxTS4KZwNVg")
-	//	assert.NoError(t, err)
-	//
-	//	key, err := CreateSortKey(getJwkKey3(), blockId, mills, transactionId, blockHeight)
-	//	assert.NoError(t, err)
-	//	assert.Equal(t, originKey, key)
-	//})
+	t.Run("should be able to generate same key with js implementations", func(t *testing.T) {
+		originKey := "000001020352,1663684217401,1e8f524466584f490d9ca865a357e53b49ed064fe9416afe2ba338102c568509"
+		blockHeight := 1020352
+		blockId, err := utils.Base64Decode("KFOkPVliGG-KnunORRQVc1hj-OBQOIvc2g4tmaWmWYpz7jC9BwDlz4a7WD8ylqaU")
+		assert.NoError(t, err)
+		//blockId := []byte("KFOkPVliGG-KnunORRQVc1hj-OBQOIvc2g4tmaWmWYpz7jC9BwDlz4a7WD8ylqaU")
+		var mills int64 = 1663684217401
+		transactionId, err := utils.Base64Decode("6kPEEwd0GW_i1FVa6nA0hYYDFMYYckswkxTS4KZwNVg")
+		assert.NoError(t, err)
+
+		key, err := CreateSortKey(getJwkKey3(), blockId, mills, transactionId, blockHeight)
+		assert.NoError(t, err)
+		assert.Equal(t, originKey, key)
+	})
 }
 
-func TestQwe(t *testing.T) {
-	wallet, _ := goar.NewWalletFromPath("../_tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json", "")
-	//d := wallet.Signer.PrvKey.D.Bytes()
-	marshal, err := json.Marshal(wallet.Signer.PrvKey)
-	assert.NoError(t, err)
-	print(string(marshal))
-}
+//func TestQwe(t *testing.T) {
+//wallet, _ := goar.NewWalletFromPath("../_tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json", "")
+//d := wallet.Signer.PrvKey.D.Bytes()
+//pem, err := jwk.EncodePEM(d)
+//assert.NoError(t, err)
+//print(base64.URLEncoding.EncodeToString(pem))
+//}
 
 func generateMissedZeroes(requiredLen int, blockHeight string) string {
 	zeroes := make([]int, requiredLen-len(blockHeight))
