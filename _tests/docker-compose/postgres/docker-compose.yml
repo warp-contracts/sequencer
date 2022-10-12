@@ -8,4 +8,4 @@ services:
     environment:
       POSTGRES_PASSWORD: passwd
     ports:
-      - 5431:5432
+      - 5432:5432
