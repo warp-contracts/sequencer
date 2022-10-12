@@ -2,19 +2,14 @@ package sequencerdb
 
 import (
 	"github.com/warp-contracts/sequencer/db/conn"
-	"gorm.io/gorm"
 )
 
 const tableName = "sequencer"
 
 func Save(s *Sequence) {
-	getConnection().Create(s)
-}
-
-func getConnection() *gorm.DB {
 	connection := conn.GetConnection()
 	connection.Table(tableName)
-	return connection
+	connection.Create(s)
 }
 
 type Sequence struct {

@@ -4,6 +4,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/warp-contracts/sequencer/_tests/_testcontainers"
 	"github.com/warp-contracts/sequencer/config"
+	"github.com/warp-contracts/sequencer/db/conn"
 	"testing"
 )
 
@@ -14,7 +15,7 @@ func TestInteraction(t *testing.T) {
 
 	t.Parallel()
 
-	connection := getConnection()
+	connection := conn.GetConnection()
 	err := connection.AutoMigrate(Interaction{})
 	assert.NoError(t, err)
 
