@@ -2,16 +2,10 @@ package interactiondb
 
 import (
 	"github.com/warp-contracts/sequencer/db/conn"
-	"gorm.io/gorm"
 )
 
 func Save(s *Interaction) {
-	getConnection().Create(s)
-}
-
-func getConnection() *gorm.DB {
-	connection := conn.GetConnection()
-	return connection
+	conn.GetConnection().Create(s)
 }
 
 type Interaction struct {
