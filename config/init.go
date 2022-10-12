@@ -2,8 +2,9 @@ package config
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"strings"
 	"sync"
 )
 
@@ -17,21 +18,44 @@ func Init(path ...string) {
 		return
 	}
 
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	viper.AutomaticEnv()
 	viper.AddConfigPath(getPath(path))
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
 		panic(fmt.Errorf("fatal error config file: %w", err))
 	}
+	validateRequiredVariables()
 	initLogs()
 	inited = true
 }
 
+func validateRequiredVariables() {
+	for _, key := range []string{
+		"postgres.password",
+		"arweave.arConnectKey",
+	} {
+		if viper.GetString(key) == "" {
+			panic(fmt.Sprintf("Key %s can't be empty", key))
+		}
+	}
+}
+
 func initLogs() {
-	l, err := log.ParseLevel(viper.GetString("log.level"))
+	l, err := logrus.ParseLevel(viper.GetString("log.level"))
 	if err != nil {
 		panic(err)
 	}
-	log.SetLevel(l)
+	logrus.SetLevel(l)
+
+	switch viper.GetString("log.format") {
+	case "json":
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	case "text":
+		logrus.SetFormatter(&logrus.TextFormatter{})
+	default:
+		logrus.Panic("Unsupported log format")
+	}
 }
 
 func getPath(path []string) string {

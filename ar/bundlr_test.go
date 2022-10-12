@@ -4,12 +4,14 @@ import (
 	"github.com/everFinance/goar/types"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
-	"github.com/warp-contracts/gateway/config"
+	"github.com/warp-contracts/sequencer/config"
 	"os"
 	"testing"
 )
 
 func TestBundlr(t *testing.T) {
+	t.Parallel()
+
 	key, err := os.ReadFile("../_tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json")
 	assert.NoError(t, err)
 	viper.Set("arweave.arConnectKey", key)

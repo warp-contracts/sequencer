@@ -1,4 +1,4 @@
-package sequence
+package sortkey
 
 import (
 	"fmt"
@@ -14,9 +14,11 @@ import (
 )
 
 var lastNow int64
-var blockHeightCount = 0
+var blockHeightCount int64 = 0
 
 func TestCreateSortKey(t *testing.T) {
+	t.Parallel()
+
 	t.Run("should create a non-empty key", func(t *testing.T) {
 		key, err := CreateSortKey(newParams())
 		assert.NoError(t, err)
@@ -35,7 +37,7 @@ func TestCreateSortKey(t *testing.T) {
 		assert.Len(t, splitKey, 3)
 		t.Run("should have blockHeight in first part", func(t *testing.T) {
 			keyPart := splitKey[0]
-			blockHeightString := strconv.Itoa(blockHeight)
+			blockHeightString := strconv.FormatInt(blockHeight, 10)
 			t.Run("should end with blockHeight", func(t *testing.T) {
 				assert.True(t, strings.HasSuffix(keyPart, blockHeightString))
 			})
@@ -90,7 +92,7 @@ func TestCreateSortKey(t *testing.T) {
 
 	t.Run("should be able to generate same key with js implementations", func(t *testing.T) {
 		originKey := "000001020352,1663684217401,1e8f524466584f490d9ca865a357e53b49ed064fe9416afe2ba338102c568509"
-		blockHeight := 1020352
+		var blockHeight int64 = 1020352
 		blockId, err := utils.Base64Decode("KFOkPVliGG-KnunORRQVc1hj-OBQOIvc2g4tmaWmWYpz7jC9BwDlz4a7WD8ylqaU")
 		assert.NoError(t, err)
 		//blockId := []byte("KFOkPVliGG-KnunORRQVc1hj-OBQOIvc2g4tmaWmWYpz7jC9BwDlz4a7WD8ylqaU")
@@ -117,7 +119,7 @@ func generateMissedZeroes(requiredLen int, blockHeight string) string {
 	return strings.Trim(strings.Join(strings.Fields(fmt.Sprint(zeroes)), ""), "[]")
 }
 
-func newParams() (jwk.Key, []byte, int64, []byte, int) {
+func newParams() (jwk.Key, []byte, int64, []byte, int64) {
 	now := time.Now().UnixMilli()
 	if now == lastNow {
 		now += 1

@@ -3,9 +3,9 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"github.com/warp-contracts/gateway/ar"
-	"github.com/warp-contracts/gateway/config"
-	"github.com/warp-contracts/gateway/routes"
+	"github.com/warp-contracts/sequencer/ar"
+	"github.com/warp-contracts/sequencer/config"
+	"github.com/warp-contracts/sequencer/routes"
 )
 
 func main() {
@@ -14,6 +14,7 @@ func main() {
 
 	r := gin.Default()
 	r.POST("sequencer/register", routes.RegisterSequencer)
+	r.POST("gateway/sequencer/register", routes.RegisterSequencer)
 
 	err := r.Run()
 	if err != nil {

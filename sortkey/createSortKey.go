@@ -1,4 +1,4 @@
-package sequence
+package sortkey
 
 import (
 	"crypto/sha256"
@@ -13,7 +13,7 @@ func CreateSortKey(
 	blockId []byte,
 	mills int64,
 	transactionId []byte,
-	blockHeight int,
+	blockHeight int64,
 ) (string, error) {
 	d := (jwkKey.(jwk.RSAPrivateKey)).D()
 	buffer := utils.ConcatBuffer(blockId, transactionId, d)

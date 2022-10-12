@@ -2,7 +2,7 @@ package ar
 
 import (
 	"github.com/stretchr/testify/assert"
-	"github.com/warp-contracts/gateway/config"
+	"github.com/warp-contracts/sequencer/config"
 	"testing"
 )
 
