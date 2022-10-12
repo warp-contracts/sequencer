@@ -8,5 +8,5 @@ import (
 )
 
 func Test(t *testing.T) {
-	config.Init("..")
+	config.Init()
 }

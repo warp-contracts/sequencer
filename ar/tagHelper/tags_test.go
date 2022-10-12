@@ -18,13 +18,13 @@ import (
 func TestPrepareTags(t *testing.T) {
 	t.Parallel()
 
-	kBytes, err := os.ReadFile("../../_tests/arweavekeys/vrf")
+	kBytes, err := os.ReadFile("../../_tests/arweavekeys/vrf-example")
 	assert.NoError(t, err)
 	key, err := crypt.UnmarshalKey(string(kBytes))
 	assert.NoError(t, err)
 
 	viper.Set("vrf.privateKey", crypt.MarshalKey(key))
-	config.Init("../..")
+	config.Init()
 
 	t.Run("should create tags", func(t *testing.T) {
 		t.Parallel()
@@ -32,7 +32,6 @@ func TestPrepareTags(t *testing.T) {
 		originalAddress := "addr"
 		var millis int64 = 123
 		sortKey := "000001026265,1664446281798,dd9a9dc0d898a93bb00e278d4c7fa8840fa3a04363c7ae4089b2c3d1ac56ecad"
-		//sortKey := "sort privateKey"
 		sourceTags := []types.Tag{
 			{
 				Name:  "transaction tag name 1",
@@ -94,12 +93,12 @@ func TestPrepareTags(t *testing.T) {
 			t.Run("should contain vrf tags", func(t *testing.T) {
 				t.Parallel()
 
-				assertTag(t, tags, "vrf-index", "SDH2cN87EE7M1gtvU6McJWCqqTbyJ2nyBAsUIaqhGTc")
+				assertTag(t, tags, "vrf-index", "s7cDEZ5ZfkbkN0NfN5jsRMiKnMGN4IHtdG3Nr2QAYyU")
 
 				vrfProof := findTag("vrf-proof", tags)
 				assert.NotNil(t, vrfProof)
-				assertTag(t, tags, "vrf-bigint", "32654801476793596434546237842178819876977662132066455741221654786158767446327")
-				assertTag(t, tags, "vrf-pubkey", "03027295998c12c584a11b3ffcb07f58d5392bd271f5185b1799fe775350dc75ce")
+				assertTag(t, tags, "vrf-bigint", "81287354089493419043609974266174296544041075436869961695329565234059829863205")
+				assertTag(t, tags, "vrf-pubkey", "03afb216678c386eeb1ceb0f5fdcfe7db3a9f7480ba5bd63695e5226f9bbb75b58")
 
 				verifier, err := secp256k1VRF.NewVRFVerifier(key.Public().(*ecdsa.PublicKey))
 				assert.NoError(t, err)
@@ -146,13 +145,13 @@ func encodeTags(tags []types.Tag) (encodedTags []types.Tag) {
 	return
 }
 
-func assertTag(t *testing.T, tags []types.Tag, tagName string, actual string) {
+func assertTag(t *testing.T, tags []types.Tag, tagName string, expected string) {
 	vrfPubkey := findTag(tagName, tags)
-	assert.NotNil(t, vrfPubkey)
+	assert.NotNil(t, vrfPubkey, "Tag %s not found", tagName)
 	if vrfPubkey == nil {
 		return
 	}
-	assert.Equal(t, vrfPubkey.Value, actual)
+	assert.Equal(t, expected, vrfPubkey.Value, "Wrong value for tag: %s", tagName)
 }
 
 func findTag(s string, tags []types.Tag) *types.Tag {

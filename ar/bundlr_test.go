@@ -16,7 +16,7 @@ func TestBundlr(t *testing.T) {
 	assert.NoError(t, err)
 	viper.Set("arweave.arConnectKey", key)
 
-	config.Init("../")
+	config.Init()
 
 	bundl := GetBundlr()
 	t.Run("should return non-nil bundlr", func(t *testing.T) {

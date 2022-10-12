@@ -11,7 +11,7 @@ var cacheTaskStarted = false
 var blockInfo *BlockInfo
 
 func StartCacheRead() {
-	config.Init("../")
+	config.Init()
 	if cacheTaskStarted {
 		return
 	}
