@@ -1,4 +1,4 @@
-package db
+package conn
 
 import (
 	"database/sql"
@@ -8,12 +8,10 @@ import (
 	"sync"
 )
 
-const (
-	PgMock = "postgres.mock"
+var (
+	connection *sql.DB
+	lock       = &sync.Mutex{}
 )
-
-var connection *sql.DB
-var lock = &sync.Mutex{}
 
 func GetPostgresConnection() *sql.DB {
 	if connection == nil {

@@ -6,6 +6,8 @@ import (
 )
 
 func TestCache(t *testing.T) {
+	t.Parallel()
+
 	t.Run("should panic when request cache info ", func(t *testing.T) {
 		assertPanic(t, func() {
 			GetCachedInfo()

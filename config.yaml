@@ -3,13 +3,17 @@ postgres:
     port: 5432
     database: postgres
     user: postgres
-    password: postgres
+    password: ""
     sslmode: disable
 arweave:
-    url: "http://localhost:1984"
-#     url: "https://arweave.net"
+    arConnectKey: ""
+#     url: "http://localhost:1984"
+    url: "https://arweave.net"
     bundlrUrls:
       - https://node2.bundlr.network
+vrf:
+    privateKey: "c6d52a8619bde048c40fa5a3e08bf33af295cf01591bb1f87fb2cf3933f90b37"
 
 log:
     level: info
+    format: text
