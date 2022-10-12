@@ -6,7 +6,16 @@ For environment variable will rewrite value from the yaml file.
 Environment variable should be in the upper case and dots should be replaced with underscore.
 For example, if we want to rewrite parameter "postgres.host", the environment variable should be named POSTGRES_HOST.
 
-# Run locally
+
+## Environments
+config.yaml file will be included for all environments.
+
+If you running tests, config_test.yaml will be included additionally.
+
+# Local run and development
+
+## Run the application
+
 It requires to set arConnectKey to run the sequencer locally:
 ```sh
 export ARWEAVE_ARCONNECTKEY="some arconnect key"
@@ -21,3 +30,12 @@ You can run application using command line:
 go run .
 ```
 Or from you IDE you can run main.go file
+
+## Tests
+
+Running all tests:
+```sh
+go run ./...
+```
+
+Tests should be written to run in parallel (t.Parallel()).

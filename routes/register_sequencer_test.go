@@ -11,7 +11,7 @@ import (
 )
 
 func TestRegisterSequence(t *testing.T) {
-	config.Init("..")
+	config.Init()
 	c := GetTestGinContext()
 	c.Request.Method = http.MethodPost
 	//wallet, err := goar.NewWalletFromPath("../_tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json", viper.GetString("arweave.url"))

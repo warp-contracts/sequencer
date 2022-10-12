@@ -8,7 +8,7 @@ import (
 )
 
 func TestSequenced(t *testing.T) {
-	config.Init("../..")
+	config.Init()
 	done := _testcontainers.RunPostgresContainer(t)
 	defer done()
 

@@ -10,7 +10,7 @@ import (
 func TestDbConnection(t *testing.T) {
 	t.Parallel()
 
-	config.Init("../..")
+	config.Init()
 	done := _testcontainers.RunPostgresContainer(t)
 	defer done()
 

@@ -7,7 +7,7 @@ import (
 )
 
 func TestGetArweaveClient(t *testing.T) {
-	config.Init("../")
+	config.Init()
 	client := GetArweaveClient()
 	assert.NotNil(t, client)
 	t.Run("should return info", func(t *testing.T) {
