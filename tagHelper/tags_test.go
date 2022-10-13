@@ -18,7 +18,7 @@ import (
 func TestPrepareTags(t *testing.T) {
 	t.Parallel()
 
-	kBytes, err := os.ReadFile("../../_tests/arweavekeys/vrf-example")
+	kBytes, err := os.ReadFile("../_tests/arweavekeys/vrf-example")
 	assert.NoError(t, err)
 	key, err := crypt.UnmarshalKey(string(kBytes))
 	assert.NoError(t, err)

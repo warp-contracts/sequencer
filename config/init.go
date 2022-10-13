@@ -12,13 +12,13 @@ import (
 	"sync"
 )
 
-var inited = false
+var initialized = false
 var initLock sync.Mutex
 
 func Init() {
 	initLock.Lock()
 	defer initLock.Unlock()
-	if inited {
+	if initialized {
 		return
 	}
 
@@ -35,7 +35,7 @@ func Init() {
 	}
 	validateRequiredVariables()
 	initLogs()
-	inited = true
+	initialized = true
 }
 
 func getConfFilename(configPath string, env string) string {

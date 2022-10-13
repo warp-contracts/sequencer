@@ -24,7 +24,7 @@ func PrepareTags(
 	vrfData VrfData,
 	err error,
 ) {
-	decodedTags, err = decodeTags(transaction.Tags)
+	decodedTags, err = utils.TagsDecode(transaction.Tags)
 	if err != nil {
 		return "", "", "", nil, nil, VrfData{}, err
 	}
@@ -100,24 +100,6 @@ func getVrfTags(sortKey string) (vrfTags []types.Tag, vrfData VrfData) {
 			Name:  "vrf-pubkey",
 			Value: vrfData.Pubkey,
 		},
-	}
-	return
-}
-
-func decodeTags(tags []types.Tag) (decodedTags []types.Tag, err error) {
-	for _, tag := range tags {
-		name, err := utils.Base64Decode(tag.Name)
-		if err != nil {
-			return nil, err
-		}
-		value, err := utils.Base64Decode(tag.Value)
-		if err != nil {
-			return nil, err
-		}
-		decodedTags = append(decodedTags, types.Tag{
-			Name:  string(name),
-			Value: string(value),
-		})
 	}
 	return
 }
