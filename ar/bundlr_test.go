@@ -14,7 +14,7 @@ func TestBundlr(t *testing.T) {
 
 	key, err := os.ReadFile("../_tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json")
 	assert.NoError(t, err)
-	viper.Set("arweave.arConnectKey", key)
+	viper.Set("arweave.walletJwk", key)
 
 	config.Init()
 

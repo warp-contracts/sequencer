@@ -10,7 +10,7 @@ var jwkKey jwk.Key
 
 func GetArConnectAsJwkKey() jwk.Key {
 	if jwkKey == nil {
-		str := viper.GetString("arweave.arConnectKey")
+		str := viper.GetString("arweave.walletJwk")
 		k, err := jwk.ParseKey([]byte(str))
 		if err != nil {
 			logrus.Panic(err)

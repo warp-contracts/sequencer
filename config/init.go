@@ -55,8 +55,7 @@ func getEnvFiles() (files []string) {
 
 func validateRequiredVariables() {
 	for _, key := range []string{
-		"postgres.password",
-		"arweave.arConnectKey",
+		"arweave.walletJwk",
 	} {
 		if viper.GetString(key) == "" {
 			panic(fmt.Sprintf("Key %s can't be empty", key))
