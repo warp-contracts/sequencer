@@ -23,6 +23,11 @@ import (
 
 func RegisterSequencer(c *gin.Context) {
 	transaction := new(types.Transaction)
+	// I know that it wasn't done in the original version
+	// but it would be wise to add transaction validation here
+	// i.e. https://github.com/everFinance/goar/blob/main/utils/transaction.go#L143
+
+	// what is the point of this operation?
 	err := c.BindJSON(transaction)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
@@ -42,10 +47,14 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 
+	// we need to be super-careful here when this code will be deployed on prod
+	// ie be sure that the timezone etc is the same as in the current - js version.
 	millis := time.Now().UnixMilli()
 	currentHeight := cachedNetworkData.NetworkInfo.Height
 	currentBlockId := cachedNetworkData.NetworkInfo.Current
 	sortKey, err := sortkey.CreateSortKey(jwk, []byte(currentBlockId), millis, []byte(transaction.ID), currentHeight)
+	// shouldn't we - in general - log errors here?
+	// at least in the beginning state of running of the new version
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, err)
 		return
@@ -64,11 +73,13 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 
+	// please log here with warn if senging to bundlr took longer than 500ms
 	bundlrResp, err := ar.GetBundlr().UploadToBundlr(
 		transaction,
 		tags...,
 	)
 	if err != nil {
+		// please log here with some placeholder that would be easy to search
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}

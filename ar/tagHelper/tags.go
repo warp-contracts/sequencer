@@ -11,6 +11,8 @@ import (
 	"strconv"
 )
 
+// this tags stuff is tightly coupled with how sequencer works (not 'general tools')
+// - so I would rather move this somewhere to the sequencer logic
 func PrepareTags(
 	transaction *types.Transaction,
 	originalAddress string,
@@ -104,6 +106,7 @@ func getVrfTags(sortKey string) (vrfTags []types.Tag, vrfData VrfData) {
 	return
 }
 
+// can't you use https://github.com/everFinance/goar/blob/main/utils/tags.go#L21 instead?
 func decodeTags(tags []types.Tag) (decodedTags []types.Tag, err error) {
 	for _, tag := range tags {
 		name, err := utils.Base64Decode(tag.Name)

@@ -1,7 +1,9 @@
 package main
 
 import (
+	// gin library
 	"github.com/gin-gonic/gin"
+	// logrus library
 	"github.com/sirupsen/logrus"
 	"github.com/warp-contracts/sequencer/ar"
 	"github.com/warp-contracts/sequencer/config"

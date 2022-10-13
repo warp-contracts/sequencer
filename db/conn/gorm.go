@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
+	// gorm library
 	"gorm.io/gorm"
 	"sync"
 )

@@ -17,6 +17,7 @@ func GetPostgresConnection() *sql.DB {
 	if connection == nil {
 		lock.Lock()
 		defer lock.Unlock()
+		// do we need to configure "raw" psql connection and gorm connection?
 		if connection == nil {
 			host := viper.GetString("postgres.host")
 			port := viper.GetInt("postgres.port")

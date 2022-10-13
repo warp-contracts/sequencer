@@ -3,11 +3,13 @@ package config
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
+	// viper library
 	"github.com/spf13/viper"
 	"strings"
 	"sync"
 )
 
+// -> initialized
 var inited = false
 var initLock sync.Mutex
 
@@ -33,7 +35,7 @@ func Init(path ...string) {
 func validateRequiredVariables() {
 	for _, key := range []string{
 		"postgres.password",
-		"arweave.arConnectKey",
+		"arweave.arConnectKey", //arConnect? you mean the arweave JWK? arconnect is a forbidden word ;-)
 	} {
 		if viper.GetString(key) == "" {
 			panic(fmt.Sprintf("Key %s can't be empty", key))
