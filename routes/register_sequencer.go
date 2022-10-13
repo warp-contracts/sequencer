@@ -8,22 +8,21 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/warp-contracts/sequencer/ar"
-	"github.com/warp-contracts/sequencer/ar/tagHelper"
 	"github.com/warp-contracts/sequencer/config"
 	"github.com/warp-contracts/sequencer/db/interactiondb"
 	"github.com/warp-contracts/sequencer/db/sequencerdb"
 	"github.com/warp-contracts/sequencer/sortkey"
+	"github.com/warp-contracts/sequencer/tagHelper"
 	"net/http"
 	"regexp"
 	"sync"
 	"time"
 )
 
-//arweave.net/{txId}
-
 func RegisterSequencer(c *gin.Context) {
 	transaction := new(types.Transaction)
 	err := c.BindJSON(transaction)
+	//utils.VerifyTransaction(*transaction)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
