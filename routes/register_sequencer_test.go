@@ -67,7 +67,7 @@ func initTest(t *testing.T) {
 	config.Init()
 
 	connection := conn.GetConnection()
-	assert.NoError(t, connection.AutoMigrate(sequencerdb.Sequence{}))
+	assert.NoError(t, connection.AutoMigrate(sequencerdb.Sequencer{}))
 	assert.NoError(t, connection.AutoMigrate(interactiondb.Interaction{}))
 
 	ar.StartCacheRead()

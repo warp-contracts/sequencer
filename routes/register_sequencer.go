@@ -2,6 +2,7 @@ package routes
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/everFinance/goar/types"
 	"github.com/everFinance/goar/utils"
 	"github.com/gin-gonic/gin"
@@ -23,15 +24,17 @@ func RegisterSequencer(c *gin.Context) {
 	transaction := new(types.Transaction)
 	err := c.BindJSON(transaction)
 	//utils.VerifyTransaction(*transaction)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+
+	if checkError(c, err, http.StatusBadRequest) {
 		return
 	}
 
 	cachedNetworkData := ar.GetCachedInfo()
 	jwk := config.GetArConnectAsJwkKey()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+	if checkError(c, err, http.StatusInternalServerError) {
+		return
+	}
+	if checkError(c, err, http.StatusInternalServerError) {
 		return
 	}
 	originalOwner := transaction.Owner
@@ -45,8 +48,7 @@ func RegisterSequencer(c *gin.Context) {
 	currentHeight := cachedNetworkData.NetworkInfo.Height
 	currentBlockId := cachedNetworkData.NetworkInfo.Current
 	sortKey, err := sortkey.CreateSortKey(jwk, []byte(currentBlockId), millis, []byte(transaction.ID), currentHeight)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+	if checkError(c, err, http.StatusInternalServerError) {
 		return
 	}
 	//print(sortKey, originalAddress)
@@ -67,8 +69,7 @@ func RegisterSequencer(c *gin.Context) {
 		transaction,
 		tags...,
 	)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+	if checkError(c, err, http.StatusInternalServerError) {
 		return
 	}
 
@@ -97,21 +98,37 @@ func RegisterSequencer(c *gin.Context) {
 	)
 
 	bundlerRespJson, err := json.Marshal(bundlrResp)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+	if checkError(c, err, http.StatusInternalServerError) {
 		return
 	}
 
 	interactionJson, err := json.Marshal(interaction)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+	if checkError(c, err, http.StatusInternalServerError) {
 		return
 	}
 
+	errs := saveResultsInDb(transaction, originalOwner, originalAddress, currentBlockId, currentHeight, millis, sortKey, bundlrResp, bundlerRespJson, interactionJson, contractTag, functionInput, inputTag, internalWrites, evolve)
+
+	if len(errs) > 0 {
+		var msg string
+		for _, e := range errs {
+			logrus.Error(e)
+			msg += e.Error() + "\n"
+		}
+		checkError(c, errors.New(msg), http.StatusInternalServerError)
+		return
+	}
+
+	c.JSON(200, bundlrResp)
+}
+
+func saveResultsInDb(transaction *types.Transaction, originalOwner string, originalAddress string, currentBlockId string, currentHeight int64, millis int64, sortKey string, bundlrResp *types.BundlrResp, bundlerRespJson []byte, interactionJson []byte, contractTag string, functionInput *FunctionInput, inputTag string, internalWrites string, evolve string) []error {
 	var wg sync.WaitGroup
 	wg.Add(2)
+	var lock sync.Mutex
+	var errs []error
 	go func() {
-		sequencerdb.Save(&sequencerdb.Sequence{
+		err := sequencerdb.Save(&sequencerdb.Sequencer{
 			OriginalSig:           transaction.Signature,
 			OriginalOwner:         originalOwner,
 			OriginalAddress:       originalAddress,
@@ -123,10 +140,15 @@ func RegisterSequencer(c *gin.Context) {
 			BundlerTxId:           bundlrResp.Id,
 			BundlerResponse:       string(bundlerRespJson),
 		})
+		if err != nil {
+			lock.Lock()
+			errs = append(errs, err)
+			lock.Unlock()
+		}
 		wg.Done()
 	}()
 	go func() {
-		interactiondb.Save(&interactiondb.Interaction{
+		err := interactiondb.Save(&interactiondb.Interaction{
 			InteractionId:      transaction.ID,
 			Interaction:        string(interactionJson),
 			BlockHeight:        currentHeight,
@@ -142,11 +164,28 @@ func RegisterSequencer(c *gin.Context) {
 			SortKey:            sortKey,
 			Evolve:             evolve,
 		})
+		if err != nil {
+			lock.Lock()
+			errs = append(errs, err)
+			lock.Unlock()
+		}
 		wg.Done()
 	}()
 	wg.Wait()
+	return errs
+}
 
-	c.JSON(200, bundlrResp)
+func checkError(c *gin.Context, err error, returnCode int) bool {
+	if err != nil {
+		if returnCode > 499 && returnCode < 600 {
+			logrus.Error(err)
+		} else {
+			logrus.Debug(err)
+		}
+		c.JSON(returnCode, err)
+		return true
+	}
+	return false
 }
 
 func createInteraction(transaction *types.Transaction,
