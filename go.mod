@@ -4,11 +4,12 @@ go 1.19
 
 require (
 	github.com/dappley/go-dappley v0.6.0
-	github.com/everFinance/goar v1.4.4
+	github.com/everFinance/goar v1.4.5
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-co-op/gocron v1.11.0
 	github.com/lestrrat-go/jwx/v2 v2.0.6
 	github.com/lib/pq v1.10.7
+	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.13.0
 	github.com/stretchr/testify v1.8.0
@@ -17,8 +18,6 @@ require (
 	gorm.io/driver/postgres v1.4.4
 	gorm.io/gorm v1.23.7
 )
-
-replace github.com/everFinance/goar v1.4.4 => github.com/Max-Levitskiy/goar v0.0.2-0.20221012071318-ada30d62551b
 
 require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
@@ -105,7 +104,6 @@ require (
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/peterh/liner v1.2.0 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/tsdb v0.7.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
