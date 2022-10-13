@@ -1,0 +1,27 @@
+version: 3
+
+env:
+  TAG_NAME: sequencer
+
+tasks:
+  run-docker-postgres:
+    desc: Run postgres docker-compose
+    cmds:
+      - docker-compose -f _tests/docker-compose/postgres/docker-compose.yml up -d
+  stop-docker-postgres:
+    desc: Stop postgres docker-compose
+    cmds:
+      - docker-compose -f _tests/docker-compose/postgres/docker-compose.yml down
+  docker-build:
+    desc: Build docker image. Use REBUILD_DOCKER=true task docker-build to force rebuild.
+    run: once
+    cmds:
+      - docker build . -t {{.TAG_NAME}}
+    status:
+      - test "$(docker images | grep {{.TAG_NAME}})"
+      - test -z "{{.REBUILD_DOCKER}}"
+
+  docker-run-sequencer:
+    desc: Run docker
+    cmds:
+      - docker run -e ARWEAVE_WALLETJWK=$(cat _tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json) {{.TAG_NAME}}
