@@ -3,7 +3,6 @@ module github.com/warp-contracts/sequencer
 go 1.19
 
 require (
-	github.com/dappley/go-dappley v0.6.0
 	github.com/everFinance/goar v1.4.5
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-co-op/gocron v1.11.0
@@ -109,7 +108,6 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rjeczalik/notify v0.9.1 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
-	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shirou/gopsutil v3.21.4-0.20210419000835-c7a38de76ee5+incompatible // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
