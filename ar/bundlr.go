@@ -30,7 +30,7 @@ type bundlr struct {
 
 func (b *bundlr) UploadToBundlr(transaction *types.Transaction, tags ...types.Tag) (*types.BundlrResp, error) {
 	var err error
-	key := viper.GetString("arweave.arConnectKey")
+	key := viper.GetString("arweave.walletJwk")
 	if key == "" {
 		return nil, errors.New("key cannot be empty")
 	}

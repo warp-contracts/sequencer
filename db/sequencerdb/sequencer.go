@@ -4,15 +4,11 @@ import (
 	"github.com/warp-contracts/sequencer/db/conn"
 )
 
-const tableName = "sequencer"
-
-func Save(s *Sequence) {
-	connection := conn.GetConnection()
-	connection.Table(tableName)
-	connection.Create(s)
+func Save(s *Sequencer) error {
+	return conn.GetConnection().Create(s).Error
 }
 
-type Sequence struct {
+type Sequencer struct {
 	OriginalSig           string
 	OriginalOwner         string
 	OriginalAddress       string

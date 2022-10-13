@@ -4,8 +4,8 @@ import (
 	"github.com/warp-contracts/sequencer/db/conn"
 )
 
-func Save(s *Interaction) {
-	conn.GetConnection().Create(s)
+func Save(s *Interaction) error {
+	return conn.GetConnection().Create(s).Error
 }
 
 type Interaction struct {

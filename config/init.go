@@ -69,6 +69,7 @@ func initLogs() {
 		panic(err)
 	}
 	logrus.SetLevel(l)
+	logrus.SetReportCaller(true)
 
 	switch viper.GetString("log.format") {
 	case "json":
@@ -90,7 +91,7 @@ out:
 			logrus.Panic(err)
 		}
 		for _, file := range files {
-			if file.Name() == "go.mod" {
+			if file.Name() == "config.yaml" {
 				abs, err := filepath.Abs(p)
 				if err != nil {
 					logrus.Panic(errors.Wrap(err, "Can't read absolute path for config"))
@@ -102,7 +103,7 @@ out:
 		p = "../" + p
 		i++
 		if i > 10 {
-			logrus.Panic("Isn't it too deep packages structure? Feel free to increase if not.")
+			logrus.Panic("config.yaml missed? Or too deep packages structure?  Feel free to increase if you sure you need it.")
 		}
 	}
 	return p + "/"

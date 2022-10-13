@@ -16,13 +16,12 @@ func TestSequenced(t *testing.T) {
 	t.Parallel()
 
 	connection := conn.GetConnection()
-	connection.Table(tableName)
-	err := connection.AutoMigrate(Sequence{})
+	err := connection.AutoMigrate(Sequencer{})
 	assert.NoError(t, err)
 
 	t.Run("save", func(t *testing.T) {
-		defer connection.Where("1=1").Delete(Sequence{})
-		origin := &Sequence{
+		defer connection.Where("1=1").Delete(Sequencer{})
+		origin := &Sequencer{
 			OriginalSig:           "OriginalSig:          ",
 			OriginalOwner:         "OriginalOwner:        ",
 			OriginalAddress:       "OriginalAddress:      ",
@@ -35,7 +34,7 @@ func TestSequenced(t *testing.T) {
 			BundlerResponse:       "BundlerResponse:      ",
 		}
 		Save(origin)
-		var saved *Sequence
+		var saved *Sequencer
 		connection.First(&saved)
 		assert.Equal(t, origin, saved)
 	})
