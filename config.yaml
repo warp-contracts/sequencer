@@ -6,7 +6,7 @@ postgres:
     password: "passwd"
     sslmode: disable
 arweave:
-    arConnectKey: ""
+    walletJwk: ""
 #     url: "http://localhost:1984"
     url: "https://arweave.net"
     bundlrUrls:

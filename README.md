@@ -16,9 +16,9 @@ If you running tests, config_test.yaml will be included additionally.
 
 ## Run the application
 
-It requires to set arConnectKey to run the sequencer locally:
+It requires to set walletJwk to run the sequencer locally:
 ```sh
-export ARWEAVE_ARCONNECTKEY="some arconnect key"
+export ARWEAVE_WALLETJWK="some arconnect key"
 ```
 You can run postgres locally:
 ```sh
