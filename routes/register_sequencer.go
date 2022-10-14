@@ -16,6 +16,7 @@ import (
 	"github.com/warp-contracts/sequencer/tagHelper"
 	"net/http"
 	"regexp"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -128,14 +129,14 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 	var lock sync.Mutex
 	var errs []error
 	go func() {
-		err := sequencerdb.Save(&sequencerdb.Sequencer{
+		err := sequencerdb.Save(&sequencerdb.Sequence{
 			OriginalSig:           transaction.Signature,
 			OriginalOwner:         originalOwner,
 			OriginalAddress:       originalAddress,
 			SequenceBlockId:       currentBlockId,
 			SequenceBlockHeight:   currentHeight,
 			SequenceTransactionId: transaction.ID,
-			SequenceMillis:        millis,
+			SequenceMillis:        strconv.FormatInt(millis, 10),
 			SequenceSortKey:       sortKey,
 			BundlerTxId:           bundlrResp.Id,
 			BundlerResponse:       string(bundlerRespJson),
