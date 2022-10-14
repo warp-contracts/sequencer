@@ -200,26 +200,18 @@ func createInteraction(transaction *types.Transaction,
 ) *Interaction {
 	return &Interaction{
 		Id:        transaction.ID,
-		Owner:     struct{ address string }{address: originalAddress},
+		Owner:     owner{Address: originalAddress},
 		Recipient: transaction.Target,
 		Tags:      decodedTags,
-		Block: struct {
-			Height    int64
-			Id        string
-			Timestamp int64
-		}{
+		Block: block{
 			Height:    height,
 			Id:        currentBlockId,
 			Timestamp: blockData.Timestamp,
 		},
-		Fee: struct {
-			Winston string
-		}{
+		Fee: fee{
 			Winston: transaction.Reward,
 		},
-		Quantity: struct {
-			Winston string
-		}{
+		Quantity: quantity{
 			Winston: transaction.Quantity,
 		},
 		SortKey: sortKey,
@@ -244,20 +236,28 @@ type FunctionInput struct {
 }
 
 type Interaction struct {
-	Id        string
-	Owner     struct{ address string }
-	Recipient string
-	Tags      []types.Tag
-	Block     struct {
-		Height    int64
-		Id        string
-		Timestamp int64
-	}
-	Fee      struct{ Winston string }
-	Quantity struct {
-		Winston string
-	}
-	SortKey string
-	Source  string
-	Vrf     tagHelper.VrfData
+	Id        string            `json:"id"`
+	Owner     owner             `json:"owner"`
+	Recipient string            `json:"recipient"`
+	Tags      []types.Tag       `json:"tags"`
+	Block     block             `json:"block"`
+	Fee       fee               `json:"fee"`
+	Quantity  quantity          `json:"quantity"`
+	SortKey   string            `json:"sortkey"`
+	Source    string            `json:"source"`
+	Vrf       tagHelper.VrfData `json:"vrf"`
+}
+type owner struct {
+	Address string `json:"address"`
+}
+type block struct {
+	Height    int64  `json:"height"`
+	Id        string `json:"id"`
+	Timestamp int64  `json:"timestamp"`
+}
+type fee struct {
+	Winston string `json:"winston"`
+}
+type quantity struct {
+	Winston string `json:"winston"`
 }

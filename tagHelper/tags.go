@@ -111,8 +111,8 @@ func indexToBigint(index []byte) *big.Int {
 }
 
 type VrfData struct {
-	Index  string
-	Proof  string
-	Bigint string
-	Pubkey string
+	Index  string `json:"index"`
+	Proof  string `json:"proof"`
+	Bigint string `json:"bigint"`
+	Pubkey string `json:"pubkey"`
 }
