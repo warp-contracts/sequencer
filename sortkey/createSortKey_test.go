@@ -90,8 +90,8 @@ func TestCreateSortKey(t *testing.T) {
 		})
 	})
 
-	t.Run("should be able to generate same key with js implementations", func(t *testing.T) {
-		originKey := "000001020352,1663684217401,1e8f524466584f490d9ca865a357e53b49ed064fe9416afe2ba338102c568509"
+	t.Run("should be able to generate correct key", func(t *testing.T) {
+		originKey := "000001020352,1663684217401,a95dc918d844f3145b2e6bc80cc0d15385195130900b001ef629c879590c2bc2"
 		var blockHeight int64 = 1020352
 		blockId, err := utils.Base64Decode("KFOkPVliGG-KnunORRQVc1hj-OBQOIvc2g4tmaWmWYpz7jC9BwDlz4a7WD8ylqaU")
 		assert.NoError(t, err)
@@ -100,7 +100,7 @@ func TestCreateSortKey(t *testing.T) {
 		transactionId, err := utils.Base64Decode("6kPEEwd0GW_i1FVa6nA0hYYDFMYYckswkxTS4KZwNVg")
 		assert.NoError(t, err)
 
-		key, err := CreateSortKey(getJwkKey3(), blockId, mills, transactionId, blockHeight)
+		key, err := CreateSortKey(getJwkKey(), blockId, mills, transactionId, blockHeight)
 		assert.NoError(t, err)
 		assert.Equal(t, originKey, key)
 	})
@@ -143,17 +143,6 @@ func getJwkKey() jwk.Key {
 
 func getJwkKey2() jwk.Key {
 	keyBytes, err := os.ReadFile("../_tests/arweavekeys/axJNcs4-2yv5-yihgmwuDyuRql_06mhLa0PtrwP3PQo.json")
-	if err != nil {
-		return nil
-	}
-	key, err := jwk.ParseKey(keyBytes)
-	if err != nil {
-		panic(err)
-	}
-	return key
-}
-func getJwkKey3() jwk.Key {
-	keyBytes, err := os.ReadFile("../_tests/arweavekeys/tst.json")
 	if err != nil {
 		return nil
 	}
