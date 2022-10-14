@@ -64,21 +64,22 @@ func validateRequiredVariables() {
 }
 
 func initLogs() {
+	switch viper.GetString("log.format") {
+	case "json":
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+	case "text":
+		logrus.SetFormatter(&logrus.TextFormatter{
+			ForceColors: true,
+		})
+	default:
+		logrus.Panic("Unsupported log format")
+	}
 	l, err := logrus.ParseLevel(viper.GetString("log.level"))
 	if err != nil {
 		panic(err)
 	}
 	logrus.SetLevel(l)
 	logrus.SetReportCaller(true)
-
-	switch viper.GetString("log.format") {
-	case "json":
-		logrus.SetFormatter(&logrus.JSONFormatter{})
-	case "text":
-		logrus.SetFormatter(&logrus.TextFormatter{})
-	default:
-		logrus.Panic("Unsupported log format")
-	}
 }
 
 func getConfigPath() string {
