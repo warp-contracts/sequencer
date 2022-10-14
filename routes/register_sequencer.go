@@ -161,7 +161,7 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 			ConfirmingPeer:     viper.GetString("arweave.bundlrUrls"),
 			Source:             "redstone-sequencer",
 			BundlerTxId:        bundlrResp.Id,
-			InteractWrite:      internalWrites,
+			InteractWrite:      []string{internalWrites},
 			SortKey:            sortKey,
 			Evolve:             evolve,
 		})

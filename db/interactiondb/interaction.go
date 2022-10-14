@@ -1,6 +1,7 @@
 package interactiondb
 
 import (
+	"github.com/lib/pq"
 	"github.com/warp-contracts/sequencer/db/conn"
 )
 
@@ -20,7 +21,7 @@ type Interaction struct {
 	ConfirmingPeer     string
 	Source             string
 	BundlerTxId        string
-	InteractWrite      string
+	InteractWrite      pq.StringArray `gorm:"type:string[]"`
 	SortKey            string
 	Evolve             string
 }
