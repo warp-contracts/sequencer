@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 	ginlogrus "github.com/toorop/gin-logrus"
 	"github.com/warp-contracts/sequencer/ar"
 	"github.com/warp-contracts/sequencer/config"
@@ -19,7 +20,7 @@ func main() {
 	r.POST("sequencer/register", routes.RegisterSequencer)
 	r.POST("gateway/sequencer/register", routes.RegisterSequencer)
 
-	err := r.Run()
+	err := r.Run(":" + viper.GetString("sequencer.port"))
 	if err != nil {
 		logrus.Panic(err)
 	}

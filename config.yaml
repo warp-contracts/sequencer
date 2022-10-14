@@ -17,3 +17,6 @@ vrf:
 log:
     level: info
     format: text
+
+sequencer:
+    port: 8080
