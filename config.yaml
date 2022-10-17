@@ -4,7 +4,7 @@ postgres:
     database: postgres
     user: postgres
     password: "passwd"
-    sslmode: disable
+    sslmode: disable # disable or require
 arweave:
     walletJwk: ""
 #     url: "http://localhost:1984"
@@ -16,7 +16,8 @@ vrf:
 
 log:
     level: info
-    format: text
+    format: text # text and json formats are supported
 
 sequencer:
     port: 8080
+    mode: debug # debug or release modes are supported

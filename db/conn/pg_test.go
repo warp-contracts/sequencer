@@ -11,8 +11,7 @@ func TestDbConnection(t *testing.T) {
 	t.Parallel()
 
 	config.Init()
-	done := _testcontainers.RunPostgresContainer(t)
-	defer done()
+	_testcontainers.RunPostgresContainer(t)
 
 	t.Run("should connect to DB", func(t *testing.T) {
 		conn := GetPostgresConnection()

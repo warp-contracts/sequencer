@@ -2,6 +2,7 @@ package _testcontainers
 
 import (
 	"context"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
@@ -15,26 +16,14 @@ var pgLock = &sync.Mutex{}
 var pgWg = &countWaitGroup{}
 var ctx = context.Background()
 
-func RunPostgresContainer(t *testing.T) (done func()) {
+func RunPostgresContainer(t *testing.T) {
 	pgLock.Lock()
 	defer pgLock.Unlock()
 	pgWg.Add(1)
 
-	terminateChan := make(chan bool)
 	if !postgresRunning {
-		container := runPostgresContainer(t)
+		runPostgresContainer(t)
 		postgresRunning = true
-		go func() {
-			defer func() { terminateChan <- true }()
-			pgWg.Wait()
-			err := container.Terminate(ctx)
-			assert.NoError(t, err)
-		}()
-	}
-	return func() {
-		if pgWg.Done() {
-			<-terminateChan
-		}
 	}
 }
 
@@ -57,6 +46,9 @@ func runPostgresContainer(t *testing.T) testcontainers.Container {
 	assert.NoError(t, err)
 	port, err := postgresContainer.MappedPort(ctx, "5432")
 	assert.NoError(t, err)
+	logrus.WithField("host", host).
+		WithField("port", port).
+		Info("Postgres is running")
 	viper.Set("postgres.host", host)
 	viper.Set("postgres.port", port.Port())
 	viper.Set("postgres.password", passwd)

@@ -21,7 +21,7 @@ type Interaction struct {
 	ConfirmingPeer     string
 	Source             string
 	BundlerTxId        string
-	InteractWrite      pq.StringArray `gorm:"type:string[]"`
+	InteractWrite      pq.StringArray `gorm:"type:text[]"`
 	SortKey            string
 	Evolve             string
 }

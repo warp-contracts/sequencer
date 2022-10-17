@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -129,6 +130,7 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 	var lock sync.Mutex
 	var errs []error
 	go func() {
+		defer wg.Done()
 		err := sequencerdb.Save(&sequencerdb.Sequence{
 			OriginalSig:           transaction.Signature,
 			OriginalOwner:         originalOwner,
@@ -146,9 +148,9 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 			errs = append(errs, err)
 			lock.Unlock()
 		}
-		wg.Done()
 	}()
 	go func() {
+		defer wg.Done()
 		err := interactiondb.Save(&interactiondb.Interaction{
 			InteractionId:      transaction.ID,
 			Interaction:        string(interactionJson),
@@ -158,7 +160,7 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 			Function:           functionInput.Function,
 			Input:              inputTag,
 			ConfirmationStatus: "confirmed",
-			ConfirmingPeer:     viper.GetString("arweave.bundlrUrls"),
+			ConfirmingPeer:     strings.Join(viper.GetStringSlice("arweave.bundlrUrls"), ","),
 			Source:             "redstone-sequencer",
 			BundlerTxId:        bundlrResp.Id,
 			InteractWrite:      []string{internalWrites},
@@ -170,7 +172,6 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 			errs = append(errs, err)
 			lock.Unlock()
 		}
-		wg.Done()
 	}()
 	wg.Wait()
 	return errs

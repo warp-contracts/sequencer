@@ -21,10 +21,9 @@ import (
 )
 
 func TestRegisterSequence(t *testing.T) {
-	done := _testcontainers.RunPostgresContainer(t)
-	defer done()
-	initTest(t)
 	t.Parallel()
+	_testcontainers.RunPostgresContainer(t)
+	initTest(t)
 
 	c, writer := GetTestGinContext()
 	c.Request.Method = http.MethodPost
@@ -36,14 +35,14 @@ func TestRegisterSequence(t *testing.T) {
 
 	RegisterSequencer(c)
 
+	var bundlrResp types.BundlrResp
+	assert.NoError(t, json.Unmarshal(writer.Body.Bytes(), &bundlrResp))
 	t.Run("response", func(t *testing.T) {
 		t.Parallel()
 		t.Run("should have success status code", func(t *testing.T) {
 			t.Parallel()
 			assert.Equal(t, 200, writer.Code)
 		})
-		var bundlrResp types.BundlrResp
-		assert.NoError(t, json.Unmarshal(writer.Body.Bytes(), &bundlrResp))
 
 		t.Run("id should not be empty", func(t *testing.T) {
 			t.Parallel()
@@ -59,6 +58,27 @@ func TestRegisterSequence(t *testing.T) {
 			var bundlerTransaction *types.Transaction
 			assert.NoError(t, json.Unmarshal(all, &bundlerTransaction))
 			assert.Equal(t, transaction, bundlerTransaction)
+		})
+	})
+
+	t.Run("should save data in the database", func(t *testing.T) {
+		t.Parallel()
+		db := conn.GetConnection()
+		t.Run("interactions", func(t *testing.T) {
+			t.Parallel()
+			var interaction interactiondb.Interaction
+			db.
+				Table("interactions").
+				//Where("interaction_id = ?", transaction.ID).
+				First(&interaction)
+			assert.NoError(t, db.Error)
+
+			t.Run("should save interaction data", func(t *testing.T) {
+				assert.NotEqual(t, interaction, interactiondb.Interaction{})
+			})
+			t.Run("should contain correct field values", func(t *testing.T) {
+				assert.Equal(t, interaction.ConfirmingPeer, "https://node.bundlr.network,https://node2.bundlr.network")
+			})
 		})
 	})
 }

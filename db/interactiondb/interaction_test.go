@@ -10,8 +10,7 @@ import (
 
 func TestInteraction(t *testing.T) {
 	config.Init()
-	done := _testcontainers.RunPostgresContainer(t)
-	defer done()
+	_testcontainers.RunPostgresContainer(t)
 
 	t.Parallel()
 
