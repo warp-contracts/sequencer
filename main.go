@@ -21,8 +21,10 @@ func main() {
 	r := gin.New()
 	r.Use(ginlogrus.Logger(logrus.StandardLogger()), gin.Recovery())
 
-	r.POST("sequencer/register", routes.RegisterSequencer)
+	//r.POST("sequencer/register", routes.RegisterSequencer)
 	r.POST("gateway/sequencer/register", routes.RegisterSequencer)
+	r.GET("gateway/arweave/info", routes.ArweaveInfoRoute)
+	r.GET("gateway/arweave/block", routes.ArweaveBlockRoute)
 
 	err := r.Run(":" + viper.GetString("sequencer.port"))
 	if err != nil {

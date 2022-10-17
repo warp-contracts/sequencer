@@ -124,7 +124,7 @@ func RegisterSequencer(c *gin.Context) {
 	c.JSON(200, bundlrResp)
 }
 
-func saveResultsInDb(transaction *types.Transaction, originalOwner string, originalAddress string, currentBlockId string, currentHeight int64, millis int64, sortKey string, bundlrResp *types.BundlrResp, bundlerRespJson []byte, interactionJson []byte, contractTag string, functionInput *FunctionInput, inputTag string, internalWrites string, evolve string) []error {
+func saveResultsInDb(transaction *types.Transaction, originalOwner string, originalAddress string, currentBlockId string, currentHeight int64, millis int64, sortKey string, bundlrResp *types.BundlrResp, bundlerRespJson []byte, interactionJson []byte, contractTag string, functionInput *FunctionInput, inputTag string, internalWrites []string, evolve string) []error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	var lock sync.Mutex
@@ -163,7 +163,7 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 			ConfirmingPeer:     strings.Join(viper.GetStringSlice("arweave.bundlrUrls"), ","),
 			Source:             "redstone-sequencer",
 			BundlerTxId:        bundlrResp.Id,
-			InteractWrite:      []string{internalWrites},
+			InteractWrite:      internalWrites,
 			SortKey:            sortKey,
 			Evolve:             evolve,
 		})

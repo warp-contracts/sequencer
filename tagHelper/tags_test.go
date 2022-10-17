@@ -123,7 +123,7 @@ func TestPrepareTags(t *testing.T) {
 			t.Parallel()
 			assert.Equal(t, contractTag, "contract tag value")
 			assert.Equal(t, inputTag, "input tag value")
-			assert.Equal(t, internalWrites, "internalWrites tag value")
+			assert.Equal(t, internalWrites, []string{"internalWrites tag value"})
 			assert.Equal(t, vrfData, VrfData{
 				Index:  findTag("vrf-index", tags).Value,
 				Proof:  findTag("vrf-proof", tags).Value,
