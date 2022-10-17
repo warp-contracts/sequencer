@@ -19,14 +19,15 @@ func PrepareTags(
 	currentHeight int64,
 	currentBlockId string,
 ) (
-	contractTag, inputTag, internalWrites string,
+	contractTag, inputTag string,
+	internalWrites []string,
 	decodedTags, tags []types.Tag,
 	vrfData VrfData,
 	err error,
 ) {
 	decodedTags, err = utils.TagsDecode(transaction.Tags)
 	if err != nil {
-		return "", "", "", nil, nil, VrfData{}, err
+		return "", "", []string{}, nil, nil, VrfData{}, err
 	}
 	tags = []types.Tag{
 		{
@@ -66,7 +67,7 @@ func PrepareTags(
 		case smartweave.TagInput:
 			inputTag = tag.Value
 		case smartweave.TagInteractWrite:
-			internalWrites = tag.Value
+			internalWrites = append(internalWrites, tag.Value)
 		}
 	}
 
