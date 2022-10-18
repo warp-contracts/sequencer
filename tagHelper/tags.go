@@ -60,6 +60,7 @@ func PrepareTags(
 		},
 	}
 
+	var requestVrfTag = false
 	for _, tag := range decodedTags {
 		switch tag.Name {
 		case smartweave.TagContractTxId:
@@ -68,12 +69,17 @@ func PrepareTags(
 			inputTag = tag.Value
 		case smartweave.TagInteractWrite:
 			internalWrites = append(internalWrites, tag.Value)
+		case smartweave.TagRequestVrf:
+			requestVrfTag = true
 		}
 	}
 
 	tags = append(tags, decodedTags...)
-	vrfTags, vrfData := getVrfTags(sortKey)
-	tags = append(tags, vrfTags...)
+	if requestVrfTag {
+		var vrfTags []types.Tag
+		vrfTags, vrfData = getVrfTags(sortKey)
+		tags = append(tags, vrfTags...)
+	}
 	return
 }
 

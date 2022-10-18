@@ -17,6 +17,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 )
 
@@ -77,6 +78,22 @@ func TestRegisterSequence(t *testing.T) {
 				assert.NotEqual(t, interaction, interactiondb.Interaction{})
 			})
 			t.Run("should contain correct field values", func(t *testing.T) {
+				assert.Equal(t, transaction.ID, interaction.InteractionId)
+
+				// potentially could be flaky
+				cachedNetworkData := ar.GetCachedInfo()
+				assert.Equal(t, cachedNetworkData.NetworkInfo.Height, interaction.BlockHeight)
+				assert.Equal(t, cachedNetworkData.NetworkInfo.Current, interaction.BlockId)
+
+				assert.Equal(t, "Ws9hhYckc-zSnVmbBep6q_kZD5zmzYzDmgMC50nMiuE", interaction.ContractId)
+				assert.Equal(t, "whatever", interaction.Function)
+				assert.Equal(t, "confirmed", interaction.ConfirmationStatus)
+				assert.Equal(t, "redstone-sequencer", interaction.Source)
+
+				assert.NotEmpty(t, interaction.SortKey)
+				assert.Equal(t, 3, len(strings.Split(interaction.SortKey, ",")))
+
+				assert.Equal(t, bundlrResp.Id, interaction.BundlerTxId)
 				assert.True(t, interaction.ConfirmingPeer == "https://node.bundlr.network" ||
 					interaction.ConfirmingPeer == "https://node2.bundlr.network")
 			})

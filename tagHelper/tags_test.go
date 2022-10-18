@@ -12,6 +12,7 @@ import (
 	"github.com/warp-contracts/sequencer/crypt"
 	"github.com/warp-contracts/sequencer/crypt/p256/secp256k1/vrf/secp256k1VRF"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -52,6 +53,10 @@ func TestPrepareTags(t *testing.T) {
 			{
 				Name:  smartweave.TagInteractWrite,
 				Value: "internalWrites tag value",
+			},
+			{
+				Name:  smartweave.TagRequestVrf,
+				Value: "true",
 			},
 		}
 		transaction := &types.Transaction{
@@ -131,7 +136,17 @@ func TestPrepareTags(t *testing.T) {
 				Pubkey: findTag("vrf-pubkey", tags).Value,
 			})
 		})
+	})
+	t.Run("should not return vrf tags when Request Vrf tag not exists", func(t *testing.T) {
+		transaction := &types.Transaction{
+			Tags: utils.TagsEncode([]types.Tag{}),
+		}
+		_, _, _, _, tags, _, err := PrepareTags(transaction, "", 1, "", 1, "")
+		assert.NoError(t, err)
 
+		for _, tag := range tags {
+			assert.False(t, strings.HasPrefix(tag.Name, "vrf-"), "tag %s is unexpected", tag)
+		}
 	})
 }
 

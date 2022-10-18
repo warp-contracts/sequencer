@@ -11,6 +11,7 @@ import (
 	"github.com/warp-contracts/sequencer/config"
 	"github.com/warp-contracts/sequencer/db/interactiondb"
 	"github.com/warp-contracts/sequencer/db/sequencerdb"
+	"github.com/warp-contracts/sequencer/measure"
 	"github.com/warp-contracts/sequencer/sortkey"
 	"github.com/warp-contracts/sequencer/tagHelper"
 	"net/http"
@@ -30,6 +31,9 @@ func RegisterSequencer(c *gin.Context) {
 	}
 
 	cachedNetworkData := ar.GetCachedInfo()
+
+	start := time.Now()
+
 	jwk := config.GetArConnectAsJwkKey()
 	if checkError(c, err, http.StatusInternalServerError) {
 		return
@@ -65,13 +69,16 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 
+	startBundlrUpload := time.Now()
 	bundlrResp, confirmPeer, err := ar.GetBundlr().UploadToBundlr(
 		transaction,
 		tags...,
 	)
+	measure.LogDurationFrom(logrus.DebugLevel, startBundlrUpload, "Uploading to bundlr")
 	if checkError(c, err, http.StatusInternalServerError) {
 		return
 	}
+	logrus.Debugf("Bundlr response id %s", bundlrResp.Id)
 
 	functionInput, err := parseFunctionInput(inputTag)
 	if err != nil || functionInput.Function == "" {
@@ -123,6 +130,7 @@ func RegisterSequencer(c *gin.Context) {
 	}
 
 	c.JSON(200, bundlrResp)
+	measure.LogDurationFrom(logrus.InfoLevel, start, "Total sequencer processing")
 }
 
 func saveResultsInDb(transaction *types.Transaction, originalOwner string, originalAddress string, currentBlockId string, currentHeight int64, millis int64, sortKey string, bundlrResp *types.BundlrResp, bundlerRespJson []byte, interactionJson []byte, contractTag string, functionInput *FunctionInput, inputTag string, internalWrites []string, evolve string, confirmPeer string) []error {
@@ -130,6 +138,7 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 	wg.Add(2)
 	var lock sync.Mutex
 	var errs []error
+	start := time.Now()
 	go func() {
 		defer wg.Done()
 		err := sequencerdb.Save(&sequencerdb.Sequence{
@@ -175,6 +184,7 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 		}
 	}()
 	wg.Wait()
+	measure.LogDurationFrom(logrus.InfoLevel, start, "Inserting into tables")
 	return errs
 }
 
