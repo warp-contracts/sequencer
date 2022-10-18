@@ -106,14 +106,6 @@ func TestCreateSortKey(t *testing.T) {
 	})
 }
 
-//func TestQwe(t *testing.T) {
-//wallet, _ := goar.NewWalletFromPath("../_tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json", "")
-//d := wallet.Signer.PrvKey.D.Bytes()
-//pem, err := jwk.EncodePEM(d)
-//assert.NoError(t, err)
-//print(base64.URLEncoding.EncodeToString(pem))
-//}
-
 func generateMissedZeroes(requiredLen int, blockHeight string) string {
 	zeroes := make([]int, requiredLen-len(blockHeight))
 	return strings.Trim(strings.Join(strings.Fields(fmt.Sprint(zeroes)), ""), "[]")
@@ -129,8 +121,14 @@ func newParams() (jwk.Key, []byte, int64, []byte, int64) {
 	return getJwkKey(), nil, now, nil, blockHeightCount
 }
 
-func getJwkKey() jwk.Key {
-	keyBytes, err := os.ReadFile("../_tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json")
+func getJwkKey(filename ...string) jwk.Key {
+	var f string
+	if len(filename) < 1 {
+		f = "../_tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json"
+	} else {
+		f = filename[0]
+	}
+	keyBytes, err := os.ReadFile(f)
 	if err != nil {
 		return nil
 	}
@@ -142,13 +140,5 @@ func getJwkKey() jwk.Key {
 }
 
 func getJwkKey2() jwk.Key {
-	keyBytes, err := os.ReadFile("../_tests/arweavekeys/axJNcs4-2yv5-yihgmwuDyuRql_06mhLa0PtrwP3PQo.json")
-	if err != nil {
-		return nil
-	}
-	key, err := jwk.ParseKey(keyBytes)
-	if err != nil {
-		panic(err)
-	}
-	return key
+	return getJwkKey("../_tests/arweavekeys/axJNcs4-2yv5-yihgmwuDyuRql_06mhLa0PtrwP3PQo.json")
 }

@@ -56,7 +56,7 @@ func TestPrepareTags(t *testing.T) {
 		}
 		transaction := &types.Transaction{
 			ID:   "tx id",
-			Tags: encodeTags(sourceTags),
+			Tags: utils.TagsEncode(sourceTags),
 		}
 		var currentHeight int64 = 123123
 		currentBlockId := "qweasd"
@@ -133,16 +133,6 @@ func TestPrepareTags(t *testing.T) {
 		})
 
 	})
-}
-
-func encodeTags(tags []types.Tag) (encodedTags []types.Tag) {
-	for _, tag := range tags {
-		encodedTags = append(encodedTags, types.Tag{
-			Name:  utils.Base64Encode([]byte(tag.Name)),
-			Value: utils.Base64Encode([]byte(tag.Value)),
-		})
-	}
-	return
 }
 
 func assertTag(t *testing.T, tags []types.Tag, tagName string, expected string) {

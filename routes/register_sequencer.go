@@ -7,7 +7,6 @@ import (
 	"github.com/everFinance/goar/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"github.com/warp-contracts/sequencer/ar"
 	"github.com/warp-contracts/sequencer/config"
 	"github.com/warp-contracts/sequencer/db/interactiondb"
@@ -17,7 +16,6 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 )
@@ -53,7 +51,7 @@ func RegisterSequencer(c *gin.Context) {
 	if checkError(c, err, http.StatusInternalServerError) {
 		return
 	}
-	//print(sortKey, originalAddress)
+
 	contractTag, inputTag, internalWrites, decodedTags, tags, vrfData, err := tagHelper.PrepareTags(
 		transaction,
 		originalAddress,
@@ -67,7 +65,7 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 
-	bundlrResp, err := ar.GetBundlr().UploadToBundlr(
+	bundlrResp, confirmPeer, err := ar.GetBundlr().UploadToBundlr(
 		transaction,
 		tags...,
 	)
@@ -109,12 +107,15 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 
-	errs := saveResultsInDb(transaction, originalOwner, originalAddress, currentBlockId, currentHeight, millis, sortKey, bundlrResp, bundlerRespJson, interactionJson, contractTag, functionInput, inputTag, internalWrites, evolve)
+	errs := saveResultsInDb(transaction, originalOwner, originalAddress, currentBlockId, currentHeight, millis, sortKey, bundlrResp, bundlerRespJson, interactionJson, contractTag, functionInput, inputTag, internalWrites, evolve, confirmPeer)
 
 	if len(errs) > 0 {
 		var msg string
 		for _, e := range errs {
 			logrus.Error(e)
+			logrus.Error(transaction)
+			logrus.Error(tags)
+			logrus.Error(bundlrResp)
 			msg += e.Error() + "\n"
 		}
 		checkError(c, errors.New(msg), http.StatusInternalServerError)
@@ -124,7 +125,7 @@ func RegisterSequencer(c *gin.Context) {
 	c.JSON(200, bundlrResp)
 }
 
-func saveResultsInDb(transaction *types.Transaction, originalOwner string, originalAddress string, currentBlockId string, currentHeight int64, millis int64, sortKey string, bundlrResp *types.BundlrResp, bundlerRespJson []byte, interactionJson []byte, contractTag string, functionInput *FunctionInput, inputTag string, internalWrites []string, evolve string) []error {
+func saveResultsInDb(transaction *types.Transaction, originalOwner string, originalAddress string, currentBlockId string, currentHeight int64, millis int64, sortKey string, bundlrResp *types.BundlrResp, bundlerRespJson []byte, interactionJson []byte, contractTag string, functionInput *FunctionInput, inputTag string, internalWrites []string, evolve string, confirmPeer string) []error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	var lock sync.Mutex
@@ -160,7 +161,7 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 			Function:           functionInput.Function,
 			Input:              inputTag,
 			ConfirmationStatus: "confirmed",
-			ConfirmingPeer:     strings.Join(viper.GetStringSlice("arweave.bundlrUrls"), ","),
+			ConfirmingPeer:     confirmPeer,
 			Source:             "redstone-sequencer",
 			BundlerTxId:        bundlrResp.Id,
 			InteractWrite:      internalWrites,

@@ -29,9 +29,26 @@ func TestBundlr(t *testing.T) {
 
 		assert.NoError(t, err)
 		transaction := &types.Transaction{}
-		resp, err := bundl.UploadToBundlr(transaction)
+		resp, confirmNode, err := bundl.UploadToBundlr(transaction)
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
+		assert.NotEmpty(t, resp.Id)
+		assert.NotEmpty(t, resp.Signature)
+		assert.NotEmpty(t, resp.Block)
+		assert.NotEmpty(t, resp.Public)
+		assert.True(t, "https://node.bundlr.network" == confirmNode ||
+			"https://node2.bundlr.network" == confirmNode)
+	})
+
+	t.Run("should return information about correct confirm peer", func(t *testing.T) {
+		viper.Set("arweave.bundlrUrls", []string{
+			"some-unexisting-node",
+			"https://node2.bundlr.network",
+			"https:/google.com",
+		})
+		_, confirmNode, err := bundl.UploadToBundlr(&types.Transaction{})
+		assert.NoError(t, err)
+		assert.True(t, "https://node2.bundlr.network" == confirmNode)
 	})
 
 }

@@ -6,8 +6,5 @@ import (
 )
 
 func GetArweaveClient() *goar.Client {
-	url := viper.GetString("arweave.url")
-	conn := goar.NewTempConn()
-	conn.SetTempConnUrl(url)
-	return conn
+	return goar.NewClient(viper.GetString("arweave.url"))
 }

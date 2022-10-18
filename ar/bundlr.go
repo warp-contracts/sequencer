@@ -21,27 +21,27 @@ func GetBundlr() Bundlr {
 }
 
 type Bundlr interface {
-	UploadToBundlr(transaction *types.Transaction, tags ...types.Tag) (*types.BundlrResp, error)
+	UploadToBundlr(transaction *types.Transaction, tags ...types.Tag) (bundlrResp *types.BundlrResp, confirmNode string, err error)
 }
 
 type bundlr struct {
 	bundlerUrls []string
 }
 
-func (b *bundlr) UploadToBundlr(transaction *types.Transaction, tags ...types.Tag) (*types.BundlrResp, error) {
-	var err error
+func (b *bundlr) UploadToBundlr(transaction *types.Transaction, tags ...types.Tag) (bundlrResp *types.BundlrResp, confirmNode string, err error) {
 	key := viper.GetString("arweave.walletJwk")
 	if key == "" {
-		return nil, errors.New("key cannot be empty")
+		err = errors.New("key cannot be empty")
+		return
 	}
 	signer, err := goar.NewSigner([]byte(key))
 	if err != nil {
-		return nil, err
+		return
 	}
 	itemSigner, err := goar.NewItemSigner(signer)
 	encodedTransaction, err := json.Marshal(transaction)
 	if err != nil {
-		return nil, err
+		return
 	}
 	item, err := itemSigner.CreateAndSignItem(
 		encodedTransaction,
@@ -49,14 +49,13 @@ func (b *bundlr) UploadToBundlr(transaction *types.Transaction, tags ...types.Ta
 		tags,
 	)
 
-	for _, url := range b.bundlerUrls {
-		var resp *types.BundlrResp
-		resp, err = utils.SubmitItemToBundlr(item, url)
+	for _, confirmNode = range b.bundlerUrls {
+		bundlrResp, err = utils.SubmitItemToBundlr(item, confirmNode)
 		if err == nil {
-			return resp, nil
+			return
 		} else {
 			logrus.Warn(err)
 		}
 	}
-	return nil, err
+	return
 }

@@ -71,8 +71,8 @@ func PrepareTags(
 		}
 	}
 
-	vrfTags, vrfData := getVrfTags(sortKey)
 	tags = append(tags, decodedTags...)
+	vrfTags, vrfData := getVrfTags(sortKey)
 	tags = append(tags, vrfTags...)
 	return
 }

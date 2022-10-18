@@ -77,7 +77,8 @@ func TestRegisterSequence(t *testing.T) {
 				assert.NotEqual(t, interaction, interactiondb.Interaction{})
 			})
 			t.Run("should contain correct field values", func(t *testing.T) {
-				assert.Equal(t, interaction.ConfirmingPeer, "https://node.bundlr.network,https://node2.bundlr.network")
+				assert.True(t, interaction.ConfirmingPeer == "https://node.bundlr.network" ||
+					interaction.ConfirmingPeer == "https://node2.bundlr.network")
 			})
 		})
 	})

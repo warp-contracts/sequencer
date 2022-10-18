@@ -3,7 +3,6 @@ package ar
 import (
 	"github.com/go-co-op/gocron"
 	"github.com/sirupsen/logrus"
-	"github.com/warp-contracts/sequencer/config"
 	"time"
 )
 
@@ -11,7 +10,6 @@ var cacheTaskStarted = false
 var blockInfo *BlockInfo
 
 func StartCacheRead() {
-	config.Init()
 	if cacheTaskStarted {
 		return
 	}
