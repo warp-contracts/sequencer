@@ -7,7 +7,9 @@ tasks:
   run-docker-postgres:
     desc: Run postgres docker-compose
     cmds:
-      - docker-compose -f _tests/docker-compose/postgres/docker-compose.yml up -d
+      - docker-compose -f _tests/docker-compose/postgres/docker-compose.yml up -d --remove-orphans
+    status:
+      - test "$(docker ps | grep 'postgres_db_1')"
   stop-docker-postgres:
     desc: Stop postgres docker-compose
     cmds:
@@ -21,7 +23,13 @@ tasks:
       - test "$(docker images | grep {{.TAG_NAME}})"
       - test -z "{{.REBUILD_DOCKER}}"
 
+  docker-stop-sequencer:
+    cmds:
+      - docker rm -f sequencer
   docker-run-sequencer:
     desc: Run docker
+    deps:
+      - run-docker-postgres
+      - docker-build
     cmds:
-      - docker run -e ARWEAVE_WALLETJWK=$(cat _tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json) {{.TAG_NAME}}
+      - docker run --name sequencer -e ARWEAVE_WALLETJWK=$(cat _tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json) -e POSTGRES_HOST=$(docker inspect postgres_db_1 | jq -r '.[].NetworkSettings.Networks.postgres_default.IPAddress') -e POSTGRES_SSLMODE=disable -e LOG_LEVEL=debug -p 8080:8080 -d --network=postgres_default  {{.TAG_NAME}}

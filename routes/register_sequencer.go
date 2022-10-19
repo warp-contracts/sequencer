@@ -114,7 +114,36 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 
-	errs := saveResultsInDb(transaction, originalOwner, originalAddress, currentBlockId, currentHeight, millis, sortKey, bundlrResp, bundlerRespJson, interactionJson, contractTag, functionInput, inputTag, internalWrites, evolve, confirmPeer)
+	sequence := &sequencerdb.Sequence{
+		OriginalSig:           transaction.Signature,
+		OriginalOwner:         originalOwner,
+		OriginalAddress:       originalAddress,
+		SequenceBlockId:       currentBlockId,
+		SequenceBlockHeight:   currentHeight,
+		SequenceTransactionId: transaction.ID,
+		SequenceMillis:        strconv.FormatInt(millis, 10),
+		SequenceSortKey:       sortKey,
+		BundlerTxId:           bundlrResp.Id,
+		BundlerResponse:       string(bundlerRespJson),
+	}
+	interact := &interactiondb.Interaction{
+		InteractionId:      transaction.ID,
+		Interaction:        string(interactionJson),
+		BlockHeight:        currentHeight,
+		BlockId:            currentBlockId,
+		ContractId:         contractTag,
+		Function:           functionInput.Function,
+		Input:              inputTag,
+		ConfirmationStatus: "confirmed",
+		ConfirmingPeer:     confirmPeer,
+		Source:             "redstone-sequencer",
+		BundlerTxId:        bundlrResp.Id,
+		InteractWrite:      internalWrites,
+		SortKey:            sortKey,
+		Evolve:             evolve,
+	}
+
+	errs := saveResultsInDb(sequence, interact)
 
 	if len(errs) > 0 {
 		var msg string
@@ -133,7 +162,7 @@ func RegisterSequencer(c *gin.Context) {
 	measure.LogDurationFrom(logrus.InfoLevel, start, "Total sequencer processing")
 }
 
-func saveResultsInDb(transaction *types.Transaction, originalOwner string, originalAddress string, currentBlockId string, currentHeight int64, millis int64, sortKey string, bundlrResp *types.BundlrResp, bundlerRespJson []byte, interactionJson []byte, contractTag string, functionInput *FunctionInput, inputTag string, internalWrites []string, evolve string, confirmPeer string) []error {
+func saveResultsInDb(sequence *sequencerdb.Sequence, interaction *interactiondb.Interaction) []error {
 	var wg sync.WaitGroup
 	wg.Add(2)
 	var lock sync.Mutex
@@ -141,18 +170,7 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 	start := time.Now()
 	go func() {
 		defer wg.Done()
-		err := sequencerdb.Save(&sequencerdb.Sequence{
-			OriginalSig:           transaction.Signature,
-			OriginalOwner:         originalOwner,
-			OriginalAddress:       originalAddress,
-			SequenceBlockId:       currentBlockId,
-			SequenceBlockHeight:   currentHeight,
-			SequenceTransactionId: transaction.ID,
-			SequenceMillis:        strconv.FormatInt(millis, 10),
-			SequenceSortKey:       sortKey,
-			BundlerTxId:           bundlrResp.Id,
-			BundlerResponse:       string(bundlerRespJson),
-		})
+		err := sequencerdb.Save(sequence)
 		if err != nil {
 			lock.Lock()
 			errs = append(errs, err)
@@ -161,22 +179,7 @@ func saveResultsInDb(transaction *types.Transaction, originalOwner string, origi
 	}()
 	go func() {
 		defer wg.Done()
-		err := interactiondb.Save(&interactiondb.Interaction{
-			InteractionId:      transaction.ID,
-			Interaction:        string(interactionJson),
-			BlockHeight:        currentHeight,
-			BlockId:            currentBlockId,
-			ContractId:         contractTag,
-			Function:           functionInput.Function,
-			Input:              inputTag,
-			ConfirmationStatus: "confirmed",
-			ConfirmingPeer:     confirmPeer,
-			Source:             "redstone-sequencer",
-			BundlerTxId:        bundlrResp.Id,
-			InteractWrite:      internalWrites,
-			SortKey:            sortKey,
-			Evolve:             evolve,
-		})
+		err := interactiondb.Save(interaction)
 		if err != nil {
 			lock.Lock()
 			errs = append(errs, err)

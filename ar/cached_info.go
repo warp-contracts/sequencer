@@ -21,7 +21,7 @@ func StartCacheRead() {
 		arweaveClient := GetArweaveClient()
 		info, err := arweaveClient.GetInfo()
 		if err != nil {
-			logrus.Error("Error with reading Arweave network info", err)
+			logrus.Errorf("Error with reading Arweave network info, %v", err)
 		} else {
 			logrus.Debug(info)
 			block, err := arweaveClient.GetBlockByID(info.Current)
