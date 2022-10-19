@@ -69,7 +69,8 @@ func initLogs() {
 		logrus.SetFormatter(&logrus.JSONFormatter{})
 	case "text":
 		logrus.SetFormatter(&logrus.TextFormatter{
-			ForceColors: true,
+			ForceColors:   true,
+			FullTimestamp: true,
 		})
 	default:
 		logrus.Panic("Unsupported log format")
