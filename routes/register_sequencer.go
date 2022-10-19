@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/everFinance/goar/types"
-	"github.com/everFinance/goar/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"github.com/warp-contracts/sequencer/ar"
@@ -42,7 +41,6 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 	originalOwner := transaction.Owner
-	originalAddress, err := utils.OwnerToAddress(originalOwner)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
 		return
@@ -56,9 +54,9 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 
-	contractTag, inputTag, internalWrites, decodedTags, tags, vrfData, err := tagHelper.PrepareTags(
+	contractTag, inputTag, originalAddress, internalWrites, decodedTags, tags, vrfData, err := tagHelper.PrepareTags(
 		transaction,
-		originalAddress,
+		originalOwner,
 		millis,
 		sortKey,
 		currentHeight,

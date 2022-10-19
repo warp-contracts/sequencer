@@ -13,13 +13,13 @@ import (
 
 func PrepareTags(
 	transaction *types.Transaction,
-	originalAddress string,
+	originalOwner string,
 	millis int64,
 	sortKey string,
 	currentHeight int64,
 	currentBlockId string,
 ) (
-	contractTag, inputTag string,
+	contractTag, inputTag, originalAddress string,
 	internalWrites []string,
 	decodedTags, tags []types.Tag,
 	vrfData VrfData,
@@ -27,7 +27,7 @@ func PrepareTags(
 ) {
 	decodedTags, err = utils.TagsDecode(transaction.Tags)
 	if err != nil {
-		return "", "", []string{}, nil, nil, VrfData{}, err
+		return
 	}
 	tags = []types.Tag{
 		{
@@ -36,7 +36,7 @@ func PrepareTags(
 		},
 		{
 			Name:  "Sequencer-Owner",
-			Value: originalAddress,
+			Value: originalOwner,
 		},
 		{
 			Name:  "Sequencer-Mills",
@@ -71,6 +71,16 @@ func PrepareTags(
 			internalWrites = append(internalWrites, tag.Value)
 		case smartweave.TagRequestVrf:
 			requestVrfTag = true
+		case "Signature-Type":
+			if tag.Value == "ethereum" {
+				originalAddress = originalOwner
+			}
+		}
+	}
+	if originalAddress == "" {
+		originalAddress, err = utils.OwnerToAddress(originalOwner)
+		if err != nil {
+			return
 		}
 	}
 

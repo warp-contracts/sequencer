@@ -3,6 +3,7 @@ package tagHelper
 import (
 	"crypto/ecdsa"
 	"encoding/base64"
+	"github.com/everFinance/goar"
 	"github.com/everFinance/goar/types"
 	"github.com/everFinance/goar/utils"
 	"github.com/spf13/viper"
@@ -30,7 +31,7 @@ func TestPrepareTags(t *testing.T) {
 	t.Run("should create tags", func(t *testing.T) {
 		t.Parallel()
 
-		originalAddress := "addr"
+		originalOwner := "addr"
 		var millis int64 = 123
 		sortKey := "000001026265,1664446281798,dd9a9dc0d898a93bb00e278d4c7fa8840fa3a04363c7ae4089b2c3d1ac56ecad"
 		sourceTags := []types.Tag{
@@ -65,9 +66,9 @@ func TestPrepareTags(t *testing.T) {
 		}
 		var currentHeight int64 = 123123
 		currentBlockId := "qweasd"
-		contractTag, inputTag, internalWrites, decodedTags, tags, vrfData, err := PrepareTags(
+		contractTag, inputTag, originalAddress, internalWrites, decodedTags, tags, vrfData, err := PrepareTags(
 			transaction,
-			originalAddress,
+			originalOwner,
 			millis,
 			sortKey,
 			currentHeight,
@@ -87,7 +88,7 @@ func TestPrepareTags(t *testing.T) {
 				t.Parallel()
 
 				assertTag(t, tags, "Sequencer", "RedStone")
-				assertTag(t, tags, "Sequencer-Owner", originalAddress)
+				assertTag(t, tags, "Sequencer-Owner", originalOwner)
 				assertTag(t, tags, "Sequencer-Mills", "123")
 				assertTag(t, tags, "Sequencer-Sort-Key", sortKey)
 				assertTag(t, tags, "Sequencer-Tx-Id", transaction.ID)
@@ -113,7 +114,7 @@ func TestPrepareTags(t *testing.T) {
 				hash, err := verifier.ProofToHash([]byte(sortKey), decodedProof)
 				assert.NoError(t, err)
 				assert.NotNil(t, hash)
-
+				assert.Equal(t, "tzKvhpZV4CkcXosFdbLzBKG8rQvJxMSQkZer74fuRhc", originalAddress)
 			})
 
 			t.Run("should have transaction's tags", func(t *testing.T) {
@@ -141,12 +142,45 @@ func TestPrepareTags(t *testing.T) {
 		transaction := &types.Transaction{
 			Tags: utils.TagsEncode([]types.Tag{}),
 		}
-		_, _, _, _, tags, _, err := PrepareTags(transaction, "", 1, "", 1, "")
+		_, _, _, _, _, tags, _, err := PrepareTags(transaction, "", 1, "", 1, "")
 		assert.NoError(t, err)
 
 		for _, tag := range tags {
 			assert.False(t, strings.HasPrefix(tag.Name, "vrf-"), "tag %s is unexpected", tag)
 		}
+	})
+	t.Run("Signature-Type", func(t *testing.T) {
+		t.Run("should return same address when Signature-Type equals ethereum", func(t *testing.T) {
+			transaction := &types.Transaction{
+				Tags: utils.TagsEncode([]types.Tag{
+					{
+						Name:  "Signature-Type",
+						Value: "ethereum",
+					},
+				}),
+			}
+			_, _, originalAddress, _, _, _, _, err := PrepareTags(transaction, "owner", 1, "", 1, "")
+			assert.NoError(t, err)
+			assert.Equal(t, "owner", originalAddress)
+		})
+		t.Run("should convert owner to address when Signature-Type is not equals to ethereum", func(t *testing.T) {
+			transaction := &types.Transaction{
+				Tags: utils.TagsEncode([]types.Tag{
+					{
+						Name:  "Signature-Type",
+						Value: "some-type",
+					},
+				}),
+			}
+			wallet, err := goar.NewWalletFromPath("../_tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json", viper.GetString("arweave.url"))
+			assert.NoError(t, err)
+
+			_, _, originalAddress, _, _, _, _, err := PrepareTags(transaction, wallet.Owner(), 1, "", 1, "")
+			assert.NoError(t, err)
+			ownerToAddress, err := utils.OwnerToAddress(wallet.Owner())
+			assert.NoError(t, err)
+			assert.Equal(t, ownerToAddress, originalAddress)
+		})
 	})
 }
 
