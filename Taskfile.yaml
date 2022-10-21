@@ -1,7 +1,12 @@
 version: 3
 
 env:
-  TAG_NAME: sequencer
+  ENV:
+    sh: echo ${ENV:-dev}
+  REPOSITORY_NAME: public.ecr.aws/g4b4d3a5/warp-sequencer
+#    sh: aws ssm get-parameter --name "/${ENV:-dev}/redstone/warp-contract/warp-sequencer/docker-repository" --query "Parameter.Value" --output text
+  TAG_NAME: dev
+  TERRAFORM_PATH: .terraform/env/
 
 tasks:
   run-docker-postgres:
@@ -18,10 +23,19 @@ tasks:
     desc: Build docker image. Use REBUILD_DOCKER=true task docker-build to force rebuild.
     run: once
     cmds:
-      - docker build . -t {{.TAG_NAME}}
+      - docker build . -t {{.REPOSITORY_NAME}}:{{.TAG_NAME}}
     status:
-      - test "$(docker images | grep {{.TAG_NAME}})"
+      - test "$(docker images {{.REPOSITORY_NAME}}:{{.TAG_NAME}} --format 1)"
       - test -z "{{.REBUILD_DOCKER}}"
+  docker-login:
+    cmds:
+      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin {{.REPOSITORY_NAME}}
+  docker-push:
+    deps:
+      - docker-build
+      - docker-login
+    cmds:
+      - docker push {{.REPOSITORY_NAME}}:{{.TAG_NAME}}
 
   docker-stop-sequencer:
     cmds:
@@ -32,4 +46,4 @@ tasks:
       - run-docker-postgres
       - docker-build
     cmds:
-      - docker run --name sequencer -e ARWEAVE_WALLETJWK=$(cat _tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json) -e POSTGRES_HOST=$(docker inspect postgres_db_1 | jq -r '.[].NetworkSettings.Networks.postgres_default.IPAddress') -e POSTGRES_SSLMODE=disable -e LOG_LEVEL=debug -p 8080:8080 -d --network=postgres_default  {{.TAG_NAME}}
+      - docker run --name sequencer -e ARWEAVE_WALLETJWK=$(cat _tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json) -e POSTGRES_HOST=$(docker inspect postgres_db_1 | jq -r '.[].NetworkSettings.Networks.postgres_default.IPAddress') -e POSTGRES_SSLMODE=disable -e LOG_LEVEL=debug -p 8080:8080 -d --network=postgres_default {{.REPOSITORY_NAME}}:{{.TAG_NAME}}

@@ -39,3 +39,27 @@ go run ./...
 ```
 
 Tests should be written to run in parallel (t.Parallel()).
+
+## Docker
+
+Run docker locally:
+```sh
+task docker-run-sequencer
+```
+
+Rebuild docker image and run:
+```sh
+task docker-run-sequencer REBUILD_DOCKER=true
+```
+
+Stop docker locally:
+```sh
+task docker-stop-sequencer
+```
+Build docker. Environment could be set using ENV variable.
+
+`Warning: ENV parameter should be as environment variable (before command), not after as task parameter.`
+Prod:
+```sh
+ENV=prod task docker-build
+```
