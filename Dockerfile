@@ -8,6 +8,8 @@ FROM debian:stable as runner
 
 RUN apt update && \
     apt install -y ca-certificates && \
+    # curl needs for healthcheck in ECS
+    apt install -y curl && \
     apt-get clean autoclean && \
     apt-get autoremove --yes && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/

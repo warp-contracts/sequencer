@@ -41,8 +41,7 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 	originalOwner := transaction.Owner
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+	if checkError(c, err, http.StatusBadRequest) {
 		return
 	}
 
@@ -62,8 +61,7 @@ func RegisterSequencer(c *gin.Context) {
 		currentHeight,
 		currentBlockId,
 	)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+	if checkError(c, err, http.StatusBadRequest) {
 		return
 	}
 
@@ -194,9 +192,9 @@ func checkError(c *gin.Context, err error, returnCode int) bool {
 		if returnCode > 499 && returnCode < 600 {
 			logrus.Error(err)
 		} else {
-			logrus.Debug(err)
+			logrus.Info(err)
 		}
-		c.JSON(returnCode, err)
+		c.JSON(returnCode, err.Error())
 		return true
 	}
 	return false

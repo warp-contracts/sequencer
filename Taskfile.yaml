@@ -7,15 +7,18 @@ env:
 #    sh: aws ssm get-parameter --name "/${ENV:-dev}/redstone/warp-contract/warp-sequencer/docker-repository" --query "Parameter.Value" --output text
   TAG_NAME: dev
   TERRAFORM_PATH: .terraform/env/
+  PLATFORM: arm64
+  IMAGE_OS: linux
+  REGION: eu-central-1
 
 tasks:
-  run-docker-postgres:
-    desc: Run postgres docker-compose
+  docker-run-postgres:
+    desc: Run postgres docker-compose.
     cmds:
       - docker-compose -f _tests/docker-compose/postgres/docker-compose.yml up -d --remove-orphans
     status:
       - test "$(docker ps | grep 'postgres_db_1')"
-  stop-docker-postgres:
+  docker-stop-postgres:
     desc: Stop postgres docker-compose
     cmds:
       - docker-compose -f _tests/docker-compose/postgres/docker-compose.yml down
@@ -23,27 +26,52 @@ tasks:
     desc: Build docker image. Use REBUILD_DOCKER=true task docker-build to force rebuild.
     run: once
     cmds:
-      - docker build . -t {{.REPOSITORY_NAME}}:{{.TAG_NAME}}
+      - docker build . -t {{.REPOSITORY_NAME}}:{{.TAG_NAME}} --platform={{.IMAGE_OS}}/{{.PLATFORM}}
     status:
-      - test "$(docker images {{.REPOSITORY_NAME}}:{{.TAG_NAME}} --format 1)"
-      - test -z "{{.REBUILD_DOCKER}}"
+      - test "$(docker images {{.REPOSITORY_NAME}}:{{.TAG_NAME}} --format 1)" || test {{.PLATFORM}} != $(docker image inspect sequencer --format '{{`{{.Architecture}}`}}')
+      - test "{{.REBUILD_DOCKER}}" != 'true'
+    preconditions:
+      - sh: test {{.PLATFORM}} = $(docker image inspect {{.REPOSITORY_NAME}}:{{.TAG_NAME}} --format '{{`{{.Architecture}}`}}') || test "{{.REBUILD_DOCKER}}" = 'true'
+        msg: "Image already exists, but PLATFORM is different (given: {{.PLATFORM}}). Please use REBUILD_DOCKER parameter or change TAG_NAME."
   docker-login:
+    desc: Login to ECR repo.
     cmds:
       - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin {{.REPOSITORY_NAME}}
   docker-push:
+    desc: Push image to ECR repo.
     deps:
-      - docker-build
+      - task: docker-build
+        vars:
+          PLATFORM: "amd64"
       - docker-login
     cmds:
       - docker push {{.REPOSITORY_NAME}}:{{.TAG_NAME}}
 
   docker-stop-sequencer:
+    desc: Stop and remove sequencer container.
     cmds:
       - docker rm -f sequencer
+    status:
+      - test -z $(docker ps --filter name=sequencer --format=1 --all)
   docker-run-sequencer:
-    desc: Run docker
+    desc: Run sequencer docker.
     deps:
-      - run-docker-postgres
+      - docker-stop-sequencer
+      - docker-run-postgres
       - docker-build
     cmds:
       - docker run --name sequencer -e ARWEAVE_WALLETJWK=$(cat _tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json) -e POSTGRES_HOST=$(docker inspect postgres_db_1 | jq -r '.[].NetworkSettings.Networks.postgres_default.IPAddress') -e POSTGRES_SSLMODE=disable -e LOG_LEVEL=debug -p 8080:8080 -d --network=postgres_default {{.REPOSITORY_NAME}}:{{.TAG_NAME}}
+  logs:
+    desc: Get Sequencer logs from cloudwatch.
+    cmds:
+      - aws logs tail /{{.ENV}}/ecs/redstone/warp-sequencer --format json {{if .FOLLOW}}--follow {{end}}{{if .LEVEL}}--filter-pattern '{ $.level = "{{.LEVEL}}" }' {{end}}--region {{.REGION}} {{.CLI_ARGS}}
+    vars:
+      LEVEL: '{{.LEVEL | default ""}}'
+      FOLLOW: '{{.FOLLOW | default ""}}'
+
+  ecs-update-service:
+    desc: Restart container in the sequencer ecs service.
+    cmds:
+      - aws ecs update-service --cluster redstone-cluster-{{.REGION}}-{{.ENV}} --region {{.REGION}} --service warp-sequencer-{{.ENV}} --force-new-deployment
+    env:
+      AWS_PAGER: ""

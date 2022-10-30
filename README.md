@@ -63,3 +63,31 @@ Prod:
 ```sh
 ENV=prod task docker-build
 ```
+
+## Logs
+
+Get logs:
+```sh
+task logs
+```
+
+Get production logs:
+```sh
+ENV=prod task logs
+```
+
+Follow logs:
+```sh
+task logs FOLLOW=true
+```
+
+Get logs with concrete level (can be debug, info, warn, error):
+```sh
+task logs LEVEL=error
+```
+
+Use custom parameters (see [documentation](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/logs/tail.html))
+```sh
+task logs -- --filter-pattern '{ $.method = "POST" && $.path = "*/register" }'
+```
+[Filter pattern documentation](https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/FilterAndPatternSyntax.html#matching-terms-events)
