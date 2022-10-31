@@ -53,7 +53,7 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 
-	contractTag, inputTag, originalAddress, internalWrites, decodedTags, tags, vrfData, err := tagHelper.PrepareTags(
+	contractTag, inputTag, originalAddress, internalWrites, decodedTags, tags, vrfData, isEvmSigner, err := tagHelper.PrepareTags(
 		transaction,
 		originalOwner,
 		millis,
@@ -63,6 +63,9 @@ func RegisterSequencer(c *gin.Context) {
 	)
 	if checkError(c, err, http.StatusBadRequest) {
 		return
+	}
+	if inputTag == "" {
+		checkError(c, errors.New("input tag is required"), http.StatusBadRequest)
 	}
 
 	startBundlrUpload := time.Now()
@@ -77,6 +80,9 @@ func RegisterSequencer(c *gin.Context) {
 	logrus.Debugf("Bundlr response id %s", bundlrResp.Id)
 
 	functionInput, err := parseFunctionInput(inputTag)
+	if checkError(c, err, http.StatusInternalServerError) {
+		return
+	}
 	if err != nil || functionInput.Function == "" {
 		logrus.WithField("input", inputTag).
 			Error("Could not parse function input", err)
@@ -89,6 +95,10 @@ func RegisterSequencer(c *gin.Context) {
 		evolve = functionInput.Value
 	}
 
+	var sign string
+	if isEvmSigner {
+		sign = transaction.Signature
+	}
 	interaction := createInteraction(
 		transaction,
 		originalAddress,
@@ -98,6 +108,7 @@ func RegisterSequencer(c *gin.Context) {
 		cachedNetworkData.CurrentBlock,
 		sortKey,
 		vrfData,
+		sign,
 	)
 
 	bundlerRespJson, err := json.Marshal(bundlrResp)
@@ -200,7 +211,8 @@ func checkError(c *gin.Context, err error, returnCode int) bool {
 	return false
 }
 
-func createInteraction(transaction *types.Transaction,
+func createInteraction(
+	transaction *types.Transaction,
 	originalAddress string,
 	decodedTags []types.Tag,
 	height int64,
@@ -208,6 +220,7 @@ func createInteraction(transaction *types.Transaction,
 	blockData *types.Block,
 	sortKey string,
 	vrfData tagHelper.VrfData,
+	signature string,
 ) *Interaction {
 	return &Interaction{
 		Id:        transaction.ID,
@@ -225,9 +238,10 @@ func createInteraction(transaction *types.Transaction,
 		Quantity: quantity{
 			Winston: transaction.Quantity,
 		},
-		SortKey: sortKey,
-		Source:  "redstone-sequencer",
-		Vrf:     vrfData,
+		SortKey:   sortKey,
+		Source:    "redstone-sequencer",
+		Vrf:       vrfData,
+		Signature: signature,
 	}
 }
 
@@ -257,6 +271,7 @@ type Interaction struct {
 	SortKey   string            `json:"sortkey"`
 	Source    string            `json:"source"`
 	Vrf       tagHelper.VrfData `json:"vrf"`
+	Signature string            `json:"signature"`
 }
 type owner struct {
 	Address string `json:"address"`

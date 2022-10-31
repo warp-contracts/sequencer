@@ -16,4 +16,5 @@ const (
 	TagWasmLangVersion = "Wasm-Lang-Version"
 	TagWasmMeta        = "Wasm-Meta"
 	TagRequestVrf      = "Request-Vrf"
+	TagSignatureType   = "Signature-Type"
 )

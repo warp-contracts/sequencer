@@ -23,6 +23,7 @@ func PrepareTags(
 	internalWrites []string,
 	decodedTags, tags []types.Tag,
 	vrfData VrfData,
+	isEvmSigner bool,
 	err error,
 ) {
 	decodedTags, err = utils.TagsDecode(transaction.Tags)
@@ -71,9 +72,10 @@ func PrepareTags(
 			internalWrites = append(internalWrites, tag.Value)
 		case smartweave.TagRequestVrf:
 			requestVrfTag = true
-		case "Signature-Type":
+		case smartweave.TagSignatureType:
 			if tag.Value == "ethereum" {
 				originalAddress = originalOwner
+				isEvmSigner = true
 			}
 		}
 	}

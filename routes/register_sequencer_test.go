@@ -6,10 +6,13 @@ import (
 	"encoding/json"
 	"github.com/everFinance/goar/types"
 	_ "github.com/everFinance/goar/types"
+	"github.com/everFinance/goar/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/warp-contracts/sequencer/_tests/_testcontainers"
 	"github.com/warp-contracts/sequencer/ar"
+	"github.com/warp-contracts/sequencer/ar/smartweave"
 	"github.com/warp-contracts/sequencer/config"
 	"github.com/warp-contracts/sequencer/db/conn"
 	"github.com/warp-contracts/sequencer/db/interactiondb"
@@ -26,79 +29,141 @@ func TestRegisterSequence(t *testing.T) {
 	_testcontainers.RunPostgresContainer(t)
 	initTest(t)
 
+	t.Run("Sample transaction", func(t *testing.T) {
+		t.Parallel()
+		transaction := getTransactionSample()
+		responseRecorder := sendTransaction(t, transaction)
+
+		var bundlrResp types.BundlrResp
+		assert.NoError(t, json.Unmarshal(responseRecorder.Body.Bytes(), &bundlrResp))
+		t.Run("response", func(t *testing.T) {
+			t.Parallel()
+			t.Run("should have success status code", func(t *testing.T) {
+				t.Parallel()
+				assert.Equal(t, 200, responseRecorder.Code)
+			},
+			)
+
+			t.Run("id should not be empty", func(t *testing.T) {
+				t.Parallel()
+				assert.NotEmpty(t, bundlrResp.Id)
+			},
+			)
+
+			t.Run("should see transaction in the arweave.net", func(t *testing.T) {
+				t.Parallel()
+				resp, err := http.Get("https://arweave.net/" + bundlrResp.Id)
+				assert.NoError(t, err)
+				all, err := io.ReadAll(resp.Body)
+				assert.NoError(t, err)
+				var bundlerTransaction *types.Transaction
+				assert.NoError(t, json.Unmarshal(all, &bundlerTransaction))
+				assert.Equal(t, transaction, bundlerTransaction)
+			},
+			)
+		},
+		)
+
+		t.Run("should save data in the database", func(t *testing.T) {
+			t.Parallel()
+			t.Run(
+				"interactions", func(t *testing.T) {
+					t.Parallel()
+					interaction := getInteraction(t, transaction)
+
+					t.Run(
+						"should save interaction data", func(t *testing.T) {
+							assert.NotEqual(t, interaction, interactiondb.Interaction{})
+						},
+					)
+					t.Run(
+						"should contain correct field values", func(t *testing.T) {
+							assert.Equal(t, transaction.ID, interaction.InteractionId)
+
+							// potentially could be flaky
+							cachedNetworkData := ar.GetCachedInfo()
+							assert.Equal(t, cachedNetworkData.NetworkInfo.Height, interaction.BlockHeight)
+							assert.Equal(t, cachedNetworkData.NetworkInfo.Current, interaction.BlockId)
+
+							assert.Equal(
+								t,
+								"Ws9hhYckc-zSnVmbBep6q_kZD5zmzYzDmgMC50nMiuE",
+								interaction.ContractId,
+							)
+							assert.Equal(t, "whatever", interaction.Function)
+							assert.Equal(t, "confirmed", interaction.ConfirmationStatus)
+							assert.Equal(t, "redstone-sequencer", interaction.Source)
+
+							assert.NotEmpty(t, interaction.SortKey)
+							assert.Equal(t, 3, len(strings.Split(interaction.SortKey, ",")))
+
+							assert.Equal(t, bundlrResp.Id, interaction.BundlerTxId)
+							assert.True(
+								t, interaction.ConfirmingPeer == "https://node.bundlr.network" ||
+									interaction.ConfirmingPeer == "https://node2.bundlr.network",
+							)
+						},
+					)
+				},
+			)
+		},
+		)
+	},
+	)
+	t.Run("ethereum transaction", func(t *testing.T) {
+		id, err := uuid.NewUUID()
+		assert.NoError(t, err)
+		transaction := &types.Transaction{
+			ID: id.String(),
+			Tags: utils.TagsEncode([]types.Tag{
+				{
+					Name:  smartweave.TagSignatureType,
+					Value: "ethereum",
+				},
+				{
+					Name:  "Input",
+					Value: "{\"function\":\"whatever\"}",
+				},
+			}),
+			Signature: "some signature",
+		}
+		responseRecorder := sendTransaction(t, transaction)
+		t.Run("should be ok", func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, 200, responseRecorder.Code, responseRecorder.Body)
+		},
+		)
+		t.Run("should be have signature in the interaction json", func(t *testing.T) {
+			var interaction Interaction
+			err = json.Unmarshal([]byte(getInteraction(t, transaction).Interaction), &interaction)
+			assert.NoError(t, err)
+			assert.Equal(t, transaction.Signature, interaction.Signature)
+		},
+		)
+	},
+	)
+}
+
+func getInteraction(t *testing.T, transaction *types.Transaction) interactiondb.Interaction {
+	var interaction interactiondb.Interaction
+	db := conn.GetConnection()
+	db.
+		Table("interactions").
+		Where("interaction_id = ?", transaction.ID).
+		First(&interaction)
+	assert.NoError(t, db.Error)
+	return interaction
+}
+
+func sendTransaction(t *testing.T, transaction *types.Transaction) *httptest.ResponseRecorder {
 	c, writer := GetTestGinContext()
 	c.Request.Method = http.MethodPost
-	transaction := getTransactionSample()
 	jsonTransaction, err := json.Marshal(transaction)
 	assert.NoError(t, err)
-
 	c.Request.Body = io.NopCloser(bytes.NewReader(jsonTransaction))
 
 	RegisterSequencer(c)
-
-	var bundlrResp types.BundlrResp
-	assert.NoError(t, json.Unmarshal(writer.Body.Bytes(), &bundlrResp))
-	t.Run("response", func(t *testing.T) {
-		t.Parallel()
-		t.Run("should have success status code", func(t *testing.T) {
-			t.Parallel()
-			assert.Equal(t, 200, writer.Code)
-		})
-
-		t.Run("id should not be empty", func(t *testing.T) {
-			t.Parallel()
-			assert.NotEmpty(t, bundlrResp.Id)
-		})
-
-		t.Run("should see transaction in the arweave.net", func(t *testing.T) {
-			t.Parallel()
-			resp, err := http.Get("https://arweave.net/" + bundlrResp.Id)
-			assert.NoError(t, err)
-			all, err := io.ReadAll(resp.Body)
-			assert.NoError(t, err)
-			var bundlerTransaction *types.Transaction
-			assert.NoError(t, json.Unmarshal(all, &bundlerTransaction))
-			assert.Equal(t, transaction, bundlerTransaction)
-		})
-	})
-
-	t.Run("should save data in the database", func(t *testing.T) {
-		t.Parallel()
-		db := conn.GetConnection()
-		t.Run("interactions", func(t *testing.T) {
-			t.Parallel()
-			var interaction interactiondb.Interaction
-			db.
-				Table("interactions").
-				//Where("interaction_id = ?", transaction.ID).
-				First(&interaction)
-			assert.NoError(t, db.Error)
-
-			t.Run("should save interaction data", func(t *testing.T) {
-				assert.NotEqual(t, interaction, interactiondb.Interaction{})
-			})
-			t.Run("should contain correct field values", func(t *testing.T) {
-				assert.Equal(t, transaction.ID, interaction.InteractionId)
-
-				// potentially could be flaky
-				cachedNetworkData := ar.GetCachedInfo()
-				assert.Equal(t, cachedNetworkData.NetworkInfo.Height, interaction.BlockHeight)
-				assert.Equal(t, cachedNetworkData.NetworkInfo.Current, interaction.BlockId)
-
-				assert.Equal(t, "Ws9hhYckc-zSnVmbBep6q_kZD5zmzYzDmgMC50nMiuE", interaction.ContractId)
-				assert.Equal(t, "whatever", interaction.Function)
-				assert.Equal(t, "confirmed", interaction.ConfirmationStatus)
-				assert.Equal(t, "redstone-sequencer", interaction.Source)
-
-				assert.NotEmpty(t, interaction.SortKey)
-				assert.Equal(t, 3, len(strings.Split(interaction.SortKey, ",")))
-
-				assert.Equal(t, bundlrResp.Id, interaction.BundlerTxId)
-				assert.True(t, interaction.ConfirmingPeer == "https://node.bundlr.network" ||
-					interaction.ConfirmingPeer == "https://node2.bundlr.network")
-			})
-		})
-	})
+	return writer
 }
 
 func initTest(t *testing.T) {
