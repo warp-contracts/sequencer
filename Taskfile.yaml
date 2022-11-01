@@ -31,7 +31,7 @@ tasks:
       - test "$(docker images {{.REPOSITORY_NAME}}:{{.TAG_NAME}} --format 1)" || test {{.PLATFORM}} != $(docker image inspect sequencer --format '{{`{{.Architecture}}`}}')
       - test "{{.REBUILD_DOCKER}}" != 'true'
     preconditions:
-      - sh: test {{.PLATFORM}} = $(docker image inspect {{.REPOSITORY_NAME}}:{{.TAG_NAME}} --format '{{`{{.Architecture}}`}}') || test "{{.REBUILD_DOCKER}}" = 'true'
+      - sh: test -z "$(docker images {{.REPOSITORY_NAME}}:{{.TAG_NAME}} --format 1)" || test {{.PLATFORM}} = $(docker image inspect {{.REPOSITORY_NAME}}:{{.TAG_NAME}} --format '{{`{{.Architecture}}`}}') || test "{{.REBUILD_DOCKER}}" = 'true'
         msg: "Image already exists, but PLATFORM is different (given: {{.PLATFORM}}). Please use REBUILD_DOCKER parameter or change TAG_NAME."
   docker-login:
     desc: Login to ECR repo.
