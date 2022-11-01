@@ -53,7 +53,7 @@ func RegisterSequencer(c *gin.Context) {
 		return
 	}
 
-	contractTag, inputTag, originalAddress, internalWrites, decodedTags, tags, vrfData, isEvmSigner, err := tagHelper.PrepareTags(
+	contractTag, inputTag, originalAddress, internalWrites, decodedTags, tags, vrfData, isEvmSigner, testnet, err := tagHelper.PrepareTags(
 		transaction,
 		originalOwner,
 		millis,
@@ -109,6 +109,7 @@ func RegisterSequencer(c *gin.Context) {
 		sortKey,
 		vrfData,
 		sign,
+		testnet,
 	)
 
 	bundlerRespJson, err := json.Marshal(bundlrResp)
@@ -211,8 +212,7 @@ func checkError(c *gin.Context, err error, returnCode int) bool {
 	return false
 }
 
-func createInteraction(
-	transaction *types.Transaction,
+func createInteraction(transaction *types.Transaction,
 	originalAddress string,
 	decodedTags []types.Tag,
 	height int64,
@@ -221,7 +221,7 @@ func createInteraction(
 	sortKey string,
 	vrfData tagHelper.VrfData,
 	signature string,
-) *Interaction {
+	testnet string) *Interaction {
 	return &Interaction{
 		Id:        transaction.ID,
 		Owner:     owner{Address: originalAddress},
@@ -242,6 +242,7 @@ func createInteraction(
 		Source:    "redstone-sequencer",
 		Vrf:       vrfData,
 		Signature: signature,
+		Testnet:   testnet,
 	}
 }
 
@@ -272,6 +273,7 @@ type Interaction struct {
 	Source    string            `json:"source"`
 	Vrf       tagHelper.VrfData `json:"vrf"`
 	Signature string            `json:"signature"`
+	Testnet   string            `json:"testnet"`
 }
 type owner struct {
 	Address string `json:"address"`

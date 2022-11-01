@@ -66,7 +66,7 @@ func TestPrepareTags(t *testing.T) {
 		}
 		var currentHeight int64 = 123123
 		currentBlockId := "qweasd"
-		contractTag, inputTag, originalAddress, internalWrites, decodedTags, tags, vrfData, _, err := PrepareTags(
+		contractTag, inputTag, originalAddress, internalWrites, decodedTags, tags, vrfData, _, _, err := PrepareTags(
 			transaction,
 			originalOwner,
 			millis,
@@ -142,7 +142,7 @@ func TestPrepareTags(t *testing.T) {
 		transaction := &types.Transaction{
 			Tags: utils.TagsEncode([]types.Tag{}),
 		}
-		_, _, _, _, _, tags, _, _, err := PrepareTags(transaction, "", 1, "", 1, "")
+		_, _, _, _, _, tags, _, _, _, err := PrepareTags(transaction, "", 1, "", 1, "")
 		assert.NoError(t, err)
 
 		for _, tag := range tags {
@@ -159,7 +159,7 @@ func TestPrepareTags(t *testing.T) {
 					},
 				}),
 			}
-			_, _, originalAddress, _, _, _, _, _, err := PrepareTags(transaction, "owner", 1, "", 1, "")
+			_, _, originalAddress, _, _, _, _, _, _, err := PrepareTags(transaction, "owner", 1, "", 1, "")
 			assert.NoError(t, err)
 			assert.Equal(t, "owner", originalAddress)
 		})
@@ -175,7 +175,7 @@ func TestPrepareTags(t *testing.T) {
 			wallet, err := goar.NewWalletFromPath("../_tests/arweavekeys/5SUBakh_R97MbHoX0_wNarVUw6DH0TziW5rG2K1vc6k.json", viper.GetString("arweave.url"))
 			assert.NoError(t, err)
 
-			_, _, originalAddress, _, _, _, _, _, err := PrepareTags(transaction, wallet.Owner(), 1, "", 1, "")
+			_, _, originalAddress, _, _, _, _, _, _, err := PrepareTags(transaction, wallet.Owner(), 1, "", 1, "")
 			assert.NoError(t, err)
 			ownerToAddress, err := utils.OwnerToAddress(wallet.Owner())
 			assert.NoError(t, err)

@@ -11,21 +11,18 @@ import (
 	"strconv"
 )
 
-func PrepareTags(
-	transaction *types.Transaction,
+func PrepareTags(transaction *types.Transaction,
 	originalOwner string,
 	millis int64,
 	sortKey string,
 	currentHeight int64,
-	currentBlockId string,
-) (
-	contractTag, inputTag, originalAddress string,
+	currentBlockId string) (contractTag, inputTag, originalAddress string,
 	internalWrites []string,
 	decodedTags, tags []types.Tag,
 	vrfData VrfData,
 	isEvmSigner bool,
-	err error,
-) {
+	testnetVersion string,
+	err error) {
 	decodedTags, err = utils.TagsDecode(transaction.Tags)
 	if err != nil {
 		return
@@ -77,6 +74,8 @@ func PrepareTags(
 				originalAddress = originalOwner
 				isEvmSigner = true
 			}
+		case smartweave.TagWarpTestnet:
+			testnetVersion = tag.Value
 		}
 	}
 	if originalAddress == "" {

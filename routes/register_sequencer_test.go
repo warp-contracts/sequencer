@@ -41,14 +41,12 @@ func TestRegisterSequence(t *testing.T) {
 			t.Run("should have success status code", func(t *testing.T) {
 				t.Parallel()
 				assert.Equal(t, 200, responseRecorder.Code)
-			},
-			)
+			})
 
 			t.Run("id should not be empty", func(t *testing.T) {
 				t.Parallel()
 				assert.NotEmpty(t, bundlrResp.Id)
-			},
-			)
+			})
 
 			t.Run("should see transaction in the arweave.net", func(t *testing.T) {
 				t.Parallel()
@@ -59,10 +57,8 @@ func TestRegisterSequence(t *testing.T) {
 				var bundlerTransaction *types.Transaction
 				assert.NoError(t, json.Unmarshal(all, &bundlerTransaction))
 				assert.Equal(t, transaction, bundlerTransaction)
-			},
-			)
-		},
-		)
+			})
+		})
 
 		t.Run("should save data in the database", func(t *testing.T) {
 			t.Parallel()
@@ -71,11 +67,9 @@ func TestRegisterSequence(t *testing.T) {
 					t.Parallel()
 					interaction := getInteraction(t, transaction)
 
-					t.Run(
-						"should save interaction data", func(t *testing.T) {
-							assert.NotEqual(t, interaction, interactiondb.Interaction{})
-						},
-					)
+					t.Run("should save interaction data", func(t *testing.T) {
+						assert.NotEqual(t, interaction, interactiondb.Interaction{})
+					})
 					t.Run(
 						"should contain correct field values", func(t *testing.T) {
 							assert.Equal(t, transaction.ID, interaction.InteractionId)
@@ -85,11 +79,9 @@ func TestRegisterSequence(t *testing.T) {
 							assert.Equal(t, cachedNetworkData.NetworkInfo.Height, interaction.BlockHeight)
 							assert.Equal(t, cachedNetworkData.NetworkInfo.Current, interaction.BlockId)
 
-							assert.Equal(
-								t,
+							assert.Equal(t,
 								"Ws9hhYckc-zSnVmbBep6q_kZD5zmzYzDmgMC50nMiuE",
-								interaction.ContractId,
-							)
+								interaction.ContractId)
 							assert.Equal(t, "whatever", interaction.Function)
 							assert.Equal(t, "confirmed", interaction.ConfirmationStatus)
 							assert.Equal(t, "redstone-sequencer", interaction.Source)
@@ -102,14 +94,10 @@ func TestRegisterSequence(t *testing.T) {
 								t, interaction.ConfirmingPeer == "https://node.bundlr.network" ||
 									interaction.ConfirmingPeer == "https://node2.bundlr.network",
 							)
-						},
-					)
-				},
-			)
-		},
-		)
-	},
-	)
+						})
+				})
+		})
+	})
 	t.Run("ethereum transaction", func(t *testing.T) {
 		id, err := uuid.NewUUID()
 		assert.NoError(t, err)
@@ -120,10 +108,7 @@ func TestRegisterSequence(t *testing.T) {
 					Name:  smartweave.TagSignatureType,
 					Value: "ethereum",
 				},
-				{
-					Name:  "Input",
-					Value: "{\"function\":\"whatever\"}",
-				},
+				defaultFunctionNameTag(),
 			}),
 			Signature: "some signature",
 		}
@@ -131,17 +116,49 @@ func TestRegisterSequence(t *testing.T) {
 		t.Run("should be ok", func(t *testing.T) {
 			t.Parallel()
 			assert.Equal(t, 200, responseRecorder.Code, responseRecorder.Body)
-		},
-		)
+		})
 		t.Run("should be have signature in the interaction json", func(t *testing.T) {
 			var interaction Interaction
 			err = json.Unmarshal([]byte(getInteraction(t, transaction).Interaction), &interaction)
 			assert.NoError(t, err)
 			assert.Equal(t, transaction.Signature, interaction.Signature)
-		},
-		)
-	},
-	)
+		})
+	})
+	t.Run("testnet", func(t *testing.T) {
+		t.Parallel()
+		id, err := uuid.NewUUID()
+		assert.NoError(t, err)
+		testnetVersion := "123"
+		transaction := &types.Transaction{
+			ID: id.String(),
+			Tags: utils.TagsEncode([]types.Tag{
+				{
+					Name:  smartweave.TagWarpTestnet,
+					Value: testnetVersion,
+				},
+				defaultFunctionNameTag(),
+			}),
+		}
+		responseRecorder := sendTransaction(t, transaction)
+		t.Run("should be ok", func(t *testing.T) {
+			t.Parallel()
+			assert.Equal(t, 200, responseRecorder.Code, responseRecorder.Body)
+		})
+		t.Run("should be have testnet version in the interaction json", func(t *testing.T) {
+			t.Parallel()
+			var interaction Interaction
+			err = json.Unmarshal([]byte(getInteraction(t, transaction).Interaction), &interaction)
+			assert.NoError(t, err)
+			assert.Equal(t, testnetVersion, interaction.Testnet)
+		})
+	})
+}
+
+func defaultFunctionNameTag() types.Tag {
+	return types.Tag{
+		Name:  "Input",
+		Value: "{\"function\":\"whatever\"}",
+	}
 }
 
 func getInteraction(t *testing.T, transaction *types.Transaction) interactiondb.Interaction {

@@ -17,4 +17,5 @@ const (
 	TagWasmMeta        = "Wasm-Meta"
 	TagRequestVrf      = "Request-Vrf"
 	TagSignatureType   = "Signature-Type"
+	TagWarpTestnet     = "Warp-Testnet"
 )
