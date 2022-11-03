@@ -1,0 +1,16 @@
+name: TF Plan
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/terraform-plan.yml"
+      - ".terraform/**"
+
+jobs:
+  plan:
+    uses: redstone-finance/shared-github-actions/.github/workflows/terraform-plan.yml@Max-Levitskiy-patch-1
+    with:
+      working-directory: .terraform/env/prod
+    secrets:
+      aws-id: ${{ secrets.AWS_ID }}
+      aws-secret: ${{ secrets.AWS_SECRET }}
