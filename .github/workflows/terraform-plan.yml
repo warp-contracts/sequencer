@@ -12,7 +12,6 @@ jobs:
     uses: warp-contracts/shared-github-actions/.github/workflows/terraform-plan.yml@Max-Levitskiy-patch-1
     with:
       working-directory: .terraform/env/prod
-    inputs:
       env: prod
     secrets:
       aws-id: ${{ secrets.AWS_ID }}
