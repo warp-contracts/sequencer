@@ -1,5 +1,14 @@
 name: Build&push docker image
-on: push
+on: 
+  push:
+    paths:
+      - ".github/workflows/build-docker.yml"
+      - "**/.go"
+      - "Dockerfile"
+      - "config.yaml"
+      - "go.mod"
+      - "go.sum"
+      - ".dockerignore"
 jobs:
   build:
     runs-on: ubuntu-latest
