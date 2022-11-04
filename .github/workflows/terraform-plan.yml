@@ -9,12 +9,10 @@ on:
 
 jobs:
   plan:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: warp-contracts/shared-github-actions/.github/workflows/terraform-plan.yml@Max-Levitskiy-patch-1
-        with:
-          working-directory: .terraform/env/prod
-          env: prod    
+    uses: warp-contracts/shared-github-actions/.github/workflows/terraform-plan.yml@Max-Levitskiy-patch-1
+    with:
+      working-directory: .terraform/env/prod
+      env: prod123
 #     secrets:
 #      aws-id: ${{ secrets.AWS_ID_PROD }}
 #      aws-secret: ${{ secrets.AWS_SECRET_PROD }}
