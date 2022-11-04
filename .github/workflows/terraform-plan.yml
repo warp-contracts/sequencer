@@ -13,5 +13,5 @@ jobs:
     with:
       working-directory: .terraform/env/prod
     secrets:
-      aws-id: ${{ secrets.AWS_ID }}
-      aws-secret: ${{ secrets.AWS_SECRET }}
+      aws-id: ${{ secrets.AWS_ID_PROD }}
+      aws-secret: ${{ secrets.AWS_SECRET_PROD }}
