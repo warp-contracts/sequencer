@@ -8,7 +8,7 @@ on:
 
 jobs:
   plan:
-    uses: warp-contracts/shared-github-actions/.github/workflows/terraform-plan.yml@v0
+    uses: warp-contracts/shared-github-actions/.github/workflows/terraform-plan.yml@Max-Levitskiy-patch-1
     with:
       working-directory: .terraform/env/prod
     secrets:
