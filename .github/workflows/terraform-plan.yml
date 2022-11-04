@@ -14,3 +14,4 @@ jobs:
     secrets:
       aws-id: ${{ secrets.AWS_ID }}
       aws-secret: ${{ secrets.AWS_SECRET }}
+      env: prod
