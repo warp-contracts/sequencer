@@ -1,0 +1,19 @@
+name: Terraform Plan
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/terraform-plan.yml"
+      - ".terraform/**"
+
+jobs:
+  plan:
+    uses: warp-contracts/shared-github-actions/.github/workflows/terraform-plan.yml@Max-Levitskiy-patch-1
+    with:
+      working-directory: .terraform/env/prod
+      env: prod
+    secrets:
+     aws-id: ${{ secrets.AWS_ID_PROD }}
+     aws-secret: ${{ secrets.AWS_SECRET_PROD }}
+

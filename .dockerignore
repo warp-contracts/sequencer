@@ -1,0 +1,6 @@
+.idea/
+README.md
+sequencer
+_tests/
+*_test.go
+.terraform
