@@ -7,13 +7,11 @@ on:
       - ".github/workflows/terraform-plan.yml"
       - ".terraform/**"
 
-
 jobs:
   plan:
     uses: warp-contracts/shared-github-actions/.github/workflows/terraform-plan.yml@Max-Levitskiy-patch-1
     with:
       working-directory: .terraform/env/prod
-      env: prod
     secrets:
       aws-id: ${{ secrets.AWS_ID }}
       aws-secret: ${{ secrets.AWS_SECRET }}
