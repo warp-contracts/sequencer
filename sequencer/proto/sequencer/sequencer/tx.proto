@@ -1,0 +1,7 @@
+syntax = "proto3";
+package warpcontracts.sequencer.sequencer;
+
+option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
+
+// Msg defines the Msg service.
+service Msg {}
