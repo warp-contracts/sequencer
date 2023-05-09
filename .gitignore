@@ -4,3 +4,11 @@ release/
 .idea/
 .vscode/
 .DS_Store
+
+# Erlang
+*.beam
+
+# Dependency directories (remove the comment below to include it)
+/bin/
+/.gopath~/
+/vendor
