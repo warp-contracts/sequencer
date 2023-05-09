@@ -113,7 +113,7 @@ import (
 )
 
 const (
-	AccountAddressPrefix = "cosmos"
+	AccountAddressPrefix = "warp"
 	Name                 = "sequencer"
 )
 
