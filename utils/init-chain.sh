@@ -5,10 +5,10 @@
 COIN="100000000000warp"
 CHAIN_ID="sequencer-0"
 OUTFILE="./out.txt"
-
 touch $OUTFILE
+
 log() {
-    printf "${RED}$1${NC}\n"
+    printf "$1\n"
 }
 
 genOut() {
@@ -38,9 +38,7 @@ gen() {
         echo $PASSWORD
         echo $PASSWORD
     ) | ./sequencer keys add $1 
-    # echo $PASSWORD | ./sequencer keys show $1
 
-    # Set up the genesis account
     ADDRESS=$(echo $PASSWORD | ./sequencer keys show $1 -a --keyring-backend file)
     ./sequencer add-genesis-account $ADDRESS $COIN 
 
@@ -59,6 +57,7 @@ gen() {
 
     ./sequencer add-genesis-account $ADDRESS $COIN  --home out/.sequencer 
 
+    log "Password: $1 : $PASSWORD"
 }
 
 run() {
