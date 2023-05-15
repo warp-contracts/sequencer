@@ -52,4 +52,5 @@ run() {
 echo "Starting entrypoint script"
 configure
 setupCosmovisor
+setupSequencer
 run
