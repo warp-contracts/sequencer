@@ -12,8 +12,8 @@ DATE    ?= $(shell date +%FT%T%z)
 export GOPATH
 
 # Display utils
-V = 0
-Q = $(if $(filter 1,$V),,@)
+V = 0 # Verbose output, change to 1 to print commands
+Q = $(if $(filter 1,$V),,@) # Conditionally print output
 M = $(shell printf "\033[34;1m▶\033[0m")
 
 # Default target

@@ -1,5 +1,6 @@
 #!/bin/sh
 # This script was used to initialize the chain for the first time and generate genesis.json
+# Run in Linux environment
 # set -ex
 
 COIN="100000000000warp"
@@ -66,7 +67,8 @@ run() {
 
     # Initialize validators, each validator has its own directory
     # this directory will later be used to run the validator node
-    for NAME in "warp-pike" "warp-kirk" "warp-picard"; do
+    # for NAME in "warp-pike" "warp-kirk" "warp-picard"; do
+    for NAME in "sequencer-0" "sequencer-1" "sequencer-2"; do
         gen $NAME
     done
 
