@@ -39,9 +39,9 @@ setupCosmovisor() {
 }
 
 setupSequencer() {
-    assert $SEQUENCER_NETWORK
-    # Copy, but don't overwrite
-    cp -n -r /app/network/$SEQUENCER_NETWORK $SEQUENCER_HOME || true
+    if [ ! -f "$SEQUENCER_HOME/data/priv_validator_state.json" ]; then
+        echo '{"height":"0","round":0,"step":0}' > $SEQUENCER_HOME/data/priv_validator_state.json
+    fi
 }
 
 run() {
