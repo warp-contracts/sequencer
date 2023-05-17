@@ -1,7 +1,28 @@
 syntax = "proto3";
+
 package warpcontracts.sequencer.sequencer;
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
 // Msg defines the Msg service.
-service Msg {}
+service Msg {
+  rpc Arweave (MsgArweave) returns (MsgArweaveResponse);
+}
+message MsgArweave {
+  string creator   =  1;
+  string format    =  2;
+  string id        =  3;
+  string lastTx    =  4;
+  string owner     =  5;
+  string tags      =  6;
+  string target    =  7;
+  string quantity  =  8;
+  string dataRoot  =  9;
+  string dataSize  = 10;
+  string data      = 11;
+  string reward    = 12;
+  string signature = 13;
+}
+
+message MsgArweaveResponse {}
+
