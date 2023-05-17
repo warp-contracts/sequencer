@@ -71446,3 +71446,10 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  warpcontracts.sequencer.sequencer.Tag:
+    type: object
+    properties:
+      name:
+        type: string
+      value:
+        type: string

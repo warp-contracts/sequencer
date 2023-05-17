@@ -36,7 +36,7 @@ func CmdArweave() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgArweave(
+			msg, err := types.NewMsgArweave(
 				clientCtx.GetFromAddress().String(),
 				argFormat,
 				argId,
@@ -51,6 +51,9 @@ func CmdArweave() *cobra.Command {
 				argReward,
 				argSignature,
 			)
+			if err != nil {
+				return err
+			}
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
