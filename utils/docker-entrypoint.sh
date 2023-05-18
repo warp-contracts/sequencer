@@ -40,6 +40,7 @@ setupCosmovisor() {
 
 setupSequencer() {
     if [ ! -f "$SEQUENCER_HOME/data/priv_validator_state.json" ]; then
+        mkdir -p $SEQUENCER_HOME/data
         echo '{"height":"0","round":0,"step":0}' > $SEQUENCER_HOME/data/priv_validator_state.json
     fi
 }
