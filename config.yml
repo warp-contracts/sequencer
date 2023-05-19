@@ -18,3 +18,8 @@ faucet:
 validators:
 - name: alice
   bonded: 100000000warp
+genesis:
+  app_state:
+    staking:
+      params:
+        bond_denom: "warp"
