@@ -25,7 +25,6 @@ var (
 
 const (
 	opWeightMsgArweave = "op_weight_msg_arweave"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgArweave int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const

@@ -17,13 +17,13 @@ message MsgArweave {
   string creator   =  1;
   int32 format    =  2;
   string id        =  3;
-  string lastTx    =  4;
+  string last_tx    =  4;
   string owner     =  5;
   repeated Tag tags =  6;
   string target    =  7;
   string quantity  =  8;
-  string dataRoot  =  9;
-  string dataSize  = 10;
+  string data_root  =  9;
+  string data_size  = 10;
   string data      = 11;
   string reward    = 12;
   string signature = 13;

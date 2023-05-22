@@ -13,10 +13,12 @@ type arweaveHandler struct {
 	ctx client.Context
 }
 
+const ArweaveEndpoint = "/api/v1/arweave"
+
 // The endpoint that accepts the Arweave transaction in the form of JSON, 
 // wraps it with a Cosmos transaction and broadcasts it to the network.
 func RegisterArweaveAPIRoute(clientCtx client.Context, router *mux.Router) {
-	router.Handle("/arweave", arweaveHandler{ctx: clientCtx}).Methods("POST")
+	router.Handle(ArweaveEndpoint, arweaveHandler{ctx: clientCtx}).Methods("POST")
 }
 
 func (h arweaveHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -37,7 +39,7 @@ func (h arweaveHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// broadcast transaction
+	// validate and broadcast transaction
 	response, err := h.ctx.BroadcastTxSync(txBytes)
 	if err != nil {
 		badRequest(w, err.Error())
