@@ -71434,6 +71434,8 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  warpcontracts.sequencer.sequencer.MsgArweaveResponse:
+    type: object
   warpcontracts.sequencer.sequencer.Params:
     type: object
     description: Params defines the parameters for the module.
@@ -71444,3 +71446,10 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  warpcontracts.sequencer.sequencer.Tag:
+    type: object
+    properties:
+      name:
+        type: string
+      value:
+        type: string

@@ -106,6 +106,7 @@ import (
 	sequencermodule "github.com/warp-contracts/sequencer/x/sequencer"
 	sequencermodulekeeper "github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	sequencermoduletypes "github.com/warp-contracts/sequencer/x/sequencer/types"
+	arweaveapi "github.com/warp-contracts/sequencer/x/sequencer/api"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/warp-contracts/sequencer/app/params"
@@ -841,6 +842,9 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 
 	// register app's OpenAPI routes.
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
+
+	// Register the route for sending Arweave transactions as JSON
+	arweaveapi.RegisterArweaveAPIRoute(clientCtx, apiSvr.Router)
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
