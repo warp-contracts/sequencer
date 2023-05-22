@@ -2,9 +2,11 @@ package types
 
 import (
 	"encoding/json"
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"strconv"
+	"github.com/warp-contracts/syncer/src/utils/arweave"
 )
 
 const TypeMsgArweave = "arweave"
@@ -73,9 +75,71 @@ func (msg *MsgArweave) GetSignBytes() []byte {
 }
 
 func (msg *MsgArweave) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Creator)
+	// Ensure message contains an Arweave transaction
+	tx, err := msg.ToArweaveTx()
+	if err != nil {
+		return err
+	}
+
+	err = tx.Verify()
+	if err != nil {
+		return err
+	}
+
+	_, err = sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 	return nil
+}
+
+func (msg *MsgArweave) ToArweaveTx() (out *arweave.Transaction, err error) {
+	out = &arweave.Transaction{
+		Format:   int(msg.Format),
+		ID:       msg.Id,
+		Quantity: msg.Quantity,
+		DataSize: msg.DataSize,
+		Reward:   msg.Reward,
+	}
+
+	err = out.LastTx.Decode(msg.LastTx)
+	if err != nil {
+		return
+	}
+	err = out.Owner.Decode(msg.Owner)
+	if err != nil {
+		return
+	}
+	err = out.Target.Decode(msg.Target)
+	if err != nil {
+		return
+	}
+	err = out.Data.Decode(msg.Data)
+	if err != nil {
+		return
+	}
+	err = out.DataRoot.Decode(msg.DataRoot)
+	if err != nil {
+		return
+	}
+	err = out.Signature.Decode(msg.Signature)
+	if err != nil {
+		return
+	}
+
+	out.Tags = make([]arweave.Tag, 0, len(msg.Tags))
+	for _, tag := range msg.Tags {
+		var tmp arweave.Tag
+		err = tmp.Name.Decode(tag.Name)
+		if err != nil {
+			return
+		}
+		err = tmp.Value.Decode(tag.Value)
+		if err != nil {
+			return
+		}
+		out.Tags = append(out.Tags, tmp)
+	}
+
+	return
 }
