@@ -2,7 +2,7 @@ vue/node_modules
 vue/dist
 release/
 .idea/
-.vscode/
+
 .DS_Store
 
 # Erlang
@@ -12,3 +12,10 @@ release/
 /bin/
 /.gopath~/
 /vendor
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
