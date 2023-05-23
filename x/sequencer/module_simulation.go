@@ -24,9 +24,9 @@ var (
 )
 
 const (
-	opWeightMsgArweave = "op_weight_msg_arweave"
+	opWeightMsgDataItem = "op_weight_msg_data_item"
 	// TODO: Determine the simulation weight value
-	defaultWeightMsgArweave int = 100
+	defaultWeightMsgDataItem int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )
@@ -62,15 +62,15 @@ func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
 
-	var weightMsgArweave int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgArweave, &weightMsgArweave, nil,
+	var weightMsgDataItem int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDataItem, &weightMsgDataItem, nil,
 		func(_ *rand.Rand) {
-			weightMsgArweave = defaultWeightMsgArweave
+			weightMsgDataItem = defaultWeightMsgDataItem
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgArweave,
-		sequencersimulation.SimulateMsgArweave(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgDataItem,
+		sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

@@ -8,21 +8,21 @@ import (
 	"github.com/warp-contracts/sequencer/testutil/sample"
 )
 
-func TestMsgArweave_ValidateBasic(t *testing.T) {
+func TestMsgDataItem_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgArweave
+		msg  MsgDataItem
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgArweave{
+			msg: MsgDataItem{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "valid address",
-			msg: MsgArweave{
+			msg: MsgDataItem{
 				Creator: sample.AccAddress(),
 			},
 		},

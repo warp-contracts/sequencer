@@ -2,32 +2,26 @@ syntax = "proto3";
 
 package warpcontracts.sequencer.sequencer;
 
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
 // Msg defines the Msg service.
-service Msg {
-  rpc Arweave (MsgArweave) returns (MsgArweaveResponse);
-}
+service Msg { rpc DataItem(MsgDataItem) returns (MsgDataItemResponse); }
 message Tag {
   string name = 1;
   string value = 2;
 }
 
-message MsgArweave {
-  string creator   =  1;
-  int32 format    =  2;
-  string id        =  3;
-  string lastTx    =  4;
-  string owner     =  5;
-  repeated Tag tags =  6;
-  string target    =  7;
-  string quantity  =  8;
-  string dataRoot  =  9;
-  string dataSize  = 10;
-  string data      = 11;
-  string reward    = 12;
-  string signature = 13;
+message MsgDataItem {
+  string creator = 1;
+  bytes data_item = 2 [
+    // (gogoproto.customtype) =
+    // "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem",
+    // (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "validate:\"max=104857600\""
+  ];
 }
 
-message MsgArweaveResponse {}
-
+message MsgDataItemResponse {}
