@@ -22,8 +22,8 @@ func SimulateMsgDataItem(
 			Creator: simAccount.Address.String(),
 		}
 
-		// TODO: Handling the Arweave simulation
+		// TODO: Handling the DataItem simulation
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "Arweave simulation not implemented"), nil, nil
+		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "DataItem simulation not implemented"), nil, nil
 	}
 }

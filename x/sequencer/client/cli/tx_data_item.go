@@ -12,7 +12,7 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdArweave() *cobra.Command {
+func CmdDataItem() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "dataitem [data]",
 		Short: "Broadcast message in DataItem format",

@@ -1,7 +1,7 @@
 package api
 
 import (
-	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -9,54 +9,46 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-type arweaveHandler struct {
+type dataItemHandler struct {
 	ctx client.Context
 }
 
-// The endpoint that accepts the Arweave transaction in the form of JSON,
+// The endpoint that accepts the DataItems as described in AND-104
 // wraps it with a Cosmos transaction and broadcasts it to the network.
-func RegisterArweaveAPIRoute(clientCtx client.Context, router *mux.Router) {
-	router.Handle("/arweave", arweaveHandler{ctx: clientCtx}).Methods("POST")
+func RegisterDataItemAPIRoute(clientCtx client.Context, router *mux.Router) {
+	router.Handle("/dataitem", dataItemHandler{ctx: clientCtx}).Methods("POST")
 }
 
-func (h arweaveHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// parse JSON
+func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var msg types.MsgDataItem
-	decoder := json.NewDecoder(r.Body)
-	decoder.DisallowUnknownFields()
-	err := decoder.Decode(&msg)
+
+	// Parse DataItem from request body
+	err := msg.DataItem.UnmarshalFromReader(r.Body)
 	if err != nil {
-		badRequest(w, err.Error())
+		http.Error(w, fmt.Sprintf("failed to parse data item: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
 
-	// wrap Arweave message with Cosmos transaction
-	txBytes, err := createTxWithArweaveMsg(h.ctx, msg)
+	// Wrap message with Cosmos transaction
+	txBuilder := h.ctx.TxConfig.NewTxBuilder()
+	txBuilder.SetMsgs(&msg)
+
+	txBytes, err := h.ctx.TxConfig.TxEncoder()(txBuilder.GetTx())
 	if err != nil {
-		badRequest(w, err.Error())
+		http.Error(w, fmt.Sprintf("failed to encode transaction: %s", err.Error()), http.StatusBadRequest)
 		return
 	}
 
-	// broadcast transaction
+	// Broadcast transaction
 	response, err := h.ctx.BroadcastTxSync(txBytes)
 	if err != nil {
-		badRequest(w, err.Error())
+		http.Error(w, "failed to broadcast transaction", http.StatusInternalServerError)
 		return
 	}
 	if response.Code != 0 {
-		badRequest(w, response.RawLog)
+		http.Error(w, "failed to broadcast transaction", http.StatusInternalServerError)
 		return
 	}
 
 	w.Write([]byte(response.TxHash))
-}
-
-func badRequest(w http.ResponseWriter, errorMessage string) {
-	http.Error(w, errorMessage, http.StatusBadRequest)
-}
-
-func createTxWithArweaveMsg(ctx client.Context, msg types.MsgDataItem) ([]byte, error) {
-	txBuilder := ctx.TxConfig.NewTxBuilder()
-	txBuilder.SetMsgs(&msg)
-	return ctx.TxConfig.TxEncoder()(txBuilder.GetTx())
 }

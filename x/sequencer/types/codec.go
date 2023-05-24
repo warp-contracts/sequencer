@@ -8,7 +8,7 @@ import (
 )
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(&MsgDataItem{}, "sequencer/Arweave", nil)
+	cdc.RegisterConcrete(&MsgDataItem{}, "sequencer/DataItem", nil)
 	// this line is used by starport scaffolding # 2
 }
 

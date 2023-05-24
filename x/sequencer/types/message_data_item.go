@@ -7,7 +7,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-const TypeMsgDataItem = "arweave"
+const TypeMsgDataItem = "data_item"
 
 var _ sdk.Msg = &MsgDataItem{}
 
@@ -16,8 +16,13 @@ func NewMsgDataItem(creator string, data string) (out *MsgDataItem, err error) {
 		Creator: creator,
 	}
 
+	dataItemBytes, err := base64.RawURLEncoding.DecodeString(data)
+	if err != nil {
+		return
+	}
+
 	// Data item is base64url encoded
-	out.DataItem, err = base64.RawURLEncoding.DecodeString(data)
+	err = out.DataItem.Unmarshal(dataItemBytes)
 	if err != nil {
 		return
 	}
@@ -48,6 +53,13 @@ func (msg *MsgDataItem) GetSignBytes() []byte {
 
 func (msg *MsgDataItem) ValidateBasic() (err error) {
 	// Ensure data item is in the correct format
+
+	// Verifies DataItem acording to the ANS-104 standard. Verifies signature.
+	// https://github.com/ArweaveTeam/arweave-standards/blob/master/ans/ANS-104.md#21-verifying-a-dataitem
+	err = msg.DataItem.Verify()
+	if err != nil {
+		return
+	}
 
 	_, err = sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
