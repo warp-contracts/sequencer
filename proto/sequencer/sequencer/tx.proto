@@ -15,8 +15,7 @@ message MsgDataItem {
   bytes data_item = 2 [
     (gogoproto.customtype) =
         "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem",
-    (gogoproto.nullable) = false,
-    (gogoproto.moretags) = "validate:\"max=104857600\""
+    (gogoproto.nullable) = false
   ];
 }
 
