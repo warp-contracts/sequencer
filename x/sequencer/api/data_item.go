@@ -31,11 +31,15 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Wrap message with Cosmos transaction
 	txBuilder := h.ctx.TxConfig.NewTxBuilder()
-	txBuilder.SetMsgs(&msg)
+	err = txBuilder.SetMsgs(&msg)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to set message=: %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
 
 	txBytes, err := h.ctx.TxConfig.TxEncoder()(txBuilder.GetTx())
 	if err != nil {
-		http.Error(w, fmt.Sprintf("failed to encode transaction: %s", err.Error()), http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("failed to encode transaction: %s", err.Error()), http.StatusInternalServerError)
 		return
 	}
 
@@ -50,5 +54,9 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte(response.TxHash))
+	_, err = w.Write([]byte(response.TxHash))
+	if err != nil {
+		http.Error(w, "failed to write response", http.StatusInternalServerError)
+		return
+	}
 }
