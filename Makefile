@@ -66,6 +66,10 @@ build-race:  | $(BASE); $(info $(M) building executable…) @
 		-tags release \
 		-o bin/$(PACKAGE) main.go
 
+.PHONY: test
+test:
+	$(GO) test ./...
+
 .PHONY: docker-build
 docker-build: all | ; $(info $(M) building docker container) @ 
 	$(GO) mod vendor

@@ -6,6 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/warp-contracts/sequencer/testutil/sample"
+	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
 func TestMsgDataItem_ValidateBasic(t *testing.T) {
@@ -21,10 +22,11 @@ func TestMsgDataItem_ValidateBasic(t *testing.T) {
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid address",
+			name: "empty data item",
 			msg: MsgDataItem{
 				Creator: sample.AccAddress(),
 			},
+			err: bundlr.ErrVerifyIdSignatureMismatch,
 		},
 	}
 	for _, tt := range tests {

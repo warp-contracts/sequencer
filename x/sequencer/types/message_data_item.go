@@ -52,7 +52,10 @@ func (msg *MsgDataItem) GetSignBytes() []byte {
 }
 
 func (msg *MsgDataItem) ValidateBasic() (err error) {
-	// Ensure data item is in the correct format
+	_, err = sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
 
 	// Verifies DataItem acording to the ANS-104 standard. Verifies signature.
 	// https://github.com/ArweaveTeam/arweave-standards/blob/master/ans/ANS-104.md#21-verifying-a-dataitem
@@ -61,9 +64,5 @@ func (msg *MsgDataItem) ValidateBasic() (err error) {
 		return
 	}
 
-	_, err = sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
 	return nil
 }
