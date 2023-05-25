@@ -9,10 +9,6 @@ option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
 // Msg defines the Msg service.
 service Msg { rpc DataItem(MsgDataItem) returns (MsgDataItemResponse); }
-message Tag {
-  string name = 1;
-  string value = 2;
-}
 
 message MsgDataItem {
   string creator = 1;
