@@ -10,9 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: checkout repo
+    - name: Checkout Repository
       uses: actions/checkout@v2
-    - name: build application
+    - name: Build
       run: make build
-    - name: run linter
-      run: make lint
+    - name: Test
+      run: make test
