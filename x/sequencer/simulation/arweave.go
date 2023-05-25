@@ -10,7 +10,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func SimulateMsgArweave(
+func SimulateMsgDataItem(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -18,12 +18,12 @@ func SimulateMsgArweave(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgArweave{
+		msg := &types.MsgDataItem{
 			Creator: simAccount.Address.String(),
 		}
 
-		// TODO: Handling the Arweave simulation
+		// TODO: Handling the DataItem simulation
 
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "Arweave simulation not implemented"), nil, nil
+		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "DataItem simulation not implemented"), nil, nil
 	}
 }

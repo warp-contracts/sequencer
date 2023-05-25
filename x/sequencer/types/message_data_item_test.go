@@ -6,25 +6,27 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 	"github.com/warp-contracts/sequencer/testutil/sample"
+	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
-func TestMsgArweave_ValidateBasic(t *testing.T) {
+func TestMsgDataItem_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgArweave
+		msg  MsgDataItem
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgArweave{
+			msg: MsgDataItem{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid address",
-			msg: MsgArweave{
+			name: "empty data item",
+			msg: MsgDataItem{
 				Creator: sample.AccAddress(),
 			},
+			err: bundlr.ErrVerifyIdSignatureMismatch,
 		},
 	}
 	for _, tt := range tests {
