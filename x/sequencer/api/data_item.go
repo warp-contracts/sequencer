@@ -16,7 +16,7 @@ type dataItemHandler struct {
 // The endpoint that accepts the DataItems as described in AND-104
 // wraps it with a Cosmos transaction and broadcasts it to the network.
 func RegisterDataItemAPIRoute(clientCtx client.Context, router *mux.Router) {
-	router.Handle("/dataitem", dataItemHandler{ctx: clientCtx}).Methods("POST")
+	router.Handle("/api/v1/dataitem", dataItemHandler{ctx: clientCtx}).Methods("POST")
 }
 
 func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -39,7 +39,7 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Broadcast transaction
+	// Validate and broadcast transaction
 	response, err := h.ctx.BroadcastTxSync(txBytes)
 	if err != nil {
 		http.Error(w, "failed to broadcast transaction", http.StatusInternalServerError)

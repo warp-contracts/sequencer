@@ -15,7 +15,7 @@ var _ = strconv.Itoa(0)
 func CmdDataItem() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "dataitem [data]",
-		Short: "Broadcast message in DataItem format",
+		Short: "Broadcast message in Arweave's DataItem format, described in ANS-104",
 		Args:  cobra.ExactArgs(12),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientTxContext(cmd)
