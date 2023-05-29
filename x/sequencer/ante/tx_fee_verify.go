@@ -7,6 +7,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
+// Checking if a transaction containing a DataItem has zero fees set.
 func verifyFee(tx sdk.Tx) error {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {

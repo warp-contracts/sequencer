@@ -7,6 +7,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
+// Checking if a transaction containing a DataItem does not have the memo, timeout height, and extension options set.
 func verifyTxBody(tx sdk.Tx) error {
 	if err := verifyMemo(tx); err != nil {
 		return err

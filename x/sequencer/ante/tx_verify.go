@@ -7,7 +7,9 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-// TODO description
+// Validation of a transaction containing a DataItem. 
+// Such a transaction can have exactly one message, and all the values in this transaction are predetermined or derived from the DataItem.
+// See: https://github.com/warp-contracts/sequencer/issues/8
 type DataItemTxDecorator struct {
 	ak sdkante.AccountKeeper
 }

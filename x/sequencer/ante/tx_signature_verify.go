@@ -12,6 +12,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
+// Validation of the signature for a transaction with a DataItem. 
+// The transaction's signature must match the signature of the DataItem. 
+// Additionally, the nonce for the given sender is validated.
 func verifySignatures(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	sigTx, ok := tx.(signing.SigVerifiableTx)
 	if !ok {
@@ -23,14 +26,6 @@ func verifySignatures(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, data
 		return err
 	}
 
-	if err := verifySingleSignature(ctx, ak, sigs, dataItem); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func verifySingleSignature(ctx sdk.Context, ak sdkante.AccountKeeper, sigs []txsigning.SignatureV2, dataItem *types.MsgDataItem) error {
 	if len(sigs) != 1 {
 		return sdkerrors.Wrap(types.ErrToManySignatures, "transaction with data item must contain exactly one signature")
 	}
@@ -42,6 +37,14 @@ func verifySingleSignature(ctx sdk.Context, ak sdkante.AccountKeeper, sigs []txs
 		return err
 	}
 
+	if err := verifySingleSignature(sig, signer, acc, dataItem); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc authtypes.AccountI, dataItem *types.MsgDataItem) error {
 	switch sigData := sig.Data.(type) {
 	case *txsigning.SingleSignatureData:
 		if !bytes.Equal(sigData.Signature, dataItem.DataItem.Signature) {
