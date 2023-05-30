@@ -10,7 +10,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-// Checking if a transaction containing a DataItem has zero fees set.
+// Checking if a transaction containing a DataItem has zero fees set
 func verifyFee(tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
@@ -36,7 +36,7 @@ func verifyFee(tx sdk.Tx, dataItem *types.MsgDataItem) error {
 
 	if !feeTx.FeeGranter().Empty() {
 		return sdkerrors.Wrapf(types.ErrNotEmptyFeeGranter,
-			"transaction with data item cannot have fee granger: %s", feeTx.FeeGranter())
+			"transaction with data item cannot have fee granter: %s", feeTx.FeeGranter())
 	}
 
 	if err := verifyTip(tx); err != nil {

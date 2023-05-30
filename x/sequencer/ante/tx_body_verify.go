@@ -58,7 +58,6 @@ func verifyExtOpts(tx sdk.Tx) error {
 	if extensionOptionsTx, ok := tx.(ante.HasExtensionOptionsTx); ok {
 		if len(extensionOptionsTx.GetExtensionOptions()) > 0 || len(extensionOptionsTx.GetNonCriticalExtensionOptions()) > 0 {
 			return sdkerrors.Wrap(types.ErrHasExtensionOptions, "transaction with data item cannot have extension options")
-
 		}
 	}
 
