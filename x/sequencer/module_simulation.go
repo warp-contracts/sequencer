@@ -24,8 +24,8 @@ var (
 )
 
 const (
-	opWeightMsgArweave = "op_weight_msg_arweave"
-	defaultWeightMsgArweave int = 100
+	opWeightMsgDataItem = "op_weight_msg_data_item"
+	defaultWeightMsgDataItem int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )

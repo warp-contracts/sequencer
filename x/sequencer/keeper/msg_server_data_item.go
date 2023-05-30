@@ -6,6 +6,6 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func (k msgServer) Arweave(goCtx context.Context, msg *types.MsgArweave) (*types.MsgArweaveResponse, error) {
-	return &types.MsgArweaveResponse{}, nil
+func (k msgServer) DataItem(goCtx context.Context, msg *types.MsgDataItem) (*types.MsgDataItemResponse, error) {
+	return &types.MsgDataItemResponse{}, nil
 }
