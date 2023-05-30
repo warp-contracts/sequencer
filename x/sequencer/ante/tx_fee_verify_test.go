@@ -1,0 +1,72 @@
+package ante
+
+import (
+	"github.com/stretchr/testify/require"
+	"testing"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
+
+	"github.com/warp-contracts/sequencer/x/sequencer/types"
+)
+
+func newTxBuilderWithDataItem() (client.TxBuilder, *types.MsgDataItem) {
+	dataItem := exampleDataItem()
+	txBuilder := newTxBuilder()
+	txBuilder.SetMsgs(&dataItem)
+	return txBuilder, &dataItem
+}
+
+var WARP_COIN = sdk.NewCoins(sdk.NewCoin("warp", sdk.NewInt(1)))
+
+func TestVerifyFeeTx(t *testing.T) {
+	txBuilder, dataItem := newTxBuilderWithDataItem()
+	tx := txBuilder.GetTx()
+
+	err := verifyFee(tx, dataItem)
+
+	require.NoError(t, err)
+}
+
+func TestVerifyFeeTxWithGas(t *testing.T) {
+	txBuilder, dataItem := newTxBuilderWithDataItem()
+	txBuilder.SetGasLimit(1)
+	tx := txBuilder.GetTx()
+
+	err := verifyFee(tx, dataItem)
+
+	require.ErrorIs(t, err, types.ErrNonZeroGas)
+}
+
+func TestVerifyFeeTxWithFee(t *testing.T) {
+	txBuilder, dataItem := newTxBuilderWithDataItem()
+	txBuilder.SetFeeAmount(WARP_COIN)
+	tx := txBuilder.GetTx()
+
+	err := verifyFee(tx, dataItem)
+
+	require.ErrorIs(t, err, types.ErrNonZeroFee)
+}
+
+func TestVerifyFeeTxWithFeePayer(t *testing.T) {
+	feePayer, _ := sdk.AccAddressFromBech32("cosmos1ex86m6j6r48ee2ptwlmpmfws6ral6pxehv6508")
+	txBuilder, dataItem := newTxBuilderWithDataItem()
+	txBuilder.SetFeePayer(feePayer)
+	tx := txBuilder.GetTx()
+
+	err := verifyFee(tx, dataItem)
+
+	require.ErrorIs(t, err, types.ErrNotEmptyFeePayer)
+}
+
+func TestVerifyFeeTxWithFeeGranter(t *testing.T) {
+	tip := &txtypes.Tip{Tipper: "cosmos1xq823wxewwv6elykrn8savrx53f5s0cqt05kms", Amount: WARP_COIN}
+	txBuilder, dataItem := newTxBuilderWithDataItem()
+	txBuilder.SetTip(tip)
+	tx := txBuilder.GetTx()
+
+	err := verifyFee(tx, dataItem)
+
+	require.ErrorIs(t, err, types.ErrNotEmptyTip)
+}

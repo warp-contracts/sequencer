@@ -1,16 +1,18 @@
 package ante
 
 import (
+	"github.com/stretchr/testify/require"
+	"testing"
+
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
-	"github.com/stretchr/testify/require"
+
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
-	"testing"
 )
 
-func newTxBuilder() authtx.ExtensionOptionsTxBuilder {
+func newExtOptionsTxBuilder() authtx.ExtensionOptionsTxBuilder {
 	return simapp.MakeTestEncodingConfig().TxConfig.NewTxBuilder().(authtx.ExtensionOptionsTxBuilder)
 }
 
@@ -23,7 +25,7 @@ func newAnyValue() *codectypes.Any {
 }
 
 func TestVerifyTxBody(t *testing.T) {
-	tx := newTxBuilder().GetTx()
+	tx := newExtOptionsTxBuilder().GetTx()
 
 	err := verifyTxBody(tx)
 
@@ -31,7 +33,7 @@ func TestVerifyTxBody(t *testing.T) {
 }
 
 func TestVerifyTxBodyWithMemo(t *testing.T) {
-	txBuilder := newTxBuilder()
+	txBuilder := newExtOptionsTxBuilder()
 	txBuilder.SetMemo("not empty memo")
 	tx := txBuilder.GetTx()
 
@@ -41,7 +43,7 @@ func TestVerifyTxBodyWithMemo(t *testing.T) {
 }
 
 func TestVerifyTxBodyWithTimeoutHeight(t *testing.T) {
-	txBuilder := newTxBuilder()
+	txBuilder := newExtOptionsTxBuilder()
 	txBuilder.SetTimeoutHeight(123)
 	tx := txBuilder.GetTx()
 
@@ -51,7 +53,7 @@ func TestVerifyTxBodyWithTimeoutHeight(t *testing.T) {
 }
 
 func TestVerifyTxBodyWithExtensionOptions(t *testing.T) {
-	txBuilder := newTxBuilder()
+	txBuilder := newExtOptionsTxBuilder()
 	txBuilder.SetExtensionOptions(newAnyValue())
 	tx := txBuilder.GetTx()
 
@@ -61,7 +63,7 @@ func TestVerifyTxBodyWithExtensionOptions(t *testing.T) {
 }
 
 func TestVerifyTxBodyWithNonCriticalExtensionOptions(t *testing.T) {
-	txBuilder := newTxBuilder()
+	txBuilder := newExtOptionsTxBuilder()
 	txBuilder.SetNonCriticalExtensionOptions(newAnyValue())
 	tx := txBuilder.GetTx()
 

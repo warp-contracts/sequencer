@@ -1,14 +1,17 @@
 package ante
 
 import (
+	"bytes"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx"
+
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 // Checking if a transaction containing a DataItem has zero fees set.
-func verifyFee(tx sdk.Tx) error {
+func verifyFee(tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
 		return sdkerrors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type FeeTx")
@@ -26,20 +29,20 @@ func verifyFee(tx sdk.Tx) error {
 		}
 	}
 
-	if !feeTx.FeePayer().Empty() {
+	if !bytes.Equal(feeTx.FeePayer(), dataItem.GetSigners()[0]) {
 		return sdkerrors.Wrapf(types.ErrNotEmptyFeePayer,
-			"transaction with data item cannot fee payer: %s", feeTx.FeePayer())
+			"transaction with data item cannot have fee payer: %s", feeTx.FeePayer())
 	}
-	
+
 	if !feeTx.FeeGranter().Empty() {
 		return sdkerrors.Wrapf(types.ErrNotEmptyFeeGranter,
-			"transaction with data item cannot fee granger: %s", feeTx.FeeGranter())
+			"transaction with data item cannot have fee granger: %s", feeTx.FeeGranter())
 	}
 
 	if err := verifyTip(tx); err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 

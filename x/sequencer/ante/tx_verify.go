@@ -4,10 +4,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
+
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-// Validation of a transaction containing a DataItem. 
+// Validation of a transaction containing a DataItem.
 // Such a transaction can have exactly one message, and all the values in this transaction are predetermined or derived from the DataItem.
 // See: https://github.com/warp-contracts/sequencer/issues/8
 type DataItemTxDecorator struct {
@@ -38,11 +39,11 @@ func (ditd DataItemTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate 
 func GetDataItemMsg(tx sdk.Tx) (*types.MsgDataItem, error) {
 	msgs := tx.GetMsgs()
 
-	if len(msgs) > 0 {
-		dataItem, isDataItem := msgs[0].(*types.MsgDataItem)
+	for _, msg := range msgs {
+		dataItem, isDataItem := msg.(*types.MsgDataItem)
 		if isDataItem {
 			if len(msgs) > 1 {
-				err := sdkerrors.Wrapf(types.ErrToManyDataItems,
+				err := sdkerrors.Wrapf(types.ErrTooManyMessages,
 					"transaction with data item can have only one message, and it has: %d", len(msgs))
 				return nil, err
 			}
@@ -62,7 +63,7 @@ func verifyTxWithDataItem(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, 
 		return err
 	}
 
-	if err := verifyFee(tx); err != nil {
+	if err := verifyFee(tx, dataItem); err != nil {
 		return err
 	}
 

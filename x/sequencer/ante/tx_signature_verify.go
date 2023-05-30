@@ -2,18 +2,20 @@ package ante
 
 import (
 	"bytes"
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
-	"github.com/warp-contracts/sequencer/x/sequencer/types"
-	"strconv"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
+	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-// Validation of the signature for a transaction with a DataItem. 
-// The transaction's signature must match the signature of the DataItem. 
+// Validation of the signature for a transaction with a DataItem.
+// The transaction's signature must match the signature of the DataItem.
 // Additionally, the nonce for the given sender is validated.
 func verifySignatures(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	sigTx, ok := tx.(signing.SigVerifiableTx)
@@ -27,7 +29,7 @@ func verifySignatures(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, data
 	}
 
 	if len(sigs) != 1 {
-		return sdkerrors.Wrap(types.ErrToManySignatures, "transaction with data item must contain exactly one signature")
+		return sdkerrors.Wrapf(types.ErrNotSingleSignature, "transaction with data item must contain exactly one signature, it has: %d", len(sigs))
 	}
 
 	sig := sigs[0]
@@ -52,7 +54,7 @@ func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc
 				"transaction with data item signature is different from data item signature")
 		}
 	case *txsigning.MultiSignatureData:
-		return sdkerrors.Wrap(types.ErrToManySigners, "transaction with data item can only have one signer")
+		return sdkerrors.Wrap(types.ErrTooManySigners, "transaction with data item can only have one signer")
 	}
 
 	if !bytes.Equal(sig.PubKey.Address(), signer) {
