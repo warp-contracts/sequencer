@@ -18,7 +18,7 @@ M = $(shell printf "\033[34;1m▶\033[0m")
 
 # Default target
 .PHONY: all
-all:  build | $(BASE); $(info $(M) built and lint everything!) @
+all:  build lint | $(BASE); $(info $(M) built and lint everything!) @
 
 # Setup
 $(BASE): ; $(info $(M) setting GOPATH…)
@@ -65,6 +65,10 @@ build-race:  | $(BASE); $(info $(M) building executable…) @
 	$Q cd $(BASE) && $(GO) build -race \
 		-tags release \
 		-o bin/$(PACKAGE) main.go
+
+.PHONY: test
+test:
+	$(GO) test ./...
 
 .PHONY: docker-build
 docker-build: all | ; $(info $(M) building docker container) @ 

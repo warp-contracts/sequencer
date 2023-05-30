@@ -12,44 +12,20 @@ import (
 
 var _ = strconv.Itoa(0)
 
-func CmdArweave() *cobra.Command {
+func CmdDataItem() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "arweave [format] [id] [last-tx] [owner] [tags] [target] [quantity] [data-root] [data-size] [data] [reward] [signature]",
-		Short: "Broadcast message arweave",
+		Use:   "dataitem [data]",
+		Short: "Broadcast message in Arweave's DataItem format, described in ANS-104",
 		Args:  cobra.ExactArgs(12),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argFormat := args[0]
-			argId := args[1]
-			argLastTx := args[2]
-			argOwner := args[3]
-			argTags := args[4]
-			argTarget := args[5]
-			argQuantity := args[6]
-			argDataRoot := args[7]
-			argDataSize := args[8]
-			argData := args[9]
-			argReward := args[10]
-			argSignature := args[11]
-
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			msg, err := types.NewMsgArweave(
+			msg, err := types.NewMsgDataItem(
 				clientCtx.GetFromAddress().String(),
-				argFormat,
-				argId,
-				argLastTx,
-				argOwner,
-				argTags,
-				argTarget,
-				argQuantity,
-				argDataRoot,
-				argDataSize,
-				argData,
-				argReward,
-				argSignature,
+				args[0],
 			)
 			if err != nil {
 				return err
