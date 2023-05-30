@@ -25,7 +25,6 @@ var (
 
 const (
 	opWeightMsgDataItem = "op_weight_msg_data_item"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgDataItem int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
