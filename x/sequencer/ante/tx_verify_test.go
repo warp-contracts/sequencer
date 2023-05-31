@@ -11,7 +11,7 @@ import (
 )
 
 func TestGetDataItemMsgOneDataItem(t *testing.T) {
-	dataItem := exampleDataItem()
+	dataItem := exampleDataItem(t)
 	txBuilder := newTxBuilder()
 	txBuilder.SetMsgs(&dataItem)
 	tx := txBuilder.GetTx()
@@ -33,7 +33,7 @@ func TestGetDataItemMsgNoMsgs(t *testing.T) {
 }
 
 func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
-	dataItem := exampleDataItem()
+	dataItem := exampleDataItem(t)
 	txBuilder := newTxBuilder()
 	txBuilder.SetMsgs(&dataItem, &dataItem)
 	tx := txBuilder.GetTx()
@@ -45,7 +45,7 @@ func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
 }
 
 func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
-	dataItem := exampleDataItem()
+	dataItem := exampleDataItem(t)
 	msg := testdata.NewTestMsg(sdk.AccAddress(dataItem.Creator))
 	txBuilder := newTxBuilder()
 	txBuilder.SetMsgs(&dataItem, msg)
@@ -58,7 +58,7 @@ func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
 }
 
 func TestGetDataItemMsgDataItemAfterMsg(t *testing.T) {
-	dataItem := exampleDataItem()
+	dataItem := exampleDataItem(t)
 	msg := testdata.NewTestMsg(sdk.AccAddress(dataItem.Creator))
 	txBuilder := newTxBuilder()
 	txBuilder.SetMsgs(msg, &dataItem)

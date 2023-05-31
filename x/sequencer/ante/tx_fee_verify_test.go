@@ -11,8 +11,8 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func newTxBuilderWithDataItem() (client.TxBuilder, *types.MsgDataItem) {
-	dataItem := exampleDataItem()
+func newTxBuilderWithDataItem(t *testing.T) (client.TxBuilder, *types.MsgDataItem) {
+	dataItem := exampleDataItem(t)
 	txBuilder := newTxBuilder()
 	txBuilder.SetMsgs(&dataItem)
 	return txBuilder, &dataItem
@@ -21,7 +21,7 @@ func newTxBuilderWithDataItem() (client.TxBuilder, *types.MsgDataItem) {
 var WARP_COIN = sdk.NewCoins(sdk.NewCoin("warp", sdk.NewInt(1)))
 
 func TestVerifyFeeTx(t *testing.T) {
-	txBuilder, dataItem := newTxBuilderWithDataItem()
+	txBuilder, dataItem := newTxBuilderWithDataItem(t)
 	tx := txBuilder.GetTx()
 
 	err := verifyFee(tx, dataItem)
@@ -30,7 +30,7 @@ func TestVerifyFeeTx(t *testing.T) {
 }
 
 func TestVerifyFeeTxWithGas(t *testing.T) {
-	txBuilder, dataItem := newTxBuilderWithDataItem()
+	txBuilder, dataItem := newTxBuilderWithDataItem(t)
 	txBuilder.SetGasLimit(1)
 	tx := txBuilder.GetTx()
 
@@ -40,7 +40,7 @@ func TestVerifyFeeTxWithGas(t *testing.T) {
 }
 
 func TestVerifyFeeTxWithFee(t *testing.T) {
-	txBuilder, dataItem := newTxBuilderWithDataItem()
+	txBuilder, dataItem := newTxBuilderWithDataItem(t)
 	txBuilder.SetFeeAmount(WARP_COIN)
 	tx := txBuilder.GetTx()
 
@@ -51,7 +51,7 @@ func TestVerifyFeeTxWithFee(t *testing.T) {
 
 func TestVerifyFeeTxWithFeePayer(t *testing.T) {
 	feePayer, _ := sdk.AccAddressFromBech32("cosmos1ex86m6j6r48ee2ptwlmpmfws6ral6pxehv6508")
-	txBuilder, dataItem := newTxBuilderWithDataItem()
+	txBuilder, dataItem := newTxBuilderWithDataItem(t)
 	txBuilder.SetFeePayer(feePayer)
 	tx := txBuilder.GetTx()
 
@@ -62,7 +62,7 @@ func TestVerifyFeeTxWithFeePayer(t *testing.T) {
 
 func TestVerifyFeeTxWithFeeGranter(t *testing.T) {
 	tip := &txtypes.Tip{Tipper: "cosmos1xq823wxewwv6elykrn8savrx53f5s0cqt05kms", Amount: WARP_COIN}
-	txBuilder, dataItem := newTxBuilderWithDataItem()
+	txBuilder, dataItem := newTxBuilderWithDataItem(t)
 	txBuilder.SetTip(tip)
 	tx := txBuilder.GetTx()
 

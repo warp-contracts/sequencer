@@ -48,7 +48,7 @@ func createEmptySignature(sequence uint64) (signing.SignatureV2) {
 
 func TestVerifySignaturesNoSignatures(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := exampleDataItem()
+	dataItem := exampleDataItem(t)
 	addCreatorAccount(app, ctx, dataItem)
 
 	txBuilder := newTxBuilder()
@@ -62,7 +62,7 @@ func TestVerifySignaturesNoSignatures(t *testing.T) {
 
 func TestVerifySignaturesTooManySignatures(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := exampleDataItem()
+	dataItem := exampleDataItem(t)
 	acc := addCreatorAccount(app, ctx, dataItem)
 	sig := createEmptySignature(acc.GetSequence())
 
@@ -78,7 +78,7 @@ func TestVerifySignaturesTooManySignatures(t *testing.T) {
 
 func TestVerifySignaturesNoSignerAccount(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := exampleDataItem()
+	dataItem := exampleDataItem(t)
 	sig := createEmptySignature(0)
 
 	txBuilder := newTxBuilder()
@@ -93,7 +93,7 @@ func TestVerifySignaturesNoSignerAccount(t *testing.T) {
 
 func TestVerifySignaturesNotEmptySignature(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := exampleDataItem()
+	dataItem := exampleDataItem(t)
 	acc := addCreatorAccount(app, ctx, dataItem)
 	sigData := &signing.SingleSignatureData{
 		SignMode:  signing.SignMode_SIGN_MODE_DIRECT,
@@ -113,7 +113,7 @@ func TestVerifySignaturesNotEmptySignature(t *testing.T) {
 
 func TestVerifySignaturesMultiSignature(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := exampleDataItem()
+	dataItem := exampleDataItem(t)
 	acc := addCreatorAccount(app, ctx, dataItem)
 	sigData := &signing.MultiSignatureData{}
 	sig := createSignature(acc.GetSequence(), sigData)
@@ -130,7 +130,7 @@ func TestVerifySignaturesMultiSignature(t *testing.T) {
 
 func TestVerifySignaturesPublicKeyMismatch(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := exampleDataItem()
+	dataItem := exampleDataItem(t)
 	acc := addCreatorAccount(app, ctx, dataItem)
 	sig := createEmptySignature(acc.GetSequence())
 
