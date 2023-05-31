@@ -19,7 +19,7 @@ func NewSigVerificationDecorator(standardSigVerificationDecorator ante.SigVerifi
 func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	dataItem, _ := GetDataItemMsg(tx)
 	if dataItem != nil {
-		return svd.AnteHandle(ctx, tx, simulate, next)
+		return next(ctx, tx, simulate)
 	}
-	return next(ctx, tx, simulate)
+	return svd.AnteHandle(ctx, tx, simulate, next)
 }

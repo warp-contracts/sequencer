@@ -4,31 +4,11 @@ import (
 	"github.com/stretchr/testify/require"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
-	"github.com/warp-contracts/syncer/src/utils/arweave"
-	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
-
-func newTxBuilder() client.TxBuilder {
-	return simapp.MakeTestEncodingConfig().TxConfig.NewTxBuilder()
-}
-
-func exampleDataItem() types.MsgDataItem {
-	dataItem := bundlr.BundleItem{
-		SignatureType: 1,
-		Signature:     arweave.Base64String("signature"),
-	}
-
-	return types.MsgDataItem{
-		Creator:  "cosmos1hsk6jryyqjfhp5dhc55tc9jtckygx0eph6dd02",
-		DataItem: dataItem,
-	}
-}
 
 func TestGetDataItemMsgOneDataItem(t *testing.T) {
 	dataItem := exampleDataItem()

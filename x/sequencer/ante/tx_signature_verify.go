@@ -49,9 +49,8 @@ func verifySignatures(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, data
 func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc authtypes.AccountI, dataItem *types.MsgDataItem) error {
 	switch sigData := sig.Data.(type) {
 	case *txsigning.SingleSignatureData:
-		if !bytes.Equal(sigData.Signature, dataItem.DataItem.Signature) {
-			return sdkerrors.Wrap(types.ErrSignatureMismatch,
-				"transaction with data item signature is different from data item signature")
+		if sigData.Signature != nil {
+			return sdkerrors.Wrap(types.ErrNotEmptySignature, "transaction with data item should have empty signature")
 		}
 	case *txsigning.MultiSignatureData:
 		return sdkerrors.Wrap(types.ErrTooManySigners, "transaction with data item can only have one signer")

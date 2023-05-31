@@ -13,7 +13,7 @@ var (
 	ErrNonZeroTimeoutHeight   = sdkerrors.Register(ModuleName, 1102, "non-zero timeout height")
 	ErrHasExtensionOptions    = sdkerrors.Register(ModuleName, 1103, "has extension options")
 	ErrNotSingleSignature     = sdkerrors.Register(ModuleName, 1104, "not single signature")
-	ErrSignatureMismatch      = sdkerrors.Register(ModuleName, 1105, "signature mismatch")
+	ErrNotEmptySignature      = sdkerrors.Register(ModuleName, 1105, "not empty signature")
 	ErrTooManySigners         = sdkerrors.Register(ModuleName, 1106, "too many signers")
 	ErrPublicKeyMismatch      = sdkerrors.Register(ModuleName, 1107, "public key mismatch")
 	ErrNoSequencerNonceTag    = sdkerrors.Register(ModuleName, 1108, "no sequencer nonce tag")
