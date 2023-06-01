@@ -104,6 +104,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	sequencermodule "github.com/warp-contracts/sequencer/x/sequencer"
+	sequencerante "github.com/warp-contracts/sequencer/x/sequencer/ante"
 	sequencerapi "github.com/warp-contracts/sequencer/x/sequencer/api"
 	sequencermodulekeeper "github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	sequencermoduletypes "github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -699,7 +700,7 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 
-	anteHandler, err := ante.NewAnteHandler(
+	anteHandler, err := sequencerante.NewAnteHandler(
 		ante.HandlerOptions{
 			AccountKeeper:   app.AccountKeeper,
 			BankKeeper:      app.BankKeeper,
