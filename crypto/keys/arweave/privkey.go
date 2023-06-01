@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
+	"crypto/x509"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 )
@@ -43,3 +44,23 @@ func (sk *PrivKey) Equals(other cryptotypes.LedgerPrivKey) bool {
 func (sk *PrivKey) Type() string {
 	return name
 }
+
+func (pk *arweaveSK) MarshalTo(data []byte) (int, error) {
+	bz := x509.MarshalPKCS1PrivateKey(&pk.secret)
+	copy(data, bz)
+	return len(bz), nil
+}
+
+func (sk *arweaveSK) Unmarshal(bz []byte) error {
+	key, err := x509.ParsePKCS1PrivateKey(bz)
+	if err != nil {
+		return err
+	}
+	sk.secret = *key
+	return nil
+}
+
+func (sk *arweaveSK) Size() int {
+	return len(x509.MarshalPKCS1PrivateKey(&sk.secret))
+}
+
