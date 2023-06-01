@@ -21,5 +21,5 @@ func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	if dataItem != nil {
 		return next(ctx, tx, simulate)
 	}
-	return svd.AnteHandle(ctx, tx, simulate, next)
+	return svd.standardSigVerificationDecorator.AnteHandle(ctx, tx, simulate, next)
 }
