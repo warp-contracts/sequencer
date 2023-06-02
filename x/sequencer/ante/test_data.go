@@ -41,7 +41,8 @@ func exampleDataItem(t *testing.T) types.MsgDataItem {
 		Tags:          bundlr.Tags{bundlr.Tag{Name: "1", Value: "2"}, bundlr.Tag{Name: "3", Value: "4"}},
 		Data:          arweave.Base64String(tool.RandomString(100)),
 	}
-	dataItem.Sign(signer)
+	err = dataItem.Sign(signer)
+	require.NoError(t, err)
 
 	return types.MsgDataItem{
 		Creator:  "cosmos1hsk6jryyqjfhp5dhc55tc9jtckygx0eph6dd02",
