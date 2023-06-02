@@ -4,15 +4,18 @@ import (
 	"github.com/stretchr/testify/require"
 	"testing"
 
-	"github.com/warp-contracts/sequencer/x/sequencer/types"
-
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/tx/signing"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
+	keys "github.com/warp-contracts/sequencer/crypto/keys/arweave"
+	"github.com/warp-contracts/sequencer/x/sequencer/types"
+
+	"github.com/warp-contracts/syncer/src/utils/bundlr"
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
@@ -30,26 +33,27 @@ func addCreatorAccount(app *simapp.SimApp, ctx sdk.Context, dataItem types.MsgDa
 	return acc
 }
 
-func createSignature(sequence uint64, data signing.SignatureData) (signing.SignatureV2) {
-	_, pubKey, _ := testdata.KeyTestPubAddr()
+func createSignature(dataItem types.MsgDataItem, sequence uint64, data signing.SignatureData) signing.SignatureV2 {
+	pubKey := &keys.PubKey{Key: dataItem.DataItem.Owner}
 	return signing.SignatureV2{
-		PubKey: pubKey,
-		Data: data,
+		PubKey:   pubKey,
 		Sequence: sequence,
+		Data:     data,
 	}
 }
 
-func createEmptySignature(sequence uint64) (signing.SignatureV2) {
-	data := &signing.SingleSignatureData{
-		SignMode:  signing.SignMode_SIGN_MODE_DIRECT,
-		Signature: nil,
-	}
-	return createSignature(sequence, data)
+var singleSignatureData = &signing.SingleSignatureData{
+	SignMode:  signing.SignMode_SIGN_MODE_DIRECT,
+	Signature: nil,
 }
 
-func createTxWithSignatures(t *testing.T, dataItem types.MsgDataItem, signatures ...signing.SignatureV2) (authsigning.Tx) {
+func createEmptySignature(dataItem types.MsgDataItem, sequence uint64) signing.SignatureV2 {
+	return createSignature(dataItem, sequence, singleSignatureData)
+}
+
+func createTxWithSignatures(t *testing.T, dataItem types.MsgDataItem, signatures ...signing.SignatureV2) authsigning.Tx {
 	txBuilder := newTxBuilder()
-	
+
 	err := txBuilder.SetMsgs(&dataItem)
 	require.NoError(t, err)
 
@@ -74,7 +78,7 @@ func TestVerifySignaturesTooManySignatures(t *testing.T) {
 	app, ctx := appAndCtx(t)
 	dataItem := exampleDataItem(t)
 	acc := addCreatorAccount(app, ctx, dataItem)
-	sig := createEmptySignature(acc.GetSequence())
+	sig := createEmptySignature(dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig, sig)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
@@ -85,7 +89,7 @@ func TestVerifySignaturesTooManySignatures(t *testing.T) {
 func TestVerifySignaturesNoSignerAccount(t *testing.T) {
 	app, ctx := appAndCtx(t)
 	dataItem := exampleDataItem(t)
-	sig := createEmptySignature(0)
+	sig := createEmptySignature(dataItem, 0)
 	tx := createTxWithSignatures(t, dataItem, sig)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
@@ -101,7 +105,7 @@ func TestVerifySignaturesNotEmptySignature(t *testing.T) {
 		SignMode:  signing.SignMode_SIGN_MODE_DIRECT,
 		Signature: []byte("signature"),
 	}
-	sig := createSignature(acc.GetSequence(), sigData)
+	sig := createSignature(dataItem, acc.GetSequence(), sigData)
 	tx := createTxWithSignatures(t, dataItem, sig)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
@@ -114,7 +118,7 @@ func TestVerifySignaturesMultiSignature(t *testing.T) {
 	dataItem := exampleDataItem(t)
 	acc := addCreatorAccount(app, ctx, dataItem)
 	sigData := &signing.MultiSignatureData{}
-	sig := createSignature(acc.GetSequence(), sigData)
+	sig := createSignature(dataItem, acc.GetSequence(), sigData)
 	tx := createTxWithSignatures(t, dataItem, sig)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
@@ -126,7 +130,12 @@ func TestVerifySignaturesPublicKeyMismatch(t *testing.T) {
 	app, ctx := appAndCtx(t)
 	dataItem := exampleDataItem(t)
 	acc := addCreatorAccount(app, ctx, dataItem)
-	sig := createEmptySignature(acc.GetSequence())
+	_, pubKey, _ := testdata.KeyTestPubAddr()
+	sig := 	signing.SignatureV2{
+		PubKey:   pubKey,
+		Sequence: acc.GetSequence(),
+		Data:     singleSignatureData,
+	}
 	tx := createTxWithSignatures(t, dataItem, sig)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
@@ -134,4 +143,50 @@ func TestVerifySignaturesPublicKeyMismatch(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrPublicKeyMismatch)
 }
 
-// TODO tests for nonce when support for Arweave/EVM keys is added
+func TestVerifySignaturesWrongSequence(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := exampleDataItem(t)
+	acc := addCreatorAccount(app, ctx, dataItem)
+	sig := createEmptySignature(dataItem, acc.GetSequence() + 1)
+	tx := createTxWithSignatures(t, dataItem, sig)
+
+	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
+
+	require.ErrorIs(t, err, sdkerrors.ErrWrongSequence)
+}
+
+func TestVerifySignaturesNoSequencerNonceTag(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := exampleDataItem(t)
+	acc := addCreatorAccount(app, ctx, dataItem)
+	sig := createEmptySignature(dataItem, acc.GetSequence())
+	tx := createTxWithSignatures(t, dataItem, sig)
+
+	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
+
+	require.ErrorIs(t, err, types.ErrNoSequencerNonceTag)
+}
+
+func TestVerifySignaturesSequencerNonceMismatch(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := exampleDataItem(t, bundlr.Tag{Name: "Sequencer-Nonce", Value: "1"})
+	acc := addCreatorAccount(app, ctx, dataItem)
+	sig := createEmptySignature(dataItem, acc.GetSequence())
+	tx := createTxWithSignatures(t, dataItem, sig)
+
+	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
+
+	require.ErrorIs(t, err, types.ErrSequencerNonceMismatch)
+}
+
+func TestVerifySignatures(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := exampleDataItem(t, bundlr.Tag{Name: "Sequencer-Nonce", Value: "0"})
+	acc := addCreatorAccount(app, ctx, dataItem)
+	sig := createEmptySignature(dataItem, acc.GetSequence())
+	tx := createTxWithSignatures(t, dataItem, sig)
+
+	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
+
+	require.NoError(t, err)
+}

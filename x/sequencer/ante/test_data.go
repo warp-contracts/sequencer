@@ -1,12 +1,13 @@
 package ante
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/simapp"
 
+	keys "github.com/warp-contracts/sequencer/crypto/keys/arweave"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	"github.com/warp-contracts/syncer/src/utils/arweave"
@@ -31,21 +32,23 @@ func newTxBuilder() client.TxBuilder {
 	return simapp.MakeTestEncodingConfig().TxConfig.NewTxBuilder()
 }
 
-func exampleDataItem(t *testing.T) types.MsgDataItem {
+func exampleDataItem(t *testing.T, tags... bundlr.Tag) types.MsgDataItem {
 	signer, err := bundlr.NewArweaveSigner(EMPTY_ARWEAVE_WALLET)
 	require.NoError(t, err)
 
 	dataItem := bundlr.BundleItem{
-		Target:        arweave.Base64String(tool.RandomString(32)),
-		Anchor:        arweave.Base64String(tool.RandomString(32)),
-		Tags:          bundlr.Tags{bundlr.Tag{Name: "1", Value: "2"}, bundlr.Tag{Name: "3", Value: "4"}},
-		Data:          arweave.Base64String(tool.RandomString(100)),
+		Target: arweave.Base64String(tool.RandomString(32)),
+		Anchor: arweave.Base64String(tool.RandomString(32)),
+		Tags:   bundlr.Tags(tags),
+		Data:   arweave.Base64String(tool.RandomString(100)),
 	}
 	err = dataItem.Sign(signer)
 	require.NoError(t, err)
 
+	pubKey := keys.PubKey{Key: signer.Owner}
+
 	return types.MsgDataItem{
-		Creator:  "cosmos1hsk6jryyqjfhp5dhc55tc9jtckygx0eph6dd02",
+		Creator:  pubKey.AccAddress().String(),
 		DataItem: dataItem,
 	}
 }

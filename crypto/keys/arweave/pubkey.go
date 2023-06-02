@@ -5,19 +5,20 @@ import (
 	"crypto"
 	"crypto/rsa"
 	"crypto/sha256"
-	"golang.org/x/crypto/ripemd160"
 	"math/big"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	tmcrypto "github.com/tendermint/tendermint/crypto"
 )
 
 func (pk *PubKey) Address() tmcrypto.Address {
-	sha := sha256.Sum256(pk.Key)
-	hasherRIPEMD160 := ripemd160.New()
-	hasherRIPEMD160.Write(sha[:])
-	return tmcrypto.Address(hasherRIPEMD160.Sum(nil))
+	return tmcrypto.AddressHash(pk.Key)
+}
+
+func (pk *PubKey) AccAddress() sdk.AccAddress {
+	return sdk.AccAddress(pk.Address())
 }
 
 func (pk *PubKey) VerifySignature(data []byte, signature []byte) bool {
