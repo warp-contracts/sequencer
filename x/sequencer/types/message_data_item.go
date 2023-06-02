@@ -1,8 +1,12 @@
 package types
 
 import (
+	"strconv"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	keys "github.com/warp-contracts/sequencer/crypto/keys/arweave"
 )
 
 const TypeMsgDataItem = "data_item"
@@ -17,12 +21,13 @@ func (msg *MsgDataItem) Type() string {
 	return TypeMsgDataItem
 }
 
+func (msg *MsgDataItem) GetCreator() sdk.AccAddress {
+	pubKey := keys.PubKey{Key: msg.DataItem.Owner}
+	return pubKey.AccAddress()
+}
+
 func (msg *MsgDataItem) GetSigners() []sdk.AccAddress {
-	creator, err := sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		panic(err)
-	}
-	return []sdk.AccAddress{creator}
+	return []sdk.AccAddress{msg.GetCreator()}
 }
 
 func (msg *MsgDataItem) GetSignBytes() []byte {
@@ -31,11 +36,6 @@ func (msg *MsgDataItem) GetSignBytes() []byte {
 }
 
 func (msg *MsgDataItem) ValidateBasic() (err error) {
-	_, err = sdk.AccAddressFromBech32(msg.Creator)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
-	}
-
 	// Verifies DataItem acording to the ANS-104 standard. Verifies signature.
 	// https://github.com/ArweaveTeam/arweave-standards/blob/master/ans/ANS-104.md#21-verifying-a-dataitem
 	err = msg.DataItem.Verify()
@@ -49,4 +49,14 @@ func (msg *MsgDataItem) ValidateBasic() (err error) {
 	}
 
 	return nil
+}
+
+func (msg *MsgDataItem) GetSequenceFromTags() (uint64, error) {
+	const sequencerNonceTag = "Sequencer-Nonce"
+	for _, tag := range msg.DataItem.Tags {
+		if tag.Name == sequencerNonceTag {
+			return strconv.ParseUint(tag.Value, 10, 64)
+		}
+	}
+	return 0, sdkerrors.Wrapf(ErrNoSequencerNonceTag, "data item does not have \"%s\" tag", sequencerNonceTag)
 }

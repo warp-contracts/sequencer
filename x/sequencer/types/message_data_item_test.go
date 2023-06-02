@@ -3,9 +3,7 @@ package types
 import (
 	"testing"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
-	"github.com/warp-contracts/sequencer/testutil/sample"
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
@@ -16,16 +14,8 @@ func TestMsgDataItem_ValidateBasic(t *testing.T) {
 		err  error
 	}{
 		{
-			name: "invalid address",
-			msg: MsgDataItem{
-				Creator: "invalid_address",
-			},
-			err: sdkerrors.ErrInvalidAddress,
-		}, {
 			name: "empty data item",
-			msg: MsgDataItem{
-				Creator: sample.AccAddress(),
-			},
+			msg: MsgDataItem{},
 			err: bundlr.ErrVerifyIdSignatureMismatch,
 		},
 	}

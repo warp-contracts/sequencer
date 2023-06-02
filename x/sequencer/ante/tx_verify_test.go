@@ -51,7 +51,7 @@ func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
 
 func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
 	dataItem := exampleDataItem(t)
-	msg := testdata.NewTestMsg(sdk.AccAddress(dataItem.Creator))
+	msg := testdata.NewTestMsg(dataItem.GetCreator())
 	tx := createTxWithMsgs(t, &dataItem, msg)
 
 	result, err := GetDataItemMsg(tx)
@@ -62,7 +62,7 @@ func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
 
 func TestGetDataItemMsgDataItemAfterMsg(t *testing.T) {
 	dataItem := exampleDataItem(t)
-	msg := testdata.NewTestMsg(sdk.AccAddress(dataItem.Creator))
+	msg := testdata.NewTestMsg(dataItem.GetCreator())
 	tx := createTxWithMsgs(t, msg, &dataItem)
 
 	result, err := GetDataItemMsg(tx)

@@ -9,7 +9,6 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/spf13/cobra"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
@@ -40,8 +39,13 @@ func CmdDataItem() *cobra.Command {
 				return
 			}
 
-			// Validates the message and sends it out
-			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+			// validates the message and sends it out
+			clientCtx.WithBroadcastMode(cmd.Flag(flags.FlagBroadcastMode).Value.String())
+			res, err := types.BroadcastDataItem(clientCtx, *msg)
+			if err != nil {
+				return
+			}
+			return clientCtx.PrintProto(res)
 		},
 	}
 
@@ -49,17 +53,13 @@ func CmdDataItem() *cobra.Command {
 	cmd.Flags().String(FlagEtherumPrivateKey, "", "Hex encoded private key for the Etherum account. Defaults to ./etherum.bin")
 	cmd.Flags().StringP(FlagData, "d", "", "File with the binary data")
 	cmd.Flags().StringArrayP(FlagTag, "t", []string{}, "One tag - a pair in the form of key=value. You can specify multiple tags. Example -t someKey=someValue -t someOtherKey=someValue")
-
-	flags.AddTxFlagsToCmd(cmd)
-
+	cmd.Flags().StringP(flags.FlagBroadcastMode, "b", flags.BroadcastSync, "Transaction broadcasting mode (sync|async|block)")
 	return cmd
 }
 
 func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types.MsgDataItem, err error) {
 	// Message
-	msg = &types.MsgDataItem{
-		Creator: clientCtx.GetFromAddress().String(),
-	}
+	msg = &types.MsgDataItem{}
 
 	// Data item may be signed with either Arweave or Etherum private key
 	arweaveWalletPath := cmd.Flag(FlagArweaveWallet).Value.String()

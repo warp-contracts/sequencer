@@ -2,7 +2,6 @@ package ante
 
 import (
 	"bytes"
-	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -80,7 +79,7 @@ func verifyNonce(acc authtypes.AccountI, sig txsigning.SignatureV2, signer sdk.A
 		)
 	}
 
-	tagSequence, err := getSequenceFromTags(dataItem)
+	tagSequence, err := dataItem.GetSequenceFromTags()
 	if err != nil {
 		return err
 	}
@@ -90,14 +89,4 @@ func verifyNonce(acc authtypes.AccountI, sig txsigning.SignatureV2, signer sdk.A
 	}
 
 	return nil
-}
-
-func getSequenceFromTags(dataItem *types.MsgDataItem) (uint64, error) {
-	const sequencerNonceTag = "Sequencer-Nonce"
-	for _, tag := range dataItem.DataItem.Tags {
-		if tag.Name == sequencerNonceTag {
-			return strconv.ParseUint(tag.Value, 10, 64)
-		}
-	}
-	return 0, sdkerrors.Wrapf(types.ErrNoSequencerNonceTag, "data item does not have \"%s\" tag", sequencerNonceTag)
 }

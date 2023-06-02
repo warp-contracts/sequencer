@@ -11,8 +11,7 @@ option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 service Msg { rpc DataItem(MsgDataItem) returns (MsgDataItemResponse); }
 
 message MsgDataItem {
-  string creator = 1;
-  bytes data_item = 2 [
+  bytes data_item = 1 [
     (gogoproto.customtype) =
         "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem",
     (gogoproto.nullable) = false

@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/simapp"
 
-	keys "github.com/warp-contracts/sequencer/crypto/keys/arweave"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	"github.com/warp-contracts/syncer/src/utils/arweave"
@@ -45,10 +44,7 @@ func exampleDataItem(t *testing.T, tags... bundlr.Tag) types.MsgDataItem {
 	err = dataItem.Sign(signer)
 	require.NoError(t, err)
 
-	pubKey := keys.PubKey{Key: signer.Owner}
-
 	return types.MsgDataItem{
-		Creator:  pubKey.AccAddress().String(),
 		DataItem: dataItem,
 	}
 }

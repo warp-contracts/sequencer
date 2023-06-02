@@ -27,8 +27,7 @@ func appAndCtx(t *testing.T) (*simapp.SimApp, sdk.Context) {
 }
 
 func addCreatorAccount(app *simapp.SimApp, ctx sdk.Context, dataItem types.MsgDataItem) authtypes.AccountI {
-	creator, _ := sdk.AccAddressFromBech32(dataItem.Creator)
-	acc := app.AccountKeeper.NewAccountWithAddress(ctx, creator)
+	acc := app.AccountKeeper.NewAccountWithAddress(ctx, dataItem.GetCreator())
 	app.AccountKeeper.SetAccount(ctx, acc)
 	return acc
 }
