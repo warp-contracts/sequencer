@@ -12,6 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 )
@@ -46,14 +47,23 @@ func createEmptySignature(sequence uint64) (signing.SignatureV2) {
 	return createSignature(sequence, data)
 }
 
+func createTxWithSignatures(t *testing.T, dataItem types.MsgDataItem, signatures ...signing.SignatureV2) (authsigning.Tx) {
+	txBuilder := newTxBuilder()
+	
+	err := txBuilder.SetMsgs(&dataItem)
+	require.NoError(t, err)
+
+	err = txBuilder.SetSignatures(signatures...)
+	require.NoError(t, err)
+
+	return txBuilder.GetTx()
+}
+
 func TestVerifySignaturesNoSignatures(t *testing.T) {
 	app, ctx := appAndCtx(t)
 	dataItem := exampleDataItem(t)
 	addCreatorAccount(app, ctx, dataItem)
-
-	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(&dataItem)
-	tx := txBuilder.GetTx()
+	tx := createTxWithSignatures(t, dataItem)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
 
@@ -65,11 +75,7 @@ func TestVerifySignaturesTooManySignatures(t *testing.T) {
 	dataItem := exampleDataItem(t)
 	acc := addCreatorAccount(app, ctx, dataItem)
 	sig := createEmptySignature(acc.GetSequence())
-
-	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(&dataItem)
-	txBuilder.SetSignatures(sig, sig)
-	tx := txBuilder.GetTx()
+	tx := createTxWithSignatures(t, dataItem, sig, sig)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
 
@@ -80,11 +86,7 @@ func TestVerifySignaturesNoSignerAccount(t *testing.T) {
 	app, ctx := appAndCtx(t)
 	dataItem := exampleDataItem(t)
 	sig := createEmptySignature(0)
-
-	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(&dataItem)
-	txBuilder.SetSignatures(sig)
-	tx := txBuilder.GetTx()
+	tx := createTxWithSignatures(t, dataItem, sig)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
 
@@ -100,11 +102,7 @@ func TestVerifySignaturesNotEmptySignature(t *testing.T) {
 		Signature: []byte("signature"),
 	}
 	sig := createSignature(acc.GetSequence(), sigData)
-
-	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(&dataItem)
-	txBuilder.SetSignatures(sig)
-	tx := txBuilder.GetTx()
+	tx := createTxWithSignatures(t, dataItem, sig)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
 
@@ -117,11 +115,7 @@ func TestVerifySignaturesMultiSignature(t *testing.T) {
 	acc := addCreatorAccount(app, ctx, dataItem)
 	sigData := &signing.MultiSignatureData{}
 	sig := createSignature(acc.GetSequence(), sigData)
-
-	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(&dataItem)
-	txBuilder.SetSignatures(sig)
-	tx := txBuilder.GetTx()
+	tx := createTxWithSignatures(t, dataItem, sig)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
 
@@ -133,11 +127,7 @@ func TestVerifySignaturesPublicKeyMismatch(t *testing.T) {
 	dataItem := exampleDataItem(t)
 	acc := addCreatorAccount(app, ctx, dataItem)
 	sig := createEmptySignature(acc.GetSequence())
-
-	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(&dataItem)
-	txBuilder.SetSignatures(sig)
-	tx := txBuilder.GetTx()
+	tx := createTxWithSignatures(t, dataItem, sig)
 
 	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
 

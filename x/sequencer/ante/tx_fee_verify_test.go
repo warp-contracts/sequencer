@@ -14,7 +14,8 @@ import (
 func newTxBuilderWithDataItem(t *testing.T) (client.TxBuilder, *types.MsgDataItem) {
 	dataItem := exampleDataItem(t)
 	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(&dataItem)
+	err := txBuilder.SetMsgs(&dataItem)
+	require.NoError(t, err)
 	return txBuilder, &dataItem
 }
 

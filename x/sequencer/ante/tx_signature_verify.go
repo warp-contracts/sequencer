@@ -86,7 +86,7 @@ func verifyNonce(acc authtypes.AccountI, sig txsigning.SignatureV2, signer sdk.A
 	}
 
 	if sig.Sequence != tagSequence {
-		sdkerrors.Wrap(types.ErrSequencerNonceMismatch, "transaction sequence does not match nonce from data item tag")
+		return sdkerrors.Wrap(types.ErrSequencerNonceMismatch, "transaction sequence does not match nonce from data item tag")
 	}
 
 	return nil
