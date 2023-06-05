@@ -48,10 +48,10 @@ func createTxWithDataItem(ctx client.Context, dataItem MsgDataItem) (tx authsign
 }
 
 func getSignature(dataItem MsgDataItem) (signature txsigning.SignatureV2, err error) {
-	pubKey := &keys.PubKey{Key: dataItem.DataItem.Owner}
+	pubKey := keys.UnmarshalPubkey(dataItem.DataItem.Owner)
 	sequence, err := dataItem.GetSequenceFromTags()
 	signature = txsigning.SignatureV2{
-		PubKey:   pubKey,
+		PubKey:   &pubKey,
 		Sequence: sequence,
 		Data:     nil,
 	}

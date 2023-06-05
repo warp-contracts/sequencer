@@ -22,7 +22,7 @@ func (msg *MsgDataItem) Type() string {
 }
 
 func (msg *MsgDataItem) GetCreator() sdk.AccAddress {
-	pubKey := keys.PubKey{Key: msg.DataItem.Owner}
+	pubKey := keys.UnmarshalPubkey(msg.DataItem.Owner)
 	return pubKey.AccAddress()
 }
 

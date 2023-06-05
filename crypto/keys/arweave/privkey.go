@@ -15,10 +15,7 @@ type arweaveSK struct {
 }
 
 func (sk *PrivKey) Bytes() []byte {
-	if sk == nil {
-		return nil
-	}
-	return sk.Key.secret.N.Bytes()
+	return sk.Key.Bytes()
 }
 
 func (sk *PrivKey) Sign(data []byte) ([]byte, error) {
@@ -30,23 +27,27 @@ func (sk *PrivKey) Sign(data []byte) ([]byte, error) {
 }
 
 func (sk *PrivKey) PubKey() cryptotypes.PubKey {
-	return &PubKey{sk.Key.secret.PublicKey.N.Bytes()}
+	return &PubKey{&arweavePK{sk.Key.secret.PublicKey}}
 }
 
 func (sk *PrivKey) Equals(other cryptotypes.LedgerPrivKey) bool {
-	otherPk, ok := other.(*PrivKey)
+	otherSk, ok := other.(*PrivKey)
 	if !ok {
 		return false
 	}
-	return sk.Key.secret.Equal(&otherPk.Key.secret)
+	return sk.Key.secret.Equal(&otherSk.Key.secret)
 }
 
 func (sk *PrivKey) Type() string {
-	return name
+	return "arweave"
 }
 
-func (pk *arweaveSK) MarshalTo(data []byte) (int, error) {
-	bz := x509.MarshalPKCS1PrivateKey(&pk.secret)
+func (sk *arweaveSK) Bytes() []byte {
+	return x509.MarshalPKCS1PrivateKey(&sk.secret)
+}
+
+func (sk *arweaveSK) MarshalTo(data []byte) (int, error) {
+	bz := sk.Bytes()
 	copy(data, bz)
 	return len(bz), nil
 }
@@ -61,6 +62,6 @@ func (sk *arweaveSK) Unmarshal(bz []byte) error {
 }
 
 func (sk *arweaveSK) Size() int {
-	return len(x509.MarshalPKCS1PrivateKey(&sk.secret))
+	return len(sk.Bytes())
 }
 
