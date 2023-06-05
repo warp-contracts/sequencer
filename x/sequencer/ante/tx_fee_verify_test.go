@@ -1,8 +1,9 @@
 package ante
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,7 +13,7 @@ import (
 )
 
 func newTxBuilderWithDataItem(t *testing.T) (client.TxBuilder, *types.MsgDataItem) {
-	dataItem := exampleDataItem(t)
+	dataItem := arweaveDataItem(t)
 	txBuilder := newTxBuilder()
 	err := txBuilder.SetMsgs(&dataItem)
 	require.NoError(t, err)

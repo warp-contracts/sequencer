@@ -2,11 +2,15 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/client"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 
-	keys "github.com/warp-contracts/sequencer/crypto/keys/arweave"
+	"github.com/warp-contracts/sequencer/crypto/keys/arweave"
+	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
+
+	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
 const SequencerNonceTag = "Sequencer-Nonce"
@@ -48,12 +52,31 @@ func createTxWithDataItem(ctx client.Context, dataItem MsgDataItem) (tx authsign
 }
 
 func getSignature(dataItem MsgDataItem) (signature txsigning.SignatureV2, err error) {
-	pubKey := keys.UnmarshalPubkey(dataItem.DataItem.Owner)
+	pubKey, err := getPublicKey(dataItem)
+	if err != nil {
+		return
+	}
 	sequence, err := dataItem.GetSequenceFromTags()
+	if err != nil {
+		return
+	}
 	signature = txsigning.SignatureV2{
-		PubKey:   &pubKey,
+		PubKey:   pubKey,
 		Sequence: sequence,
 		Data:     nil,
 	}
 	return
+}
+
+func getPublicKey(dataItem MsgDataItem) (cryptotypes.PubKey, error) {
+	switch dataItem.DataItem.SignatureType {
+	case bundlr.SignatureTypeArweave:
+		pubKey := arweave.UnmarshalPubkey(dataItem.DataItem.Owner)
+		return pubKey, nil
+	case bundlr.SignatureTypeEtherum:
+		pubKey, err := ethereum.UnmarshalPubkey(dataItem.DataItem.Owner)
+		return pubKey, err
+	default:
+		return nil, bundlr.ErrUnsupportedSignatureType
+	}
 }

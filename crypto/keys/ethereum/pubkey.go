@@ -75,3 +75,11 @@ func (pk *ethereumPK) Unmarshal(bz []byte) error {
 	pk.public = *key
 	return nil
 }
+
+func UnmarshalPubkey(bz []byte) (*PubKey, error) {
+	key, err := etherum_crypto.UnmarshalPubkey(bz)
+	if err != nil {
+		return nil, err
+	}
+	return &PubKey{&ethereumPK{*key}}, nil
+}

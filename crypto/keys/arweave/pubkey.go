@@ -72,6 +72,6 @@ func (pk *arweavePK) Unmarshal(bz []byte) error {
 	return nil
 }
 
-func UnmarshalPubkey(bz []byte) PubKey {
-	return PubKey{&arweavePK{unmarshalRsaPublicKey(bz)}}
+func UnmarshalPubkey(bz []byte) *PubKey {
+	return &PubKey{&arweavePK{unmarshalRsaPublicKey(bz)}}
 }

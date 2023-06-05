@@ -1,8 +1,9 @@
 package ante
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,7 +12,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func createTxWithMsgs(t *testing.T, msgs ...sdk.Msg) (authsigning.Tx) {
+func createTxWithMsgs(t *testing.T, msgs ...sdk.Msg) authsigning.Tx {
 	txBuilder := newTxBuilder()
 
 	err := txBuilder.SetMsgs(msgs...)
@@ -21,7 +22,7 @@ func createTxWithMsgs(t *testing.T, msgs ...sdk.Msg) (authsigning.Tx) {
 }
 
 func TestGetDataItemMsgOneDataItem(t *testing.T) {
-	dataItem := exampleDataItem(t)
+	dataItem := arweaveDataItem(t)
 	tx := createTxWithMsgs(t, &dataItem)
 
 	result, err := GetDataItemMsg(tx)
@@ -40,7 +41,7 @@ func TestGetDataItemMsgNoMsgs(t *testing.T) {
 }
 
 func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
-	dataItem := exampleDataItem(t)
+	dataItem := arweaveDataItem(t)
 	tx := createTxWithMsgs(t, &dataItem, &dataItem)
 
 	result, err := GetDataItemMsg(tx)
@@ -50,7 +51,7 @@ func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
 }
 
 func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
-	dataItem := exampleDataItem(t)
+	dataItem := arweaveDataItem(t)
 	msg := testdata.NewTestMsg(dataItem.GetCreator())
 	tx := createTxWithMsgs(t, &dataItem, msg)
 
@@ -61,7 +62,7 @@ func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
 }
 
 func TestGetDataItemMsgDataItemAfterMsg(t *testing.T) {
-	dataItem := exampleDataItem(t)
+	dataItem := arweaveDataItem(t)
 	msg := testdata.NewTestMsg(dataItem.GetCreator())
 	tx := createTxWithMsgs(t, msg, &dataItem)
 

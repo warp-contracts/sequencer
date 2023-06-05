@@ -5,12 +5,19 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 
 	"github.com/warp-contracts/sequencer/crypto/keys/arweave"
+	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
 )
 
 func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
-	var pk *cryptotypes.PubKey
-	registry.RegisterImplementations(pk, &arweave.PubKey{})
+	var arweavePublic *cryptotypes.PubKey
+	registry.RegisterImplementations(arweavePublic, &arweave.PubKey{})
 
-	var priv *cryptotypes.PrivKey
-	registry.RegisterImplementations(priv, &arweave.PrivKey{})
+	var arweavePrivate *cryptotypes.PrivKey
+	registry.RegisterImplementations(arweavePrivate, &arweave.PrivKey{})
+
+	var ethereumPublic *cryptotypes.PubKey
+	registry.RegisterImplementations(ethereumPublic, &ethereum.PubKey{})
+
+	var ethereumPrivate *cryptotypes.PrivKey
+	registry.RegisterImplementations(ethereumPrivate, &ethereum.PrivKey{})
 }
