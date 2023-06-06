@@ -13,8 +13,6 @@ import (
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
-const SequencerNonceTag = "Sequencer-Nonce"
-
 func BroadcastDataItem(ctx client.Context, dataItem MsgDataItem) (*sdk.TxResponse, error) {
 	tx, err := createTxWithDataItem(ctx, dataItem)
 	if err != nil {
@@ -69,12 +67,16 @@ func getSignature(dataItem MsgDataItem) (signature txsigning.SignatureV2, err er
 }
 
 func getPublicKey(dataItem MsgDataItem) (cryptotypes.PubKey, error) {
-	switch dataItem.DataItem.SignatureType {
+	return GetPublicKey(dataItem.DataItem.SignatureType, dataItem.DataItem.Owner)
+}
+
+func GetPublicKey(signatureType bundlr.SignatureType, owner []byte) (cryptotypes.PubKey, error) {
+	switch signatureType {
 	case bundlr.SignatureTypeArweave:
-		pubKey := arweave.UnmarshalPubkey(dataItem.DataItem.Owner)
+		pubKey := arweave.UnmarshalPubkey(owner)
 		return pubKey, nil
 	case bundlr.SignatureTypeEtherum:
-		pubKey, err := ethereum.UnmarshalPubkey(dataItem.DataItem.Owner)
+		pubKey, err := ethereum.UnmarshalPubkey(owner)
 		return pubKey, err
 	default:
 		return nil, bundlr.ErrUnsupportedSignatureType

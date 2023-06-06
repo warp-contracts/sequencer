@@ -701,7 +701,7 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 
 	anteHandler, err := sequencerante.NewAnteHandler(
-		ante.HandlerOptions{
+		sequencerante.HandlerOptions{
 			AccountKeeper:   app.AccountKeeper,
 			BankKeeper:      app.BankKeeper,
 			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),

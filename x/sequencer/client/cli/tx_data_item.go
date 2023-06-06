@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/spf13/cobra"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
@@ -116,6 +118,14 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 		msg.DataItem.Tags = append(msg.DataItem.Tags, bundlr.Tag(tag))
 	}
 
+	// Add nonce tag
+	sequence, err := getAccountSequence(clientCtx, msg, signer)
+	if err != nil {
+		return
+	}
+	tag := bundlr.Tag{Name: types.SequencerNonceTag, Value: strconv.FormatUint(sequence, 10)}
+	msg.DataItem.Tags = append(msg.DataItem.Tags, bundlr.Tag(tag))
+
 	// Read data
 	msg.DataItem.Data, err = os.ReadFile(cmd.Flag(FlagData).Value.String())
 	if err != nil {
@@ -140,4 +150,21 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 	}
 
 	return
+}
+
+// Returns the sequence for the account or 0 if the account does not exist
+func getAccountSequence(clientCtx client.Context, msg *types.MsgDataItem, signer bundlr.Signer) (uint64, error) {
+
+	addr, err := types.GetPublicKey(msg.DataItem.SignatureType, signer.GetOwner())
+	if err != nil {
+		return 0, err
+	}
+
+	acc, err := clientCtx.AccountRetriever.GetAccount(clientCtx, sdk.AccAddress(addr.Address()))
+	if acc == nil || err != nil {
+		// account does not exist
+		return 0, nil
+	}
+
+	return acc.GetSequence(), nil
 }

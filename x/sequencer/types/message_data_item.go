@@ -10,6 +10,8 @@ import (
 )
 
 const TypeMsgDataItem = "data_item"
+// TODO: move to syncer/src/utils/warp/tags.go
+const SequencerNonceTag = "Sequencer-Nonce"
 
 var _ sdk.Msg = &MsgDataItem{}
 
@@ -52,11 +54,10 @@ func (msg *MsgDataItem) ValidateBasic() (err error) {
 }
 
 func (msg *MsgDataItem) GetSequenceFromTags() (uint64, error) {
-	const sequencerNonceTag = "Sequencer-Nonce"
 	for _, tag := range msg.DataItem.Tags {
-		if tag.Name == sequencerNonceTag {
+		if tag.Name == SequencerNonceTag {
 			return strconv.ParseUint(tag.Value, 10, 64)
 		}
 	}
-	return 0, sdkerrors.Wrapf(ErrNoSequencerNonceTag, "data item does not have \"%s\" tag", sequencerNonceTag)
+	return 0, sdkerrors.Wrapf(ErrNoSequencerNonceTag, "data item does not have \"%s\" tag", SequencerNonceTag)
 }

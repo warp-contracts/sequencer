@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
-	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -16,7 +16,7 @@ import (
 // Validation of the signature for a transaction with a DataItem.
 // The transaction's signature must match the signature of the DataItem.
 // Additionally, the nonce for the given sender is validated.
-func verifySignatures(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
+func verifySignatures(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	sigTx, ok := tx.(signing.SigVerifiableTx)
 	if !ok {
 		return sdkerrors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type SigVerifiableTx")
@@ -33,16 +33,24 @@ func verifySignatures(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, data
 
 	sig := sigs[0]
 	signer := dataItem.GetSigners()[0]
-	acc, err := sdkante.GetSignerAcc(ctx, ak, signer)
-	if err != nil {
-		return err
-	}
+	acc := getOrCreateAccount(ctx, ak, signer)
 
 	if err := verifySingleSignature(sig, signer, acc, dataItem); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.AccAddress) authtypes.AccountI {
+	acc := ak.GetAccount(ctx, addr)
+
+	if acc == nil {
+		acc = ak.NewAccountWithAddress(ctx, addr)
+		ak.SetAccount(ctx, acc)
+	}
+
+	return acc
 }
 
 func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc authtypes.AccountI, dataItem *types.MsgDataItem) error {
