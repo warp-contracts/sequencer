@@ -3,13 +3,18 @@ package types
 import (
 	"strconv"
 
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	keys "github.com/warp-contracts/sequencer/crypto/keys/arweave"
+	"github.com/warp-contracts/sequencer/crypto/keys/arweave"
+	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
+
+	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
 const TypeMsgDataItem = "data_item"
+
 // TODO: move to syncer/src/utils/warp/tags.go
 const SequencerNonceTag = "Sequencer-Nonce"
 
@@ -24,8 +29,11 @@ func (msg *MsgDataItem) Type() string {
 }
 
 func (msg *MsgDataItem) GetCreator() sdk.AccAddress {
-	pubKey := keys.UnmarshalPubkey(msg.DataItem.Owner)
-	return pubKey.AccAddress()
+	pubKey, err := msg.GetPublicKey()
+	if err != nil {
+		panic(err)
+	}
+	return sdk.AccAddress(pubKey.Address())
 }
 
 func (msg *MsgDataItem) GetSigners() []sdk.AccAddress {
@@ -60,4 +68,21 @@ func (msg *MsgDataItem) GetSequenceFromTags() (uint64, error) {
 		}
 	}
 	return 0, sdkerrors.Wrapf(ErrNoSequencerNonceTag, "data item does not have \"%s\" tag", SequencerNonceTag)
+}
+
+func (msg *MsgDataItem) GetPublicKey() (cryptotypes.PubKey, error) {
+	return GetPublicKey(msg.DataItem.SignatureType, msg.DataItem.Owner)
+}
+
+func GetPublicKey(signatureType bundlr.SignatureType, owner []byte) (cryptotypes.PubKey, error) {
+	switch signatureType {
+	case bundlr.SignatureTypeArweave:
+		pubKey := arweave.UnmarshalPubkey(owner)
+		return pubKey, nil
+	case bundlr.SignatureTypeEtherum:
+		pubKey, err := ethereum.UnmarshalPubkey(owner)
+		return pubKey, err
+	default:
+		return nil, bundlr.ErrUnsupportedSignatureType
+	}
 }

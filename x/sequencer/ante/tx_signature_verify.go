@@ -33,7 +33,10 @@ func verifySignatures(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, d
 
 	sig := sigs[0]
 	signer := dataItem.GetSigners()[0]
-	acc := getOrCreateAccount(ctx, ak, signer)
+	acc, err := getOrCreateAccount(ctx, ak, signer, dataItem)
+	if err != nil {
+		return err
+	}
 
 	if err := verifySingleSignature(sig, signer, acc, dataItem); err != nil {
 		return err
@@ -42,15 +45,26 @@ func verifySignatures(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, d
 	return nil
 }
 
-func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.AccAddress) authtypes.AccountI {
+func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.AccAddress, dataItem *types.MsgDataItem) (authtypes.AccountI, error) {
 	acc := ak.GetAccount(ctx, addr)
 
 	if acc == nil {
+		pubKey, err := dataItem.GetPublicKey()
+		if err != nil {
+			return nil, err
+		}
+
 		acc = ak.NewAccountWithAddress(ctx, addr)
+
+		err = acc.SetPubKey(pubKey)
+		if err != nil {
+			return nil, err
+		}
+		
 		ak.SetAccount(ctx, acc)
 	}
 
-	return acc
+	return acc, nil
 }
 
 func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc authtypes.AccountI, dataItem *types.MsgDataItem) error {

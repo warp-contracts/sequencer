@@ -8,7 +8,6 @@ import (
 	"math/big"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	tmcrypto "github.com/tendermint/tendermint/crypto"
 )
@@ -19,10 +18,6 @@ type arweavePK struct {
 
 func (pk *PubKey) Address() tmcrypto.Address {
 	return tmcrypto.AddressHash(pk.Bytes())
-}
-
-func (pk *PubKey) AccAddress() sdk.AccAddress {
-	return sdk.AccAddress(pk.Address())
 }
 
 func (pk *PubKey) VerifySignature(data []byte, signature []byte) bool {
