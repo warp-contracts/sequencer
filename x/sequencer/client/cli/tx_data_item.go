@@ -19,7 +19,7 @@ import (
 var _ = strconv.Itoa(0)
 
 const (
-	FlagEtherumPrivateKey = "etherum-private-key"
+	FlagEthereumPrivateKey = "ethereum-private-key"
 	FlagArweaveWallet     = "arweave-wallet"
 	FlagData              = "data"
 	FlagTag               = "tag"
@@ -52,7 +52,7 @@ func CmdDataItem() *cobra.Command {
 	}
 
 	cmd.Flags().String(FlagArweaveWallet, "", "Path to an Arweave wallet. Defaults to ./wallet.json")
-	cmd.Flags().String(FlagEtherumPrivateKey, "", "Hex encoded private key for the Etherum account. Defaults to ./etherum.bin")
+	cmd.Flags().String(FlagEthereumPrivateKey, "", "Hex encoded private key for the Ethereum account. Defaults to ./ethereum.bin")
 	cmd.Flags().StringP(FlagData, "d", "", "File with the binary data")
 	cmd.Flags().StringArrayP(FlagTag, "t", []string{}, "One tag - a pair in the form of key=value. You can specify multiple tags. Example -t someKey=someValue -t someOtherKey=someValue")
 	cmd.Flags().StringP(flags.FlagBroadcastMode, "b", flags.BroadcastSync, "Transaction broadcasting mode (sync|async|block)")
@@ -63,13 +63,13 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 	// Message
 	msg = &types.MsgDataItem{}
 
-	// Data item may be signed with either Arweave or Etherum private key
+	// Data item may be signed with either Arweave or Ethereum private key
 	arweaveWalletPath := cmd.Flag(FlagArweaveWallet).Value.String()
-	etherumPrivateKeyPath := cmd.Flag(FlagEtherumPrivateKey).Value.String()
-	if (arweaveWalletPath == "" && etherumPrivateKeyPath == "") || (arweaveWalletPath != "" && etherumPrivateKeyPath != "") {
+	ethereumPrivateKeyPath := cmd.Flag(FlagEthereumPrivateKey).Value.String()
+	if (arweaveWalletPath == "" && ethereumPrivateKeyPath == "") || (arweaveWalletPath != "" && ethereumPrivateKeyPath != "") {
 		fmt.Println(arweaveWalletPath)
-		fmt.Println(etherumPrivateKeyPath)
-		err = errors.New("exactly one etherum private key or arweave wallet is required")
+		fmt.Println(ethereumPrivateKeyPath)
+		err = errors.New("exactly one ethereum private key or arweave wallet is required")
 		return
 	}
 
@@ -91,16 +91,16 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 		}
 		msg.DataItem.SignatureType = bundlr.SignatureTypeArweave
 	} else {
-		buf, err = os.ReadFile(etherumPrivateKeyPath)
+		buf, err = os.ReadFile(ethereumPrivateKeyPath)
 		if err != nil {
 			return
 		}
 
-		signer, err = bundlr.NewEtherumSigner(string(buf))
+		signer, err = bundlr.NewEthereumSigner(string(buf))
 		if err != nil {
 			return
 		}
-		msg.DataItem.SignatureType = bundlr.SignatureTypeEtherum
+		msg.DataItem.SignatureType = bundlr.SignatureTypeEthereum
 	}
 
 	// Get tags from flags

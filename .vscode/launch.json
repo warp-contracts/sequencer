@@ -21,11 +21,11 @@
             "program": "${workspaceFolder}/cmd/sequencerd/main.go",
         },
         {
-            "name": "Send DataItem signed with Etherum private key",
+            "name": "Send DataItem signed with Ethereum private key",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "args": ["tx", "sequencer", "dataitem", "--etherum-private-key", "${workspaceFolder}/utils/etherum-private-key.hex", "--data", "${workspaceFolder}/readme.md", "--from", "alice"],
+            "args": ["tx", "sequencer", "dataitem", "--ethereum-private-key", "${workspaceFolder}/utils/ethereum-private-key.hex", "--data", "${workspaceFolder}/readme.md", "--from", "alice"],
             "program": "${workspaceFolder}/cmd/sequencerd/main.go",
         }
     ]

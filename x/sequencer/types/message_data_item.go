@@ -79,7 +79,7 @@ func GetPublicKey(signatureType bundlr.SignatureType, owner []byte) (cryptotypes
 	case bundlr.SignatureTypeArweave:
 		pubKey := arweave.UnmarshalPubkey(owner)
 		return pubKey, nil
-	case bundlr.SignatureTypeEtherum:
+	case bundlr.SignatureTypeEthereum:
 		pubKey, err := ethereum.UnmarshalPubkey(owner)
 		return pubKey, err
 	default:

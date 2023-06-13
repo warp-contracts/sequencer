@@ -28,7 +28,7 @@ const EMPTY_ARWEAVE_WALLET = `{
     "qi": "XqpyET1rXxpqflIE_5fpVYzpJy316JgBcoFoaQwJXBV2S-AkiOgSHVP_OClZXj2ondHHpShvNbSmFZ8NDunbZhNqDWpXYWFJsdq8-Hcid-c0kipCfh75i799EdLs2HS8zAbbJiVhl5I0QeTE0n3mEUsNWDSMC0pIbZtKuc1Ij849rIxIDhMOKjEMCNUQJVn-FcajTttoamnUHzb4whFmgnMm8JWVDwdFK0Yt4TbchrHg4gpmGHzn1LD4mUPeqstd_JKgZQYMzZawAupN9C3SXDCYjAI6Glskjm-M5eC3yTEFnOE74cHymtI61rU-4-n2aPzMMPsJsLm7U8hzKkHEZg"
 }`
 
-const ETHERUM_PRIVATE_KEY = `0xf4a2b939592564feb35ab10a8e04f6f2fe0943579fb3c9c33505298978b74893`
+const ETHEREUM_PRIVATE_KEY = `0xf4a2b939592564feb35ab10a8e04f6f2fe0943579fb3c9c33505298978b74893`
 
 func newTxBuilder() client.TxBuilder {
 	return simapp.MakeTestEncodingConfig().TxConfig.NewTxBuilder()
@@ -42,7 +42,7 @@ func arweaveDataItem(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
 }
 
 func ethereumDataItem(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
-	signer, err := bundlr.NewEtherumSigner(ETHERUM_PRIVATE_KEY)
+	signer, err := bundlr.NewEthereumSigner(ETHEREUM_PRIVATE_KEY)
 	require.NoError(t, err)
 
 	return createExampleDataItem(t, signer, tags...)

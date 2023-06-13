@@ -19,7 +19,7 @@ require (
 	github.com/stretchr/testify v1.8.3
 	github.com/tendermint/tendermint v0.34.24
 	github.com/tendermint/tm-db v0.6.7
-	github.com/warp-contracts/syncer v0.1.216
+	github.com/warp-contracts/syncer v0.1.226
 	google.golang.org/genproto/googleapis/api v0.0.0-20230530153820-e85fd2cbaebc
 	google.golang.org/grpc v1.55.0
 	gopkg.in/yaml.v2 v2.4.0
