@@ -5,6 +5,7 @@ import (
 	"crypto"
 	"crypto/rsa"
 	"crypto/sha256"
+	"encoding/json"
 	"math/big"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -60,7 +61,7 @@ func unmarshalRsaPublicKey(bz []byte) rsa.PublicKey {
 		N: new(big.Int).SetBytes(bz),
 		E: 65537, //"AQAB"
 	}
-} 
+}
 
 func (pk *arweavePK) Unmarshal(bz []byte) error {
 	pk.public = unmarshalRsaPublicKey(bz)
@@ -69,4 +70,12 @@ func (pk *arweavePK) Unmarshal(bz []byte) error {
 
 func UnmarshalPubkey(bz []byte) *PubKey {
 	return &PubKey{&arweavePK{unmarshalRsaPublicKey(bz)}}
+}
+
+func (pk arweavePK) MarshalJSON() ([]byte, error) {
+	return json.Marshal(pk.public)
+}
+
+func (pk *arweavePK) UnmarshalJSON(data []byte) error {
+	return json.Unmarshal(data, &pk.public)
 }

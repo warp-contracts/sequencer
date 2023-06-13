@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/ecdsa"
 	"crypto/sha256"
+	"encoding/json"
 
 	etherum_crypto "github.com/ethereum/go-ethereum/crypto"
 
@@ -82,4 +83,12 @@ func UnmarshalPubkey(bz []byte) (*PubKey, error) {
 		return nil, err
 	}
 	return &PubKey{&ethereumPK{*key}}, nil
+}
+
+func (pk ethereumPK) MarshalJSON() ([]byte, error) {
+	return json.Marshal(pk.public)
+}
+
+func (pk *ethereumPK) UnmarshalJSON(data []byte) error {
+	return json.Unmarshal(data, &pk.public)
 }
