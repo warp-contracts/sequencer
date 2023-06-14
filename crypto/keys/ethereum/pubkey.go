@@ -15,6 +15,11 @@ func (pk *PubKey) Address() tmcrypto.Address {
 }
 
 func (pk *PubKey) VerifySignature(data []byte, signature []byte) bool {
+	if len(signature) == ethereum_crypto.SignatureLength {
+		// remove recovery ID (V) if contained in the signature
+		signature = signature[:len(signature)-1]
+	}
+
 	hashed := sha256.Sum256(data)
 	return ethereum_crypto.VerifySignature(pk.Key, hashed[:], signature)
 }
