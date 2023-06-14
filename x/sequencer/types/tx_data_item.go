@@ -56,7 +56,10 @@ func getSignature(dataItem MsgDataItem) (signature txsigning.SignatureV2, err er
 	signature = txsigning.SignatureV2{
 		PubKey:   pubKey,
 		Sequence: sequence,
-		Data:     nil,
+		Data:     &txsigning.SingleSignatureData{
+			SignMode: txsigning.SignMode_SIGN_MODE_DIRECT,
+			Signature: nil,
+		},
 	}
 	return
 }

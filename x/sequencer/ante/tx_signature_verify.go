@@ -70,7 +70,10 @@ func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.A
 func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc authtypes.AccountI, dataItem *types.MsgDataItem) error {
 	switch sigData := sig.Data.(type) {
 	case *txsigning.SingleSignatureData:
-		if sigData.Signature != nil {
+		if sigData.SignMode != txsigning.SignMode_SIGN_MODE_DIRECT {
+			return sdkerrors.Wrap(types.ErrInvalidSignMode, "transaction with data item should have direct sign mode")
+		}
+		if len(sigData.Signature) > 0 {
 			return sdkerrors.Wrap(types.ErrNotEmptySignature, "transaction with data item should have empty signature")
 		}
 	case *txsigning.MultiSignatureData:

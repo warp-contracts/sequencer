@@ -102,6 +102,22 @@ func TestVerifySignaturesTooManySignatures(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrNotSingleSignature)
 }
 
+func TestVerifySignaturesInvalidSignMode(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := arweaveDataItem(t)
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	sigData := &signing.SingleSignatureData{
+		SignMode:  signing.SignMode_SIGN_MODE_UNSPECIFIED,
+		Signature: nil,
+	}
+	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
+	tx := createTxWithSignatures(t, dataItem, sig)
+
+	err := verifySignatures(ctx, app.AccountKeeper, tx, &dataItem)
+
+	require.ErrorIs(t, err, types.ErrInvalidSignMode)
+}
+
 func TestVerifySignaturesNotEmptySignature(t *testing.T) {
 	app, ctx := appAndCtx(t)
 	dataItem := arweaveDataItem(t)
