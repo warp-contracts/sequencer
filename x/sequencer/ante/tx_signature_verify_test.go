@@ -33,13 +33,13 @@ func addCreatorAccount(t *testing.T, app *simapp.SimApp, ctx sdk.Context, dataIt
 
 	err := acc.SetSequence(5)
 	require.NoError(t, err)
-	
+
 	app.AccountKeeper.SetAccount(ctx, acc)
 	return acc
 }
 
 func createArweaveSignature(dataItem types.MsgDataItem, sequence uint64, data signing.SignatureData) signing.SignatureV2 {
-	pubKey := arweave.UnmarshalPubkey(dataItem.DataItem.Owner)
+	pubKey := arweave.FromOwner(dataItem.DataItem.Owner)
 	return signing.SignatureV2{
 		PubKey:   pubKey,
 		Sequence: sequence,
@@ -57,7 +57,7 @@ func createEmptyArweaveSignature(dataItem types.MsgDataItem, sequence uint64) si
 }
 
 func createEmptyEthereumSignature(t *testing.T, dataItem types.MsgDataItem, sequence uint64) signing.SignatureV2 {
-	pubKey, err := ethereum.UnmarshalPubkey(dataItem.DataItem.Owner)
+	pubKey, err := ethereum.FromOwner(dataItem.DataItem.Owner)
 	require.NoError(t, err)
 
 	return signing.SignatureV2{

@@ -77,10 +77,10 @@ func (msg *MsgDataItem) GetPublicKey() (cryptotypes.PubKey, error) {
 func GetPublicKey(signatureType bundlr.SignatureType, owner []byte) (cryptotypes.PubKey, error) {
 	switch signatureType {
 	case bundlr.SignatureTypeArweave:
-		pubKey := arweave.UnmarshalPubkey(owner)
+		pubKey := arweave.FromOwner(owner)
 		return pubKey, nil
 	case bundlr.SignatureTypeEthereum:
-		pubKey, err := ethereum.UnmarshalPubkey(owner)
+		pubKey, err := ethereum.FromOwner(owner)
 		return pubKey, err
 	default:
 		return nil, bundlr.ErrUnsupportedSignatureType

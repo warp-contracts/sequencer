@@ -5,7 +5,6 @@ import (
 	"crypto"
 	"crypto/rsa"
 	"crypto/sha256"
-	"encoding/json"
 	"math/big"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -13,25 +12,31 @@ import (
 	tmcrypto "github.com/tendermint/tendermint/crypto"
 )
 
-type arweavePK struct {
-	public rsa.PublicKey
-}
-
 func (pk *PubKey) Address() tmcrypto.Address {
-	return tmcrypto.AddressHash(pk.Bytes())
+	return tmcrypto.AddressHash(pk.Key)
 }
 
 func (pk *PubKey) VerifySignature(data []byte, signature []byte) bool {
 	hashed := sha256.Sum256(data)
+	key := pk.publicKey()
 
-	return rsa.VerifyPSS(&pk.Key.public, crypto.SHA256, hashed[:], []byte(signature), &rsa.PSSOptions{
+	return rsa.VerifyPSS(&key, crypto.SHA256, hashed[:], []byte(signature), &rsa.PSSOptions{
 		SaltLength: rsa.PSSSaltLengthAuto,
 		Hash:       crypto.SHA256,
-	}) != nil
+	}) == nil
+}
+
+func (pk *PubKey) publicKey() rsa.PublicKey {
+	return rsa.PublicKey{
+		N: new(big.Int).SetBytes(pk.Key),
+		E: 65537, //"AQAB"
+	}
 }
 
 func (pk *PubKey) Bytes() []byte {
-	return pk.Key.Bytes()
+	bz := make([]byte, len(pk.Key))
+	copy(bz, pk.Key)
+	return bz
 }
 
 func (pk *PubKey) Equals(other cryptotypes.PubKey) bool {
@@ -42,40 +47,10 @@ func (pk *PubKey) Type() string {
 	return "arweave"
 }
 
-func (pk *arweavePK) Bytes() []byte {
-	return pk.public.N.Bytes()
+func createPublicKey(key rsa.PublicKey) *PubKey {
+	return &PubKey{key.N.Bytes()}
 }
 
-func (pk *arweavePK) Size() int {
-	return len(pk.Bytes())
-}
-
-func (pk *arweavePK) MarshalTo(data []byte) (int, error) {
-	bz := pk.Bytes()
-	copy(data, bz)
-	return len(bz), nil
-}
-
-func unmarshalRsaPublicKey(bz []byte) rsa.PublicKey {
-	return rsa.PublicKey{
-		N: new(big.Int).SetBytes(bz),
-		E: 65537, //"AQAB"
-	}
-}
-
-func (pk *arweavePK) Unmarshal(bz []byte) error {
-	pk.public = unmarshalRsaPublicKey(bz)
-	return nil
-}
-
-func UnmarshalPubkey(bz []byte) *PubKey {
-	return &PubKey{&arweavePK{unmarshalRsaPublicKey(bz)}}
-}
-
-func (pk arweavePK) MarshalJSON() ([]byte, error) {
-	return json.Marshal(pk.public)
-}
-
-func (pk *arweavePK) UnmarshalJSON(data []byte) error {
-	return json.Unmarshal(data, &pk.public)
+func FromOwner(owner []byte) *PubKey {
+	return &PubKey{owner}
 }

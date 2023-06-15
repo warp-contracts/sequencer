@@ -3,6 +3,7 @@ package ethereum
 import (
 	"bytes"
 	"crypto/sha256"
+
 	ethereum_crypto "github.com/ethereum/go-ethereum/crypto"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -11,7 +12,7 @@ import (
 )
 
 func (pk *PubKey) Address() tmcrypto.Address {
-	return tmcrypto.AddressHash(pk.Bytes())
+	return tmcrypto.AddressHash(pk.Key)
 }
 
 func (pk *PubKey) VerifySignature(data []byte, signature []byte) bool {
@@ -38,8 +39,8 @@ func (pk *PubKey) Type() string {
 	return "ethereum"
 }
 
-func UnmarshalPubkey(bz []byte) (*PubKey, error) {
-	key, err := ethereum_crypto.UnmarshalPubkey(bz)
+func FromOwner(owner []byte) (*PubKey, error) {
+	key, err := ethereum_crypto.UnmarshalPubkey(owner)
 	if err != nil {
 		return nil, err
 	}

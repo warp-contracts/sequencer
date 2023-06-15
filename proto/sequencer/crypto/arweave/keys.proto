@@ -6,9 +6,9 @@ import "gogoproto/gogo.proto";
 option go_package = "github.com/warp-contracts/sequencer/crypto/keys/arweave";
 
 message PubKey {
-  bytes key = 1 [(gogoproto.customtype) = "arweavePK"];
+  bytes key = 1;
 }
 
 message PrivKey {
-  bytes key = 1 [(gogoproto.customtype) = "arweaveSK"];
+  bytes key = 1;
 }
