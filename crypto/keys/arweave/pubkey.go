@@ -19,11 +19,11 @@ func (pk *PubKey) Address() tmcrypto.Address {
 func (pk *PubKey) VerifySignature(data []byte, signature []byte) bool {
 	hashed := sha256.Sum256(data)
 	key := pk.publicKey()
-
-	return rsa.VerifyPSS(&key, crypto.SHA256, hashed[:], []byte(signature), &rsa.PSSOptions{
+	err := rsa.VerifyPSS(&key, crypto.SHA256, hashed[:], []byte(signature), &rsa.PSSOptions{
 		SaltLength: rsa.PSSSaltLengthAuto,
 		Hash:       crypto.SHA256,
-	}) == nil
+	})
+	return err == nil
 }
 
 func (pk *PubKey) publicKey() rsa.PublicKey {

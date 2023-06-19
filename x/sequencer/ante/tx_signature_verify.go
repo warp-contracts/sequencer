@@ -48,22 +48,23 @@ func verifySignatures(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, d
 func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.AccAddress, dataItem *types.MsgDataItem) (authtypes.AccountI, error) {
 	acc := ak.GetAccount(ctx, addr)
 
-	if acc == nil {
-		pubKey, err := dataItem.GetPublicKey()
-		if err != nil {
-			return nil, err
-		}
-
-		acc = ak.NewAccountWithAddress(ctx, addr)
-
-		err = acc.SetPubKey(pubKey)
-		if err != nil {
-			return nil, err
-		}
-		
-		ak.SetAccount(ctx, acc)
+	if acc != nil {
+		return acc, nil
 	}
 
+	pubKey, err := dataItem.GetPublicKey()
+	if err != nil {
+		return nil, err
+	}
+
+	acc = ak.NewAccountWithAddress(ctx, addr)
+
+	err = acc.SetPubKey(pubKey)
+	if err != nil {
+		return nil, err
+	}
+	
+	ak.SetAccount(ctx, acc)
 	return acc, nil
 }
 
