@@ -2,6 +2,7 @@ package ante
 
 import (
 	"bytes"
+	"cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -19,7 +20,7 @@ import (
 func verifySignatures(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	sigTx, ok := tx.(signing.SigVerifiableTx)
 	if !ok {
-		return sdkerrors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type SigVerifiableTx")
+		return errors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type SigVerifiableTx")
 	}
 
 	sigs, err := sigTx.GetSignaturesV2()
@@ -28,7 +29,7 @@ func verifySignatures(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, d
 	}
 
 	if len(sigs) != 1 {
-		return sdkerrors.Wrapf(types.ErrNotSingleSignature, "transaction with data item must contain exactly one signature, it has: %d", len(sigs))
+		return errors.Wrapf(types.ErrNotSingleSignature, "transaction with data item must contain exactly one signature, it has: %d", len(sigs))
 	}
 
 	sig := sigs[0]
@@ -63,7 +64,7 @@ func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.A
 	if err != nil {
 		return nil, err
 	}
-	
+
 	ak.SetAccount(ctx, acc)
 	return acc, nil
 }
@@ -72,22 +73,22 @@ func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc
 	switch sigData := sig.Data.(type) {
 	case *txsigning.SingleSignatureData:
 		if sigData.SignMode != txsigning.SignMode_SIGN_MODE_DIRECT {
-			return sdkerrors.Wrap(types.ErrInvalidSignMode, "transaction with data item should have direct sign mode")
+			return errors.Wrap(types.ErrInvalidSignMode, "transaction with data item should have direct sign mode")
 		}
 		if len(sigData.Signature) > 0 {
-			return sdkerrors.Wrap(types.ErrNotEmptySignature, "transaction with data item should have empty signature")
+			return errors.Wrap(types.ErrNotEmptySignature, "transaction with data item should have empty signature")
 		}
 	case *txsigning.MultiSignatureData:
-		return sdkerrors.Wrap(types.ErrTooManySigners, "transaction with data item can only have one signer")
+		return errors.Wrap(types.ErrTooManySigners, "transaction with data item can only have one signer")
 	}
 
 	if !bytes.Equal(sig.PubKey.Address(), signer) {
-		return sdkerrors.Wrap(types.ErrPublicKeyMismatch,
+		return errors.Wrap(types.ErrPublicKeyMismatch,
 			"transaction public key address does not match message creator address")
 	}
 
 	if !bytes.Equal(sig.PubKey.Bytes(), dataItem.DataItem.Owner) {
-		return sdkerrors.Wrap(types.ErrPublicKeyMismatch,
+		return errors.Wrap(types.ErrPublicKeyMismatch,
 			"transaction public key does not match message public key")
 	}
 
@@ -100,18 +101,18 @@ func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc
 
 func verifyNonce(acc authtypes.AccountI, sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
 	if sig.Sequence != acc.GetSequence() {
-		return sdkerrors.Wrapf(sdkerrors.ErrWrongSequence,
+		return errors.Wrapf(sdkerrors.ErrWrongSequence,
 			"account sequence mismatch, expected %d, got %d", acc.GetSequence(), sig.Sequence,
 		)
 	}
 
-	tagSequence, err := dataItem.GetSequenceFromTags()
+	tagNonce, err := dataItem.GetNonceFromTags()
 	if err != nil {
 		return err
 	}
 
-	if sig.Sequence != tagSequence {
-		return sdkerrors.Wrap(types.ErrSequencerNonceMismatch, "transaction sequence does not match nonce from data item tag")
+	if sig.Sequence != tagNonce {
+		return errors.Wrap(types.ErrSequencerNonceMismatch, "transaction sequence does not match nonce from data item tag")
 	}
 
 	return nil

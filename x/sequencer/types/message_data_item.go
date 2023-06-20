@@ -1,22 +1,20 @@
 package types
 
 import (
+	"cosmossdk.io/errors"
 	"strconv"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/warp-contracts/sequencer/crypto/keys/arweave"
 	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
 
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
+	"github.com/warp-contracts/syncer/src/utils/warp"
 )
 
 const TypeMsgDataItem = "data_item"
-
-// TODO: move to syncer/src/utils/warp/tags.go
-const SequencerNonceTag = "Sequencer-Nonce"
 
 var _ sdk.Msg = &MsgDataItem{}
 
@@ -61,13 +59,13 @@ func (msg *MsgDataItem) ValidateBasic() (err error) {
 	return nil
 }
 
-func (msg *MsgDataItem) GetSequenceFromTags() (uint64, error) {
+func (msg *MsgDataItem) GetNonceFromTags() (uint64, error) {
 	for _, tag := range msg.DataItem.Tags {
-		if tag.Name == SequencerNonceTag {
+		if tag.Name == warp.TagSequencerNonce {
 			return strconv.ParseUint(tag.Value, 10, 64)
 		}
 	}
-	return 0, sdkerrors.Wrapf(ErrNoSequencerNonceTag, "data item does not have \"%s\" tag", SequencerNonceTag)
+	return 0, errors.Wrapf(ErrNoSequencerNonceTag, "data item does not have \"%s\" tag", warp.TagSequencerNonce)
 }
 
 func (msg *MsgDataItem) GetPublicKey() (cryptotypes.PubKey, error) {

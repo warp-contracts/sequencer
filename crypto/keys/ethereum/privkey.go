@@ -12,19 +12,19 @@ import (
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
-func (sk PrivKey) Bytes() []byte {
+func (sk *PrivKey) Bytes() []byte {
 	bz := make([]byte, len(sk.Key))
 	copy(bz, sk.Key)
 	return bz
 }
 
-func (sk PrivKey) Sign(data []byte) ([]byte, error) {
+func (sk *PrivKey) Sign(data []byte) ([]byte, error) {
 	hashed := sha256.Sum256(data)
-	return ethereum_crypto.Sign(hashed[:], sk.privKey())
+	return ethereum_crypto.Sign(hashed[:], sk.ecdsaPrivateKey())
 }
 
-func (privKey PrivKey) privKey() *ecdsa.PrivateKey {
-	key, err := ethereum_crypto.ToECDSA(privKey.Key)
+func (sk *PrivKey) ecdsaPrivateKey() *ecdsa.PrivateKey {
+	key, err := ethereum_crypto.ToECDSA(sk.Key)
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +33,7 @@ func (privKey PrivKey) privKey() *ecdsa.PrivateKey {
 }
 
 func (sk *PrivKey) PubKey() cryptotypes.PubKey {
-	publicKey, ok := sk.privKey().Public().(*ecdsa.PublicKey)
+	publicKey, ok := sk.ecdsaPrivateKey().Public().(*ecdsa.PublicKey)
 	if !ok {
 		panic(bundlr.ErrFailedToParseEthereumPublicKey)
 	}

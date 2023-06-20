@@ -6,23 +6,25 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	
+
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
+	"github.com/warp-contracts/syncer/src/utils/warp"
 )
 
 var _ = strconv.Itoa(0)
 
 const (
 	FlagEthereumPrivateKey = "ethereum-private-key"
-	FlagArweaveWallet     = "arweave-wallet"
-	FlagData              = "data"
-	FlagTag               = "tag"
+	FlagArweaveWallet      = "arweave-wallet"
+	FlagData               = "data"
+	FlagTag                = "tag"
 )
 
 func CmdDataItem() *cobra.Command {
@@ -115,7 +117,7 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 		if err != nil {
 			return
 		}
-		msg.DataItem.Tags = append(msg.DataItem.Tags, bundlr.Tag(tag))
+		msg.DataItem.Tags = append(msg.DataItem.Tags, tag)
 	}
 
 	// Add nonce tag
@@ -123,8 +125,8 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 	if err != nil {
 		return
 	}
-	tag := bundlr.Tag{Name: types.SequencerNonceTag, Value: strconv.FormatUint(sequence, 10)}
-	msg.DataItem.Tags = append(msg.DataItem.Tags, bundlr.Tag(tag))
+	tag := bundlr.Tag{Name: warp.TagSequencerNonce, Value: strconv.FormatUint(sequence, 10)}
+	msg.DataItem.Tags = append(msg.DataItem.Tags, tag)
 
 	// Read data
 	msg.DataItem.Data, err = os.ReadFile(cmd.Flag(FlagData).Value.String())

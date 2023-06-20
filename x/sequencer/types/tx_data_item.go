@@ -49,15 +49,15 @@ func getSignature(dataItem MsgDataItem) (signature txsigning.SignatureV2, err er
 	if err != nil {
 		return
 	}
-	sequence, err := dataItem.GetSequenceFromTags()
+	nonce, err := dataItem.GetNonceFromTags()
 	if err != nil {
 		return
 	}
 	signature = txsigning.SignatureV2{
 		PubKey:   pubKey,
-		Sequence: sequence,
-		Data:     &txsigning.SingleSignatureData{
-			SignMode: txsigning.SignMode_SIGN_MODE_DIRECT,
+		Sequence: nonce,
+		Data: &txsigning.SingleSignatureData{
+			SignMode:  txsigning.SignMode_SIGN_MODE_DIRECT,
 			Signature: nil,
 		},
 	}

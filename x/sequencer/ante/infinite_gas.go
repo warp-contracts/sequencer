@@ -1,6 +1,6 @@
 package ante
 
-import(
+import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -10,7 +10,13 @@ func NewSetInfiniteGasMeterDecorator() SetInfiniteGasMeterDecorator {
 	return SetInfiniteGasMeterDecorator{}
 }
 
+// For transactions containing an Arweave DataItem we do not check gas consumption
 func (sigmd SetInfiniteGasMeterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	newCtx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+	dataItem, _ := GetDataItemMsg(tx)
+	if dataItem != nil {
+		newCtx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
+	} else {
+		newCtx = ctx
+	}
 	return next(newCtx, tx, simulate)
 }

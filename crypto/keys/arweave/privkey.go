@@ -16,7 +16,7 @@ func (sk *PrivKey) Bytes() []byte {
 }
 
 func (sk *PrivKey) Sign(data []byte) ([]byte, error) {
-	key, err := sk.privateKey()
+	key, err := sk.rsaPrivateKey()
 	if err != nil {
 		return nil, err
 	}
@@ -28,12 +28,12 @@ func (sk *PrivKey) Sign(data []byte) ([]byte, error) {
 	})
 }
 
-func (sk *PrivKey) privateKey() (*rsa.PrivateKey, error) {
+func (sk *PrivKey) rsaPrivateKey() (*rsa.PrivateKey, error) {
 	return x509.ParsePKCS1PrivateKey(sk.Key)
 }
 
 func (sk *PrivKey) PubKey() cryptotypes.PubKey {
-	key, err := sk.privateKey()
+	key, err := sk.rsaPrivateKey()
 	if err != nil {
 		panic(err)
 	}

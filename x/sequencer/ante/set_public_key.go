@@ -1,6 +1,7 @@
 package ante
 
 import (
+	"cosmossdk.io/errors"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -21,7 +22,7 @@ func NewSetPubKeyDecorator(standardSetPubKeyDecorator ante.SetPubKeyDecorator) S
 	}
 }
 
-// For transactions containing an Arweave DataItem, an account with a set public key has already been created. 
+// For transactions containing an Arweave DataItem, an account with a set public key has already been created.
 // In this case, we only emit events that are emitted in the standard SetPubKeyDecorator.
 func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
 	dataItem, _ := GetDataItemMsg(tx)
@@ -38,7 +39,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 func emitEvents(ctx sdk.Context, tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	sigTx, ok := tx.(authsigning.SigVerifiableTx)
 	if !ok {
-		return sdkerrors.Wrap(sdkerrors.ErrTxDecode, "invalid tx type")
+		return errors.Wrap(sdkerrors.ErrTxDecode, "invalid tx type")
 	}
 
 	signers := sigTx.GetSigners()

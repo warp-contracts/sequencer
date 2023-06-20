@@ -1,8 +1,9 @@
 package ante
 
 import (
+	"cosmossdk.io/errors"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -43,7 +44,7 @@ func GetDataItemMsg(tx sdk.Tx) (*types.MsgDataItem, error) {
 		dataItem, isDataItem := msg.(*types.MsgDataItem)
 		if isDataItem {
 			if len(msgs) > 1 {
-				err := sdkerrors.Wrapf(types.ErrTooManyMessages,
+				err := errors.Wrapf(types.ErrTooManyMessages,
 					"transaction with data item can have only one message, and it has: %d", len(msgs))
 				return nil, err
 			}
