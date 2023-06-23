@@ -3,24 +3,25 @@ package types
 // DONTCOVER
 
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"cosmossdk.io/errors"
 )
 
 // x/sequencer module sentinel errors
 var (
-	ErrTooManyMessages        = sdkerrors.Register(ModuleName, 1100, "too many messages")
-	ErrNotEmptyMemo           = sdkerrors.Register(ModuleName, 1101, "not empty memo")
-	ErrNonZeroTimeoutHeight   = sdkerrors.Register(ModuleName, 1102, "non-zero timeout height")
-	ErrHasExtensionOptions    = sdkerrors.Register(ModuleName, 1103, "has extension options")
-	ErrNotSingleSignature     = sdkerrors.Register(ModuleName, 1104, "not single signature")
-	ErrNotEmptySignature      = sdkerrors.Register(ModuleName, 1105, "not empty signature")
-	ErrTooManySigners         = sdkerrors.Register(ModuleName, 1106, "too many signers")
-	ErrPublicKeyMismatch      = sdkerrors.Register(ModuleName, 1107, "public key mismatch")
-	ErrNoSequencerNonceTag    = sdkerrors.Register(ModuleName, 1108, "no sequencer nonce tag")
-	ErrSequencerNonceMismatch = sdkerrors.Register(ModuleName, 1109, "sequencer nonce mismatch")
-	ErrNonZeroGas             = sdkerrors.Register(ModuleName, 1110, "non-zero gas")
-	ErrNonZeroFee             = sdkerrors.Register(ModuleName, 1111, "non-zero fee")
-	ErrNotEmptyFeePayer       = sdkerrors.Register(ModuleName, 1112, "not empty fee payer")
-	ErrNotEmptyFeeGranter     = sdkerrors.Register(ModuleName, 1113, "not empty fee granter")
-	ErrNotEmptyTip            = sdkerrors.Register(ModuleName, 1114, "not empty tip")
+	ErrTooManyMessages        = errors.Register(ModuleName, 1100, "too many messages")
+	ErrNotEmptyMemo           = errors.Register(ModuleName, 1101, "not empty memo")
+	ErrNonZeroTimeoutHeight   = errors.Register(ModuleName, 1102, "non-zero timeout height")
+	ErrHasExtensionOptions    = errors.Register(ModuleName, 1103, "has extension options")
+	ErrNotSingleSignature     = errors.Register(ModuleName, 1104, "not single signature")
+	ErrInvalidSignMode        = errors.Register(ModuleName, 1105, "invalid sign mode")
+	ErrNotEmptySignature      = errors.Register(ModuleName, 1106, "not empty signature")
+	ErrTooManySigners         = errors.Register(ModuleName, 1107, "too many signers")
+	ErrPublicKeyMismatch      = errors.Register(ModuleName, 1108, "public key mismatch")
+	ErrNoSequencerNonceTag    = errors.Register(ModuleName, 1109, "no sequencer nonce tag")
+	ErrSequencerNonceMismatch = errors.Register(ModuleName, 1110, "sequencer nonce mismatch")
+	ErrNonZeroGas             = errors.Register(ModuleName, 1111, "non-zero gas")
+	ErrNonZeroFee             = errors.Register(ModuleName, 1112, "non-zero fee")
+	ErrNotEmptyFeePayer       = errors.Register(ModuleName, 1113, "not empty fee payer")
+	ErrNotEmptyFeeGranter     = errors.Register(ModuleName, 1114, "not empty fee granter")
+	ErrNotEmptyTip            = errors.Register(ModuleName, 1115, "not empty tip")
 )

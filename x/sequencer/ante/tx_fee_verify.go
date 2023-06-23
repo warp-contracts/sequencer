@@ -2,6 +2,7 @@ package ante
 
 import (
 	"bytes"
+	"cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -14,28 +15,28 @@ import (
 func verifyFee(tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
-		return sdkerrors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type FeeTx")
+		return errors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type FeeTx")
 	}
 
 	if feeTx.GetGas() != 0 {
-		return sdkerrors.Wrapf(types.ErrNonZeroGas,
+		return errors.Wrapf(types.ErrNonZeroGas,
 			"transaction with data item cannot have non-zero gas: %d", feeTx.GetGas())
 	}
 
 	for _, coin := range feeTx.GetFee() {
 		if coin.Amount.Int64() != 0 {
-			return sdkerrors.Wrapf(types.ErrNonZeroFee,
-				"transaction with data item cannot have non-zero fee: %d", coin.String())
+			return errors.Wrapf(types.ErrNonZeroFee,
+				"transaction with data item cannot have non-zero fee: %s", coin.String())
 		}
 	}
 
 	if !bytes.Equal(feeTx.FeePayer(), dataItem.GetSigners()[0]) {
-		return sdkerrors.Wrapf(types.ErrNotEmptyFeePayer,
+		return errors.Wrapf(types.ErrNotEmptyFeePayer,
 			"transaction with data item cannot have fee payer: %s", feeTx.FeePayer())
 	}
 
 	if !feeTx.FeeGranter().Empty() {
-		return sdkerrors.Wrapf(types.ErrNotEmptyFeeGranter,
+		return errors.Wrapf(types.ErrNotEmptyFeeGranter,
 			"transaction with data item cannot have fee granter: %s", feeTx.FeeGranter())
 	}
 
@@ -49,7 +50,7 @@ func verifyFee(tx sdk.Tx, dataItem *types.MsgDataItem) error {
 func verifyTip(sdkTx sdk.Tx) error {
 	tipTx, ok := sdkTx.(tx.TipTx)
 	if ok && tipTx.GetTip() != nil {
-		return sdkerrors.Wrap(types.ErrNotEmptyTip, "transaction with data cannot have a tip")
+		return errors.Wrap(types.ErrNotEmptyTip, "transaction with data cannot have a tip")
 	}
 	return nil
 }

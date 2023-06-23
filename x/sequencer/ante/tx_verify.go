@@ -1,9 +1,10 @@
 package ante
 
 import (
+	"cosmossdk.io/errors"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
@@ -12,10 +13,10 @@ import (
 // Such a transaction can have exactly one message, and all the values in this transaction are predetermined or derived from the DataItem.
 // See: https://github.com/warp-contracts/sequencer/issues/8
 type DataItemTxDecorator struct {
-	ak sdkante.AccountKeeper
+	ak authkeeper.AccountKeeper
 }
 
-func NewDataItemTxDecorator(ak sdkante.AccountKeeper) DataItemTxDecorator {
+func NewDataItemTxDecorator(ak authkeeper.AccountKeeper) DataItemTxDecorator {
 	return DataItemTxDecorator{
 		ak: ak,
 	}
@@ -43,7 +44,7 @@ func GetDataItemMsg(tx sdk.Tx) (*types.MsgDataItem, error) {
 		dataItem, isDataItem := msg.(*types.MsgDataItem)
 		if isDataItem {
 			if len(msgs) > 1 {
-				err := sdkerrors.Wrapf(types.ErrTooManyMessages,
+				err := errors.Wrapf(types.ErrTooManyMessages,
 					"transaction with data item can have only one message, and it has: %d", len(msgs))
 				return nil, err
 			}
@@ -54,7 +55,12 @@ func GetDataItemMsg(tx sdk.Tx) (*types.MsgDataItem, error) {
 	return nil, nil
 }
 
-func verifyTxWithDataItem(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
+func HasSingleDataItem(tx sdk.Tx) bool {
+	dataItem, err := GetDataItemMsg(tx)
+	return dataItem != nil && err == nil
+}
+
+func verifyTxWithDataItem(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	if err := verifyTxBody(tx); err != nil {
 		return err
 	}

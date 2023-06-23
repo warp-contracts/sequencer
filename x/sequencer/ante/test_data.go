@@ -1,8 +1,9 @@
 package ante
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/simapp"
@@ -27,24 +28,37 @@ const EMPTY_ARWEAVE_WALLET = `{
     "qi": "XqpyET1rXxpqflIE_5fpVYzpJy316JgBcoFoaQwJXBV2S-AkiOgSHVP_OClZXj2ondHHpShvNbSmFZ8NDunbZhNqDWpXYWFJsdq8-Hcid-c0kipCfh75i799EdLs2HS8zAbbJiVhl5I0QeTE0n3mEUsNWDSMC0pIbZtKuc1Ij849rIxIDhMOKjEMCNUQJVn-FcajTttoamnUHzb4whFmgnMm8JWVDwdFK0Yt4TbchrHg4gpmGHzn1LD4mUPeqstd_JKgZQYMzZawAupN9C3SXDCYjAI6Glskjm-M5eC3yTEFnOE74cHymtI61rU-4-n2aPzMMPsJsLm7U8hzKkHEZg"
 }`
 
+const ETHEREUM_PRIVATE_KEY = `0xf4a2b939592564feb35ab10a8e04f6f2fe0943579fb3c9c33505298978b74893`
+
 func newTxBuilder() client.TxBuilder {
 	return simapp.MakeTestEncodingConfig().TxConfig.NewTxBuilder()
 }
 
-func exampleDataItem(t *testing.T) types.MsgDataItem {
+func arweaveDataItem(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
 	signer, err := bundlr.NewArweaveSigner(EMPTY_ARWEAVE_WALLET)
 	require.NoError(t, err)
 
+	return createExampleDataItem(t, signer, tags...)
+}
+
+func ethereumDataItem(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
+	signer, err := bundlr.NewEthereumSigner(ETHEREUM_PRIVATE_KEY)
+	require.NoError(t, err)
+
+	return createExampleDataItem(t, signer, tags...)
+}
+
+func createExampleDataItem(t *testing.T, signer bundlr.Signer, tags ...bundlr.Tag) types.MsgDataItem {
 	dataItem := bundlr.BundleItem{
-		Target:        arweave.Base64String(tool.RandomString(32)),
-		Anchor:        arweave.Base64String(tool.RandomString(32)),
-		Tags:          bundlr.Tags{bundlr.Tag{Name: "1", Value: "2"}, bundlr.Tag{Name: "3", Value: "4"}},
-		Data:          arweave.Base64String(tool.RandomString(100)),
+		Target: arweave.Base64String(tool.RandomString(32)),
+		Anchor: arweave.Base64String(tool.RandomString(32)),
+		Tags:   bundlr.Tags(tags),
+		Data:   arweave.Base64String(tool.RandomString(100)),
 	}
-	dataItem.Sign(signer)
+	err := dataItem.Sign(signer)
+	require.NoError(t, err)
 
 	return types.MsgDataItem{
-		Creator:  "cosmos1hsk6jryyqjfhp5dhc55tc9jtckygx0eph6dd02",
 		DataItem: dataItem,
 	}
 }

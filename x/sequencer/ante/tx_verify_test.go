@@ -1,20 +1,29 @@
 package ante
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func TestGetDataItemMsgOneDataItem(t *testing.T) {
-	dataItem := exampleDataItem(t)
+func createTxWithMsgs(t *testing.T, msgs ...sdk.Msg) authsigning.Tx {
 	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(&dataItem)
-	tx := txBuilder.GetTx()
+
+	err := txBuilder.SetMsgs(msgs...)
+	require.NoError(t, err)
+
+	return txBuilder.GetTx()
+}
+
+func TestGetDataItemMsgOneDataItem(t *testing.T) {
+	dataItem := arweaveDataItem(t)
+	tx := createTxWithMsgs(t, &dataItem)
 
 	result, err := GetDataItemMsg(tx)
 
@@ -23,8 +32,7 @@ func TestGetDataItemMsgOneDataItem(t *testing.T) {
 }
 
 func TestGetDataItemMsgNoMsgs(t *testing.T) {
-	txBuilder := newTxBuilder()
-	tx := txBuilder.GetTx()
+	tx := createTxWithMsgs(t)
 
 	result, err := GetDataItemMsg(tx)
 
@@ -33,10 +41,8 @@ func TestGetDataItemMsgNoMsgs(t *testing.T) {
 }
 
 func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
-	dataItem := exampleDataItem(t)
-	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(&dataItem, &dataItem)
-	tx := txBuilder.GetTx()
+	dataItem := arweaveDataItem(t)
+	tx := createTxWithMsgs(t, &dataItem, &dataItem)
 
 	result, err := GetDataItemMsg(tx)
 
@@ -45,11 +51,9 @@ func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
 }
 
 func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
-	dataItem := exampleDataItem(t)
-	msg := testdata.NewTestMsg(sdk.AccAddress(dataItem.Creator))
-	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(&dataItem, msg)
-	tx := txBuilder.GetTx()
+	dataItem := arweaveDataItem(t)
+	msg := testdata.NewTestMsg(dataItem.GetCreator())
+	tx := createTxWithMsgs(t, &dataItem, msg)
 
 	result, err := GetDataItemMsg(tx)
 
@@ -58,11 +62,9 @@ func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
 }
 
 func TestGetDataItemMsgDataItemAfterMsg(t *testing.T) {
-	dataItem := exampleDataItem(t)
-	msg := testdata.NewTestMsg(sdk.AccAddress(dataItem.Creator))
-	txBuilder := newTxBuilder()
-	txBuilder.SetMsgs(msg, &dataItem)
-	tx := txBuilder.GetTx()
+	dataItem := arweaveDataItem(t)
+	msg := testdata.NewTestMsg(dataItem.GetCreator())
+	tx := createTxWithMsgs(t, msg, &dataItem)
 
 	result, err := GetDataItemMsg(tx)
 

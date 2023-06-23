@@ -29,22 +29,8 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Wrap message with Cosmos transaction
-	txBuilder := h.ctx.TxConfig.NewTxBuilder()
-	err = txBuilder.SetMsgs(&msg)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed to set message=: %s", err.Error()), http.StatusInternalServerError)
-		return
-	}
-
-	txBytes, err := h.ctx.TxConfig.TxEncoder()(txBuilder.GetTx())
-	if err != nil {
-		http.Error(w, fmt.Sprintf("failed to encode transaction: %s", err.Error()), http.StatusInternalServerError)
-		return
-	}
-
-	// Validate and broadcast transaction
-	response, err := h.ctx.BroadcastTxSync(txBytes)
+	// Wrap message with Cosmos transaction, validate and broadcast transaction
+	response, err := types.BroadcastDataItem(h.ctx, msg)
 	if err != nil {
 		http.Error(w, "failed to broadcast transaction", http.StatusInternalServerError)
 		return

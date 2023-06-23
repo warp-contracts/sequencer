@@ -2,12 +2,12 @@ package ante
 
 import (
 	"bytes"
-	"strconv"
+	"cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
-	sdkante "github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -17,10 +17,10 @@ import (
 // Validation of the signature for a transaction with a DataItem.
 // The transaction's signature must match the signature of the DataItem.
 // Additionally, the nonce for the given sender is validated.
-func verifySignatures(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
+func verifySignatures(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	sigTx, ok := tx.(signing.SigVerifiableTx)
 	if !ok {
-		return sdkerrors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type SigVerifiableTx")
+		return errors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type SigVerifiableTx")
 	}
 
 	sigs, err := sigTx.GetSignaturesV2()
@@ -29,12 +29,12 @@ func verifySignatures(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, data
 	}
 
 	if len(sigs) != 1 {
-		return sdkerrors.Wrapf(types.ErrNotSingleSignature, "transaction with data item must contain exactly one signature, it has: %d", len(sigs))
+		return errors.Wrapf(types.ErrNotSingleSignature, "transaction with data item must contain exactly one signature, it has: %d", len(sigs))
 	}
 
 	sig := sigs[0]
 	signer := dataItem.GetSigners()[0]
-	acc, err := sdkante.GetSignerAcc(ctx, ak, signer)
+	acc, err := getOrCreateAccount(ctx, ak, signer, dataItem)
 	if err != nil {
 		return err
 	}
@@ -46,23 +46,49 @@ func verifySignatures(ctx sdk.Context, ak sdkante.AccountKeeper, tx sdk.Tx, data
 	return nil
 }
 
+func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.AccAddress, dataItem *types.MsgDataItem) (authtypes.AccountI, error) {
+	acc := ak.GetAccount(ctx, addr)
+
+	if acc != nil {
+		return acc, nil
+	}
+
+	pubKey, err := dataItem.GetPublicKey()
+	if err != nil {
+		return nil, err
+	}
+
+	acc = ak.NewAccountWithAddress(ctx, addr)
+
+	err = acc.SetPubKey(pubKey)
+	if err != nil {
+		return nil, err
+	}
+
+	ak.SetAccount(ctx, acc)
+	return acc, nil
+}
+
 func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc authtypes.AccountI, dataItem *types.MsgDataItem) error {
 	switch sigData := sig.Data.(type) {
 	case *txsigning.SingleSignatureData:
-		if sigData.Signature != nil {
-			return sdkerrors.Wrap(types.ErrNotEmptySignature, "transaction with data item should have empty signature")
+		if sigData.SignMode != txsigning.SignMode_SIGN_MODE_DIRECT {
+			return errors.Wrap(types.ErrInvalidSignMode, "transaction with data item should have direct sign mode")
+		}
+		if len(sigData.Signature) > 0 {
+			return errors.Wrap(types.ErrNotEmptySignature, "transaction with data item should have empty signature")
 		}
 	case *txsigning.MultiSignatureData:
-		return sdkerrors.Wrap(types.ErrTooManySigners, "transaction with data item can only have one signer")
+		return errors.Wrap(types.ErrTooManySigners, "transaction with data item can only have one signer")
 	}
 
 	if !bytes.Equal(sig.PubKey.Address(), signer) {
-		return sdkerrors.Wrap(types.ErrPublicKeyMismatch,
+		return errors.Wrap(types.ErrPublicKeyMismatch,
 			"transaction public key address does not match message creator address")
 	}
 
 	if !bytes.Equal(sig.PubKey.Bytes(), dataItem.DataItem.Owner) {
-		return sdkerrors.Wrap(types.ErrPublicKeyMismatch,
+		return errors.Wrap(types.ErrPublicKeyMismatch,
 			"transaction public key does not match message public key")
 	}
 
@@ -75,29 +101,19 @@ func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc
 
 func verifyNonce(acc authtypes.AccountI, sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
 	if sig.Sequence != acc.GetSequence() {
-		return sdkerrors.Wrapf(sdkerrors.ErrWrongSequence,
+		return errors.Wrapf(sdkerrors.ErrWrongSequence,
 			"account sequence mismatch, expected %d, got %d", acc.GetSequence(), sig.Sequence,
 		)
 	}
 
-	tagSequence, err := getSequenceFromTags(dataItem)
+	tagNonce, err := dataItem.GetNonceFromTags()
 	if err != nil {
 		return err
 	}
 
-	if sig.Sequence != tagSequence {
-		sdkerrors.Wrap(types.ErrSequencerNonceMismatch, "transaction sequence does not match nonce from data item tag")
+	if sig.Sequence != tagNonce {
+		return errors.Wrap(types.ErrSequencerNonceMismatch, "transaction sequence does not match nonce from data item tag")
 	}
 
 	return nil
-}
-
-func getSequenceFromTags(dataItem *types.MsgDataItem) (uint64, error) {
-	const sequencerNonceTag = "Sequencer-Nonce"
-	for _, tag := range dataItem.DataItem.Tags {
-		if tag.Name == sequencerNonceTag {
-			return strconv.ParseUint(tag.Value, 10, 64)
-		}
-	}
-	return 0, sdkerrors.Wrapf(types.ErrNoSequencerNonceTag, "data item does not have \"%s\" tag", sequencerNonceTag)
 }

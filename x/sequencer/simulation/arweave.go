@@ -17,13 +17,7 @@ func SimulateMsgDataItem(
 ) simtypes.Operation {
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
-		simAccount, _ := simtypes.RandomAcc(r, accs)
-		msg := &types.MsgDataItem{
-			Creator: simAccount.Address.String(),
-		}
-
-		// TODO: Handling the DataItem simulation
-
+		msg := &types.MsgDataItem{}
 		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "DataItem simulation not implemented"), nil, nil
 	}
 }

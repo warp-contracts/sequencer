@@ -1,6 +1,8 @@
 package ante
 
 import (
+	"cosmossdk.io/errors"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -28,11 +30,11 @@ func verifyTxBody(tx sdk.Tx) error {
 func verifyMemo(tx sdk.Tx) error {
 	memoTx, ok := tx.(sdk.TxWithMemo)
 	if !ok {
-		return sdkerrors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type TxWithMemo")
+		return errors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type TxWithMemo")
 	}
 
 	if memoTx.GetMemo() != "" {
-		return sdkerrors.Wrapf(types.ErrNotEmptyMemo,
+		return errors.Wrapf(types.ErrNotEmptyMemo,
 			"transaction with data item cannot have non-empty memo: %s", memoTx.GetMemo())
 
 	}
@@ -43,11 +45,11 @@ func verifyMemo(tx sdk.Tx) error {
 func verifyTimeoutHeight(tx sdk.Tx) error {
 	timeoutTx, ok := tx.(sdk.TxWithTimeoutHeight)
 	if !ok {
-		return sdkerrors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type TxWithTimeoutHeight")
+		return errors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type TxWithTimeoutHeight")
 	}
 
 	if timeoutTx.GetTimeoutHeight() != 0 {
-		return sdkerrors.Wrapf(types.ErrNonZeroTimeoutHeight,
+		return errors.Wrapf(types.ErrNonZeroTimeoutHeight,
 			"transaction with data item cannot have non-zero timeout height: %d", timeoutTx.GetTimeoutHeight())
 	}
 
@@ -57,7 +59,7 @@ func verifyTimeoutHeight(tx sdk.Tx) error {
 func verifyExtOpts(tx sdk.Tx) error {
 	if extensionOptionsTx, ok := tx.(ante.HasExtensionOptionsTx); ok {
 		if len(extensionOptionsTx.GetExtensionOptions()) > 0 || len(extensionOptionsTx.GetNonCriticalExtensionOptions()) > 0 {
-			return sdkerrors.Wrap(types.ErrHasExtensionOptions, "transaction with data item cannot have extension options")
+			return errors.Wrap(types.ErrHasExtensionOptions, "transaction with data item cannot have extension options")
 		}
 	}
 
