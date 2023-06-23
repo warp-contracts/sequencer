@@ -25,7 +25,11 @@ func NewSetPubKeyDecorator(standardSetPubKeyDecorator ante.SetPubKeyDecorator) S
 // For transactions containing an Arweave DataItem, an account with a set public key has already been created.
 // In this case, we only emit events that are emitted in the standard SetPubKeyDecorator.
 func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	dataItem, _ := GetDataItemMsg(tx)
+	dataItem, err := GetDataItemMsg(tx)
+	if err != nil {
+		return ctx, err
+	}
+
 	if dataItem != nil {
 		if err := emitEvents(ctx, tx, dataItem); err != nil {
 			return ctx, err
@@ -33,6 +37,7 @@ func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate b
 
 		return next(ctx, tx, simulate)
 	}
+
 	return spkd.standardSetPubKeyDecorator.AnteHandle(ctx, tx, simulate, next)
 }
 

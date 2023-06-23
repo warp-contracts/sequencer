@@ -13,9 +13,7 @@ import (
 )
 
 func (sk *PrivKey) Bytes() []byte {
-	bz := make([]byte, len(sk.Key))
-	copy(bz, sk.Key)
-	return bz
+	return sk.Key
 }
 
 func (sk *PrivKey) Sign(data []byte) ([]byte, error) {

@@ -55,6 +55,11 @@ func GetDataItemMsg(tx sdk.Tx) (*types.MsgDataItem, error) {
 	return nil, nil
 }
 
+func HasSingleDataItem(tx sdk.Tx) bool {
+	dataItem, err := GetDataItemMsg(tx)
+	return dataItem != nil && err == nil
+}
+
 func verifyTxWithDataItem(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	if err := verifyTxBody(tx); err != nil {
 		return err

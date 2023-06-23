@@ -26,9 +26,7 @@ func (pk *PubKey) VerifySignature(data []byte, signature []byte) bool {
 }
 
 func (pk *PubKey) Bytes() []byte {
-	bz := make([]byte, len(pk.Key))
-	copy(bz, pk.Key)
-	return bz
+	return pk.Key
 }
 
 func (pk *PubKey) Equals(other cryptotypes.PubKey) bool {
