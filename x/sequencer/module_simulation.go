@@ -4,7 +4,6 @@ import (
 	"math/rand"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -18,9 +17,9 @@ import (
 var (
 	_ = sample.AccAddress
 	_ = sequencersimulation.FindAccount
-	_ = simappparams.StakePerAccount
 	_ = simulation.MsgEntryKind
 	_ = baseapp.Paramspace
+        _ = rand.Rand{}
 )
 
 const (
@@ -43,36 +42,46 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&sequencerGenesis)
 }
 
-// ProposalContents doesn't return any content functions for governance proposals
-func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent {
-	return nil
-}
-
-// RandomizedParams creates randomized  param changes for the simulator
-func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
-
-	return []simtypes.ParamChange{}
-}
-
-// RegisterStoreDecoder registers a decoder
+// RegisterStoreDecoder registers a decoder.
 func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
+
+// ProposalContents doesn't return any content functions for governance proposals.
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalMsg {
+        return nil
+}
 
 // WeightedOperations returns the all the gov module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
-	operations := make([]simtypes.WeightedOperation, 0)
+        operations := make([]simtypes.WeightedOperation, 0)
 
-	var weightMsgDataItem int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDataItem, &weightMsgDataItem, nil,
-		func(_ *rand.Rand) {
-			weightMsgDataItem = defaultWeightMsgDataItem
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgDataItem,
-		sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
+        var weightMsgDataItem int
+        simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDataItem, &weightMsgDataItem, nil,
+                func(_ *rand.Rand) {
+                        weightMsgDataItem = defaultWeightMsgDataItem
+                },
+        )
+        operations = append(operations, simulation.NewWeightedOperation(
+                weightMsgDataItem,
+                sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper),
+        ))
 
-	// this line is used by starport scaffolding # simapp/module/operation
+        // this line is used by starport scaffolding # simapp/module/operation
 
-	return operations
+        return operations
 }
+
+// ProposalMsgs returns msgs used for governance proposals for simulations.
+func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
+        return []simtypes.WeightedProposalMsg{
+                simulation.NewWeightedProposalMsg(
+                        opWeightMsgDataItem,
+                        defaultWeightMsgDataItem,
+                        func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+                                sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper)
+                                return nil
+                        },
+                ),
+                // this line is used by starport scaffolding # simapp/module/OpMsg
+        }
+}
+
