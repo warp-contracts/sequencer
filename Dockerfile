@@ -11,6 +11,7 @@ COPY Makefile .
 COPY go.mod .
 COPY go.sum .
 COPY app app
+COPY crypto crypto
 COPY docs docs
 COPY tools tools
 COPY x x

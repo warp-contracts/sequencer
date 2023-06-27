@@ -14,7 +14,7 @@ log() {
 
 genOut() {
     export HOME="./out"
-    MAIN_PASSWORD=$(cat /dev/random | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+    MAIN_PASSWORD=$(cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
     mkdir -p $HOME/.sequencer/config/gentx
 
@@ -22,14 +22,14 @@ genOut() {
     ./sequencer config keyring-backend file 
 
     # Modify genesis.json
-    sed -i 's/"stake"/"warp"/g' $HOME/.sequencer/config/genesis.json
+    sed -i'' -e 's/"stake"/"warp"/g' $HOME/.sequencer/config/genesis.json
 }
 
 gen() {
     mkdir -p $1
     NAME=$1
     export HOME="./$1"
-    PASSWORD=$(cat /dev/random | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+    PASSWORD=$(cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
     ./sequencer init warp-sequencer --chain-id $CHAIN_ID 
     ./sequencer config keyring-backend file 
