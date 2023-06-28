@@ -1,5 +1,5 @@
 {
-  "genesis_time": "2023-06-26T15:30:32.389844Z",
+  "genesis_time": "2023-06-28T14:38:19.691543Z",
   "chain_id": "sequencer-0",
   "initial_height": "1",
   "consensus_params": {
@@ -36,21 +36,21 @@
       "accounts": [
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "warp1wuakrjv3mdga4ax9hu2n7fltm36m6wum9ex292",
+          "address": "warp1l5tqafuml7lpjmrsclul4qk4vlsgcs8aax08km",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "warp1uytxlrxaky03z3z6gglxg92mu28hgtuv62rvsa",
+          "address": "warp1dp22uva28n2q4dvdccxxdqamknhgj0kxw9l6mp",
           "pub_key": null,
           "account_number": "1",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "warp1he0dygh257qddfcxtq8psc3nqg8qr6fkk3vd0v",
+          "address": "warp199g2kunvhfw2c8wsrme3tklvxumc7u4ufvrrlm",
           "pub_key": null,
           "account_number": "2",
           "sequence": "0"
@@ -67,28 +67,28 @@
       },
       "balances": [
         {
-          "address": "warp1wuakrjv3mdga4ax9hu2n7fltm36m6wum9ex292",
+          "address": "warp199g2kunvhfw2c8wsrme3tklvxumc7u4ufvrrlm",
           "coins": [
             {
-              "denom": "warp",
+              "denom": "warptest",
               "amount": "100000000000"
             }
           ]
         },
         {
-          "address": "warp1he0dygh257qddfcxtq8psc3nqg8qr6fkk3vd0v",
+          "address": "warp1dp22uva28n2q4dvdccxxdqamknhgj0kxw9l6mp",
           "coins": [
             {
-              "denom": "warp",
+              "denom": "warptest",
               "amount": "100000000000"
             }
           ]
         },
         {
-          "address": "warp1uytxlrxaky03z3z6gglxg92mu28hgtuv62rvsa",
+          "address": "warp1l5tqafuml7lpjmrsclul4qk4vlsgcs8aax08km",
           "coins": [
             {
-              "denom": "warp",
+              "denom": "warptest",
               "amount": "100000000000"
             }
           ]
@@ -105,7 +105,7 @@
     "consensus": null,
     "crisis": {
       "constant_fee": {
-        "denom": "warp",
+        "denom": "warptest",
         "amount": "1000"
       }
     },
@@ -142,7 +142,7 @@
               {
                 "@type": "/cosmos.staking.v1beta1.MsgCreateValidator",
                 "description": {
-                  "moniker": "sequencer-1",
+                  "moniker": "sequencer-2",
                   "identity": "",
                   "website": "warp.cc",
                   "security_contact": "",
@@ -154,19 +154,19 @@
                   "max_change_rate": "0.010000000000000000"
                 },
                 "min_self_delegation": "1",
-                "delegator_address": "warp1uytxlrxaky03z3z6gglxg92mu28hgtuv62rvsa",
-                "validator_address": "warpvaloper1uytxlrxaky03z3z6gglxg92mu28hgtuvquqrlv",
+                "delegator_address": "warp199g2kunvhfw2c8wsrme3tklvxumc7u4ufvrrlm",
+                "validator_address": "warpvaloper199g2kunvhfw2c8wsrme3tklvxumc7u4un6qvs2",
                 "pubkey": {
                   "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "eUqZwzkZ4T/kQxjNQzwywCFthokYRmQysGCzNsrvcLE="
+                  "key": "QeIrzarCGcvGlFl1BeGWixIadYM5IFN0qiJncThRl6w="
                 },
                 "value": {
-                  "denom": "warp",
+                  "denom": "warptest",
                   "amount": "100000000000"
                 }
               }
             ],
-            "memo": "2062ce53eac3aead97dbd0791ed2201f57ab470e@192.168.0.27:26656",
+            "memo": "15ac19038b53f66ff3175f370f6f7a1c61db2bdc@192.168.100.22:26656",
             "timeout_height": "0",
             "extension_options": [],
             "non_critical_extension_options": []
@@ -176,7 +176,7 @@
               {
                 "public_key": {
                   "@type": "/cosmos.crypto.secp256k1.PubKey",
-                  "key": "AwnVd5rGxphXtfpzjcqIC9pb7j3LYyXXJ1C0imMc1JjX"
+                  "key": "A1Jaqq/LDaSVhr1iOZJ/cVGg03Eg4Ae2H4681b0/sqcZ"
                 },
                 "mode_info": {
                   "single": {
@@ -195,7 +195,69 @@
             "tip": null
           },
           "signatures": [
-            "covrNl8ZiMsHwl5HGMdnq11/YlsjEhff0RHOfv3zpZQ6ijfkJzB11TPIHsuEJQ+pncUZpE5N2iCfropmE1FvQw=="
+            "/PZQ7EilSuKXNcBSgITaxgJGpDZEdyToGcXl/B1/6eUp6KC+PT69jhW7e9Y518QJgIwjhhfSBK0mMPz7FL7lsQ=="
+          ]
+        },
+        {
+          "body": {
+            "messages": [
+              {
+                "@type": "/cosmos.staking.v1beta1.MsgCreateValidator",
+                "description": {
+                  "moniker": "sequencer-1",
+                  "identity": "",
+                  "website": "warp.cc",
+                  "security_contact": "",
+                  "details": "Warp Validator"
+                },
+                "commission": {
+                  "rate": "0.100000000000000000",
+                  "max_rate": "0.200000000000000000",
+                  "max_change_rate": "0.010000000000000000"
+                },
+                "min_self_delegation": "1",
+                "delegator_address": "warp1dp22uva28n2q4dvdccxxdqamknhgj0kxw9l6mp",
+                "validator_address": "warpvaloper1dp22uva28n2q4dvdccxxdqamknhgj0kx5nu45s",
+                "pubkey": {
+                  "@type": "/cosmos.crypto.ed25519.PubKey",
+                  "key": "0IfltzFsga4QvZh9IkXold+K5fgJMiJQHGVR5Wtt0x8="
+                },
+                "value": {
+                  "denom": "warptest",
+                  "amount": "100000000000"
+                }
+              }
+            ],
+            "memo": "c02cc42f0b0107d44d4f76524da2d3212a7ee5c5@192.168.100.22:26656",
+            "timeout_height": "0",
+            "extension_options": [],
+            "non_critical_extension_options": []
+          },
+          "auth_info": {
+            "signer_infos": [
+              {
+                "public_key": {
+                  "@type": "/cosmos.crypto.secp256k1.PubKey",
+                  "key": "A3aEucOk4N6E/uAN3vuavwdK3Z8BPQGGAxIqytDKHX5S"
+                },
+                "mode_info": {
+                  "single": {
+                    "mode": "SIGN_MODE_DIRECT"
+                  }
+                },
+                "sequence": "0"
+              }
+            ],
+            "fee": {
+              "amount": [],
+              "gas_limit": "200000",
+              "payer": "",
+              "granter": ""
+            },
+            "tip": null
+          },
+          "signatures": [
+            "rgomjSF5iAINC/VpGlQihW090gi0Pa6Sl1DvALM7Kq4pIEW6o45r8tFf8lqg0X6Y/B5AIBVvKzGUNFgil1YlBQ=="
           ]
         },
         {
@@ -216,19 +278,19 @@
                   "max_change_rate": "0.010000000000000000"
                 },
                 "min_self_delegation": "1",
-                "delegator_address": "warp1wuakrjv3mdga4ax9hu2n7fltm36m6wum9ex292",
-                "validator_address": "warpvaloper1wuakrjv3mdga4ax9hu2n7fltm36m6wuml0992m",
+                "delegator_address": "warp1l5tqafuml7lpjmrsclul4qk4vlsgcs8aax08km",
+                "validator_address": "warpvaloper1l5tqafuml7lpjmrsclul4qk4vlsgcs8a8svge2",
                 "pubkey": {
                   "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "0N7wK3to4890v5ahBxGBrXDVkckUQYXtbB3VJAi4Pmc="
+                  "key": "kZpQ3Ee2zSYZdbAYcRlZQermMhhxAOGo7kO8DsRXCLA="
                 },
                 "value": {
-                  "denom": "warp",
+                  "denom": "warptest",
                   "amount": "100000000000"
                 }
               }
             ],
-            "memo": "475dab7e042c0d7b3b3c314610e50b5f1e459d92@192.168.0.27:26656",
+            "memo": "cf264422b88a40c6ca055c88ef19fc6f1ef52840@192.168.100.22:26656",
             "timeout_height": "0",
             "extension_options": [],
             "non_critical_extension_options": []
@@ -238,7 +300,7 @@
               {
                 "public_key": {
                   "@type": "/cosmos.crypto.secp256k1.PubKey",
-                  "key": "AvCnW9NvowkK4debMNZT6eLZBlOUzzB2CUWkjKfbKv0I"
+                  "key": "ArS19NfY96a2DvEkFySRy5DHIXPmazO0dRYH1i4hbIPU"
                 },
                 "mode_info": {
                   "single": {
@@ -257,69 +319,7 @@
             "tip": null
           },
           "signatures": [
-            "GzfsjYS368P8yjISmiQYbhNzQJuH/5pWAxNqi2w0Nx5OMmMwT/3S8OHMAxckfkJ1BNPc499QVFh8h/hIWBqadw=="
-          ]
-        },
-        {
-          "body": {
-            "messages": [
-              {
-                "@type": "/cosmos.staking.v1beta1.MsgCreateValidator",
-                "description": {
-                  "moniker": "sequencer-2",
-                  "identity": "",
-                  "website": "warp.cc",
-                  "security_contact": "",
-                  "details": "Warp Validator"
-                },
-                "commission": {
-                  "rate": "0.100000000000000000",
-                  "max_rate": "0.200000000000000000",
-                  "max_change_rate": "0.010000000000000000"
-                },
-                "min_self_delegation": "1",
-                "delegator_address": "warp1he0dygh257qddfcxtq8psc3nqg8qr6fkk3vd0v",
-                "validator_address": "warpvaloper1he0dygh257qddfcxtq8psc3nqg8qr6fkv80zqa",
-                "pubkey": {
-                  "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "nudsUqaRQ2eqU8sIbJhw9bpyr5eSXX1u9G+0S5c7pWs="
-                },
-                "value": {
-                  "denom": "warp",
-                  "amount": "100000000000"
-                }
-              }
-            ],
-            "memo": "886ab947ad4966d8615efd6652ac1065890d8918@192.168.0.27:26656",
-            "timeout_height": "0",
-            "extension_options": [],
-            "non_critical_extension_options": []
-          },
-          "auth_info": {
-            "signer_infos": [
-              {
-                "public_key": {
-                  "@type": "/cosmos.crypto.secp256k1.PubKey",
-                  "key": "AlxCsbm6MHaTLxx4vqSMb9uE4vFoZfOG/qM/jGeO4/Hp"
-                },
-                "mode_info": {
-                  "single": {
-                    "mode": "SIGN_MODE_DIRECT"
-                  }
-                },
-                "sequence": "0"
-              }
-            ],
-            "fee": {
-              "amount": [],
-              "gas_limit": "200000",
-              "payer": "",
-              "granter": ""
-            },
-            "tip": null
-          },
-          "signatures": [
-            "IM56H+kQcnQh0GuKE9aXofHLRDR+Bm853lqiPenIB6kh7mFcs/Y1FKpJClcmagOAWsAub9TMmi66/f9foqX4AQ=="
+            "nyImMV6VhSkJdgVLHzms9Jtsl55YtNLy1czZV2VFdjpqZmjJO86hgqbozevnEuyq9MkfahB0DceP4IZ+7DUBXg=="
           ]
         }
       ]
@@ -335,7 +335,7 @@
       "params": {
         "min_deposit": [
           {
-            "denom": "warp",
+            "denom": "warptest",
             "amount": "10000000"
           }
         ],
@@ -421,7 +421,7 @@
         "annual_provisions": "0.000000000000000000"
       },
       "params": {
-        "mint_denom": "warp",
+        "mint_denom": "warptest",
         "inflation_rate_change": "0.130000000000000000",
         "inflation_max": "0.200000000000000000",
         "inflation_min": "0.070000000000000000",
@@ -450,7 +450,7 @@
         "max_validators": 100,
         "max_entries": 7,
         "historical_entries": 10000,
-        "bond_denom": "warp",
+        "bond_denom": "warptest",
         "min_commission_rate": "0.000000000000000000"
       },
       "last_total_power": "0",
