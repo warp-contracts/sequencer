@@ -5,15 +5,15 @@ import (
 	"testing"
 
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
+	"github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 func newExtOptionsTxBuilder() authtx.ExtensionOptionsTxBuilder {
-	return simapp.MakeTestEncodingConfig().TxConfig.NewTxBuilder().(authtx.ExtensionOptionsTxBuilder)
+	return testutil.MakeTestEncodingConfig().TxConfig.NewTxBuilder().(authtx.ExtensionOptionsTxBuilder)
 }
 
 func newAnyValue() *codectypes.Any {

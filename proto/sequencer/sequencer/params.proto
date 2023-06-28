@@ -1,5 +1,5 @@
 syntax = "proto3";
-package warpcontracts.sequencer.sequencer;
+package sequencer.sequencer;
 
 import "gogoproto/gogo.proto";
 

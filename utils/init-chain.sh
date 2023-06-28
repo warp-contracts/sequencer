@@ -5,46 +5,53 @@
 
 COIN="100000000000warp"
 CHAIN_ID="sequencer-0"
-OUTFILE="./out.txt"
+TEMP_DIR="/tmp/init-chain"
+rm -rf $TEMP_DIR
+mkdir $TEMP_DIR
+OUTFILE="$TEMP_DIR/out.txt"
 touch $OUTFILE
+REPO_DIR="$(dirname "$(realpath -- "$0"/..)")"
+CONFIG_SUBDIR=".sequencer/config"
+GENTX_SUBDIR="$CONFIG_SUBDIR/gentx"
+SEQUENCER="$REPO_DIR/bin/sequencer"
 
 log() {
     printf "$1\n"
 }
 
 genOut() {
-    export HOME="./out"
-    MAIN_PASSWORD=$(cat /dev/random | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+    export HOME="$TEMP_DIR/all"
+    MAIN_PASSWORD=$(cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
-    mkdir -p $HOME/.sequencer/config/gentx
+    mkdir -p "$HOME/$GENTX_SUBDIR"
 
-    ./sequencer init warp-sequencer --chain-id $CHAIN_ID  
-    ./sequencer config keyring-backend file 
+    $SEQUENCER init warp-sequencer --chain-id $CHAIN_ID  
+    $SEQUENCER config keyring-backend file 
 
     # Modify genesis.json
-    sed -i 's/"stake"/"warp"/g' $HOME/.sequencer/config/genesis.json
+    sed -i'' -e 's/"stake"/"warp"/g' $HOME/$CONFIG_SUBDIR/genesis.json
 }
 
 gen() {
     mkdir -p $1
     NAME=$1
-    export HOME="./$1"
-    PASSWORD=$(cat /dev/random | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+    export HOME="$TEMP_DIR/$1"
+    PASSWORD=$(cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 
-    ./sequencer init warp-sequencer --chain-id $CHAIN_ID 
-    ./sequencer config keyring-backend file 
+    $SEQUENCER init warp-sequencer --chain-id $CHAIN_ID 
+    $SEQUENCER config keyring-backend file 
 
     # Validator's account
     (
         echo $PASSWORD
         echo $PASSWORD
-    ) | ./sequencer keys add $1 
+    ) | $SEQUENCER keys add $1 
 
-    ADDRESS=$(echo $PASSWORD | ./sequencer keys show $1 -a --keyring-backend file)
-    ./sequencer add-genesis-account $ADDRESS $COIN 
+    ADDRESS=$(echo $PASSWORD | $SEQUENCER keys show $1 -a --keyring-backend file)
+    $SEQUENCER add-genesis-account $ADDRESS $COIN 
 
     # Register account as validator operator
-    $(echo $PASSWORD | ./sequencer gentx $1 $COIN \
+    $(echo $PASSWORD | $SEQUENCER gentx $1 $COIN \
         --from $ADDRESS \
         --moniker $1 \
         --chain-id $CHAIN_ID \
@@ -54,11 +61,19 @@ gen() {
         
 
     # Collect genesis tx to the output genesis.json
-    cp $1/.sequencer/config/gentx/* out/.sequencer/config/gentx
-
-    ./sequencer add-genesis-account $ADDRESS $COIN  --home out/.sequencer 
+    cp $TEMP_DIR/$1/$GENTX_SUBDIR/* $TEMP_DIR/all/$GENTX_SUBDIR
+    $SEQUENCER add-genesis-account $ADDRESS $COIN  --home $TEMP_DIR/all/.sequencer 
 
     log "Password: $1 : $PASSWORD"
+}
+
+copy() {
+    cp $TEMP_DIR/all/$CONFIG_SUBDIR/*toml $REPO_DIR/network/local/$1/config
+    cp $TEMP_DIR/all/$CONFIG_SUBDIR/*json $REPO_DIR/network/local/$1/config
+    cp $TEMP_DIR/$1/$CONFIG_SUBDIR/node_key.json $REPO_DIR/network/local/$1/config
+    cp $TEMP_DIR/$1/$CONFIG_SUBDIR/priv_validator_key.json $REPO_DIR/network/local/$1/config
+    rm -f $REPO_DIR/network/local/$1/keyring-file/*
+    cp $TEMP_DIR/$1/.sequencer/keyring-file/* $REPO_DIR/network/local/$1/keyring-file
 }
 
 run() {
@@ -72,8 +87,12 @@ run() {
         gen $NAME
     done
 
-    export HOME="./out"
-    ./sequencer collect-gentxs 
+    export HOME="$TEMP_DIR/all"
+    $SEQUENCER collect-gentxs 
+
+    for NAME in "sequencer-0" "sequencer-1" "sequencer-2"; do
+        copy $NAME
+    done
 }
 
 run > $OUTFILE 2>&1

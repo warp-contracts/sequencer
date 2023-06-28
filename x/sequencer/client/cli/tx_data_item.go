@@ -44,7 +44,7 @@ func CmdDataItem() *cobra.Command {
 			}
 
 			// validates the message and sends it out
-			clientCtx.WithBroadcastMode(cmd.Flag(flags.FlagBroadcastMode).Value.String())
+			clientCtx = clientCtx.WithBroadcastMode(cmd.Flag(flags.FlagBroadcastMode).Value.String())
 			res, err := types.BroadcastDataItem(clientCtx, *msg)
 			if err != nil {
 				return
@@ -57,7 +57,7 @@ func CmdDataItem() *cobra.Command {
 	cmd.Flags().String(FlagEthereumPrivateKey, "", "Hex encoded private key for the Ethereum account. Defaults to ./ethereum.bin")
 	cmd.Flags().StringP(FlagData, "d", "", "File with the binary data")
 	cmd.Flags().StringArrayP(FlagTag, "t", []string{}, "One tag - a pair in the form of key=value. You can specify multiple tags. Example -t someKey=someValue -t someOtherKey=someValue")
-	cmd.Flags().StringP(flags.FlagBroadcastMode, "b", flags.BroadcastSync, "Transaction broadcasting mode (sync|async|block)")
+	cmd.Flags().StringP(flags.FlagBroadcastMode, "b", flags.BroadcastSync, "Transaction broadcasting mode (sync|async)")
 	return cmd
 }
 

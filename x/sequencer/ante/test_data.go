@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/cosmos/cosmos-sdk/types/module/testutil"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
@@ -31,7 +31,7 @@ const EMPTY_ARWEAVE_WALLET = `{
 const ETHEREUM_PRIVATE_KEY = `0xf4a2b939592564feb35ab10a8e04f6f2fe0943579fb3c9c33505298978b74893`
 
 func newTxBuilder() client.TxBuilder {
-	return simapp.MakeTestEncodingConfig().TxConfig.NewTxBuilder()
+	return testutil.MakeTestEncodingConfig().TxConfig.NewTxBuilder()
 }
 
 func arweaveDataItem(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {

@@ -1,11 +1,10 @@
 package ante
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
-	"github.com/cosmos/cosmos-sdk/simapp"
+	"cosmossdk.io/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -19,7 +18,7 @@ import (
 
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
 
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 )
 
 func appAndCtx(t *testing.T) (*simapp.SimApp, sdk.Context) {

@@ -13,7 +13,7 @@ curl http://localhost:1317/cosmos/staking/v1beta1/validators
 
 # Check the status of each node
 ./bin/sequencer status
-./bin/sequencer status -n -n tcp://localhost:26667
-./bin/sequencer status -n -n tcp://localhost:26677
+./bin/sequencer status --node tcp://localhost:26667
+./bin/sequencer status --node tcp://localhost:26677
 
 ```
