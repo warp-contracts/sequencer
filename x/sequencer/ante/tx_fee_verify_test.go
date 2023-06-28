@@ -20,7 +20,7 @@ func newTxBuilderWithDataItem(t *testing.T) (client.TxBuilder, *types.MsgDataIte
 	return txBuilder, &dataItem
 }
 
-var WARP_COIN = sdk.NewCoins(sdk.NewCoin("warp", sdk.NewInt(1)))
+var WARP_COIN = sdk.NewCoins(sdk.NewCoin("warptest", sdk.NewInt(1)))
 
 func TestVerifyFeeTx(t *testing.T) {
 	txBuilder, dataItem := newTxBuilderWithDataItem(t)

@@ -3,7 +3,7 @@
 # Run in Linux environment
 # set -ex
 
-COIN="100000000000warp"
+COIN="100000000000warptest"
 CHAIN_ID="sequencer-0"
 TEMP_DIR="/tmp/init-chain"
 rm -rf $TEMP_DIR
@@ -29,7 +29,7 @@ genOut() {
     $SEQUENCER config keyring-backend file 
 
     # Modify genesis.json
-    sed -i'' -e 's/"stake"/"warp"/g' $HOME/$CONFIG_SUBDIR/genesis.json
+    sed -i'' -e 's/"stake"/"warptest"/g' $HOME/$CONFIG_SUBDIR/genesis.json
 }
 
 gen() {
@@ -82,7 +82,6 @@ run() {
 
     # Initialize validators, each validator has its own directory
     # this directory will later be used to run the validator node
-    # for NAME in "warp-pike" "warp-kirk" "warp-picard"; do
     for NAME in "sequencer-0" "sequencer-1" "sequencer-2"; do
         gen $NAME
     done
