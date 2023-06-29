@@ -69,8 +69,6 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 	arweaveWalletPath := cmd.Flag(FlagArweaveWallet).Value.String()
 	ethereumPrivateKeyPath := cmd.Flag(FlagEthereumPrivateKey).Value.String()
 	if (arweaveWalletPath == "" && ethereumPrivateKeyPath == "") || (arweaveWalletPath != "" && ethereumPrivateKeyPath != "") {
-		fmt.Println(arweaveWalletPath)
-		fmt.Println(ethereumPrivateKeyPath)
 		err = errors.New("exactly one ethereum private key or arweave wallet is required")
 		return
 	}
@@ -157,12 +155,12 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 // Returns the sequence for the account or 0 if the account does not exist
 func getAccountSequence(clientCtx client.Context, msg *types.MsgDataItem, signer bundlr.Signer) (uint64, error) {
 
-	addr, err := types.GetPublicKey(msg.DataItem.SignatureType, signer.GetOwner())
+	key, err := types.GetPublicKey(msg.DataItem.SignatureType, signer.GetOwner())
 	if err != nil {
 		return 0, err
 	}
 
-	acc, err := clientCtx.AccountRetriever.GetAccount(clientCtx, sdk.AccAddress(addr.Address()))
+	acc, err := clientCtx.AccountRetriever.GetAccount(clientCtx, sdk.AccAddress(key.Address()))
 	if acc == nil || err != nil {
 		// account does not exist
 		return 0, nil
