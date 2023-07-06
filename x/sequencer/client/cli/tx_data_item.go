@@ -14,6 +14,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
+
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
 	"github.com/warp-contracts/syncer/src/utils/warp"
 )

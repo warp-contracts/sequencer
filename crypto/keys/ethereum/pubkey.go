@@ -2,13 +2,14 @@ package ethereum
 
 import (
 	"bytes"
-	"crypto/sha256"
 
 	ethereum_crypto "github.com/ethereum/go-ethereum/crypto"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 
 	tmcrypto "github.com/cometbft/cometbft/crypto"
+
+	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
 func (pk *PubKey) Address() tmcrypto.Address {
@@ -21,7 +22,7 @@ func (pk *PubKey) VerifySignature(data []byte, signature []byte) bool {
 		signature = signature[:len(signature)-1]
 	}
 
-	hashed := sha256.Sum256(data)
+	hashed := bundlr.EthereumHash(data)
 	return ethereum_crypto.VerifySignature(pk.Key, hashed[:], signature)
 }
 

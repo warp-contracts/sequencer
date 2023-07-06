@@ -36,7 +36,7 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if response.Code != 0 {
-		http.Error(w, "failed to broadcast transaction", http.StatusInternalServerError)
+		http.Error(w, "failed to broadcast transaction: " + response.RawLog, http.StatusInternalServerError)
 		return
 	}
 

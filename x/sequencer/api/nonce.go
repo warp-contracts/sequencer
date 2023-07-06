@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -27,7 +28,7 @@ type nonceResponse struct {
 	Nonce   uint64 `json:"nonce"`
 }
 
-// The endpoint that returns the account address and nonce for the given fields of the DataItem: 
+// The endpoint that returns the account address and nonce for the given fields of the DataItem:
 // owner (in Base64URL format) and signature type.
 func RegisterNonceAPIRoute(clientCtx client.Context, router *mux.Router) {
 	router.Handle("/api/v1/nonce", nonceHandler{ctx: clientCtx})
@@ -59,7 +60,10 @@ func getPublicKeyFromParameters(r *http.Request) (key cryptotypes.PubKey, err er
 		err = errors.New("no owner parameter")
 		return
 	}
-	ownerBytes, err := base64.URLEncoding.DecodeString(owner)
+	for strings.HasSuffix(owner, "=") {
+		owner = owner[:len(owner) - 1]
+	}
+	ownerBytes, err := base64.URLEncoding.WithPadding(base64.NoPadding).DecodeString(owner)
 	if err != nil {
 		return
 	}
