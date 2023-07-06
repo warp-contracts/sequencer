@@ -22,12 +22,12 @@ type nonceHandler struct {
 	validate *validator.Validate
 }
 
-type nonceRequest struct {
+type NonceRequest struct {
 	SignatureType int    `json:"signature_type" validate:"required,oneof=1 3"`
-	Owner         string `json:"owner" validate:"required,base64rawurl"`
+	Owner         string `json:"owner" validate:"required,base64rawurl,min=87,max=683"`
 }
 
-type nonceResponse struct {
+type NonceResponse struct {
 	Address string `json:"address"`
 	Nonce   uint64 `json:"nonce"`
 }
@@ -39,7 +39,7 @@ func RegisterNonceAPIRoute(clientCtx client.Context, router *mux.Router) {
 }
 
 func (h nonceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	var request nonceRequest
+	var request NonceRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -65,11 +65,15 @@ func (h nonceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, err = fmt.Fprintf(w, "%s", jsonResponse)
+	if err != nil {
+		http.Error(w, "failed to write response", http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Fprintf(w, "%s", jsonResponse)
 }
 
-func getPublicKey(request nonceRequest) (key cryptotypes.PubKey, err error) {
+func getPublicKey(request NonceRequest) (key cryptotypes.PubKey, err error) {
 	ownerBytes, err := base64.RawURLEncoding.DecodeString(request.Owner)
 	if err != nil {
 		return
@@ -79,9 +83,9 @@ func getPublicKey(request nonceRequest) (key cryptotypes.PubKey, err error) {
 	return types.GetPublicKey(signatureType, ownerBytes)
 }
 
-func getAddressWithNonce(ctx client.Context, key cryptotypes.PubKey) nonceResponse {
+func getAddressWithNonce(ctx client.Context, key cryptotypes.PubKey) NonceResponse {
 	address := sdk.AccAddress(key.Address())
-	response := nonceResponse{Address: address.String()}
+	response := NonceResponse{Address: address.String()}
 
 	acc, err := ctx.AccountRetriever.GetAccount(ctx, address)
 	if acc == nil || err != nil {
