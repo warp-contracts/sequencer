@@ -3,12 +3,10 @@ package api
 import (
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
+	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"net/http"
-	"strconv"
-	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
@@ -20,7 +18,13 @@ import (
 )
 
 type nonceHandler struct {
-	ctx client.Context
+	ctx      client.Context
+	validate *validator.Validate
+}
+
+type nonceRequest struct {
+	SignatureType int    `json:"signature_type" validate:"required,oneof=1 3"`
+	Owner         string `json:"owner" validate:"required,base64rawurl"`
 }
 
 type nonceResponse struct {
@@ -31,11 +35,24 @@ type nonceResponse struct {
 // The endpoint that returns the account address and nonce for the given fields of the DataItem:
 // owner (in Base64URL format) and signature type.
 func RegisterNonceAPIRoute(clientCtx client.Context, router *mux.Router) {
-	router.Handle("/api/v1/nonce", nonceHandler{ctx: clientCtx})
+	router.Handle("/api/v1/nonce", nonceHandler{ctx: clientCtx, validate: validator.New()}).Methods("POST")
 }
 
 func (h nonceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	publicKey, err := getPublicKeyFromParameters(r)
+	var request nonceRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = h.validate.Struct(request)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	publicKey, err := getPublicKey(request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -52,45 +69,14 @@ func (h nonceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "%s", jsonResponse)
 }
 
-func getPublicKeyFromParameters(r *http.Request) (key cryptotypes.PubKey, err error) {
-	params := r.URL.Query()
-
-	owner := params.Get("owner")
-	if len(owner) == 0 {
-		err = errors.New("no owner parameter")
-		return
-	}
-	for strings.HasSuffix(owner, "=") {
-		owner = owner[:len(owner) - 1]
-	}
-	ownerBytes, err := base64.URLEncoding.WithPadding(base64.NoPadding).DecodeString(owner)
+func getPublicKey(request nonceRequest) (key cryptotypes.PubKey, err error) {
+	ownerBytes, err := base64.RawURLEncoding.DecodeString(request.Owner)
 	if err != nil {
 		return
 	}
 
-	signatureTypeStr := params.Get("signature_type")
-	if len(signatureTypeStr) == 0 {
-		err = errors.New("no signature_type parameter")
-		return
-	}
-	signatureTypeInt, err := strconv.Atoi(signatureTypeStr)
-	if err != nil {
-		err = errors.New("signature_type should be numeric")
-		return
-	}
-	signatureType := bundlr.SignatureType(signatureTypeInt)
-	if signatureType != bundlr.SignatureTypeArweave && signatureType != bundlr.SignatureTypeEthereum {
-		err = fmt.Errorf("invalid signature_type value, should be %d or %d",
-			bundlr.SignatureTypeArweave, bundlr.SignatureTypeEthereum)
-		return
-	}
-
-	key, err = types.GetPublicKey(signatureType, ownerBytes)
-	if err != nil {
-		return
-	}
-
-	return
+	signatureType := bundlr.SignatureType(request.SignatureType)
+	return types.GetPublicKey(signatureType, ownerBytes)
 }
 
 func getAddressWithNonce(ctx client.Context, key cryptotypes.PubKey) nonceResponse {
