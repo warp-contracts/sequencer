@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -11,6 +12,11 @@ import (
 
 type dataItemHandler struct {
 	ctx client.Context
+}
+
+type dataItemResponse struct {
+	SequencerTxHash string `json:"sequencer_tx_hash"`
+	DataItemId      string `json:"data_item_id"`
 }
 
 // The endpoint that accepts the DataItems as described in AND-104
@@ -36,13 +42,23 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if response.Code != 0 {
-		http.Error(w, "failed to broadcast transaction", http.StatusInternalServerError)
+		http.Error(w, "failed to broadcast transaction: " + response.RawLog, http.StatusInternalServerError)
 		return
 	}
 
-	_, err = w.Write([]byte(response.TxHash))
+	jsonResponse, err := json.Marshal(dataItemResponse{
+		SequencerTxHash: response.TxHash,
+		DataItemId:      msg.DataItem.Id.Base64(),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = fmt.Fprintf(w, "%s", jsonResponse)
 	if err != nil {
 		http.Error(w, "failed to write response", http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
 }

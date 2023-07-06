@@ -3,7 +3,6 @@ package ethereum
 import (
 	"bytes"
 	"crypto/ecdsa"
-	"crypto/sha256"
 
 	ethereum_crypto "github.com/ethereum/go-ethereum/crypto"
 
@@ -17,7 +16,7 @@ func (sk *PrivKey) Bytes() []byte {
 }
 
 func (sk *PrivKey) Sign(data []byte) ([]byte, error) {
-	hashed := sha256.Sum256(data)
+	hashed := bundlr.EthereumHash(data)
 	return ethereum_crypto.Sign(hashed[:], sk.ecdsaPrivateKey())
 }
 
