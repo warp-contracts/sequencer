@@ -47,6 +47,7 @@ setupSequencer() {
 
 run() {
     cat $HOME/.sequencer/config/genesis.json
+    cosmovisor version
     cosmovisor run start
 }
 
