@@ -27,9 +27,6 @@ genOut() {
 
     $SEQUENCER init warp-sequencer --chain-id $CHAIN_ID  
     $SEQUENCER config keyring-backend file 
-
-    # Modify genesis.json
-    sed -i'' -e 's/"stake"/"warptest"/g' $HOME/$CONFIG_SUBDIR/genesis.json
 }
 
 gen() {
@@ -67,6 +64,20 @@ gen() {
     log "Password: $1 : $PASSWORD"
 }
 
+replace() {
+    sed -i'' -e 's/"stake"/"warptest"/g' $TEMP_DIR/all/$CONFIG_SUBDIR/genesis.json
+    sed -i'' -e 's/"inflation": "0.130000000000000000",/"inflation": "0.000000000000000000",/g' $TEMP_DIR/all/$CONFIG_SUBDIR/genesis.json
+    sed -i'' -e 's/"inflation_rate_change": "0.130000000000000000",/"inflation_rate_change": "0.000000000000000000",/g' $TEMP_DIR/all/$CONFIG_SUBDIR/genesis.json
+    sed -i'' -e 's/"inflation_max": "0.200000000000000000",/"inflation_max": "0.000000000000000000",/g' $TEMP_DIR/all/$CONFIG_SUBDIR/genesis.json
+    sed -i'' -e 's/"inflation_min": "0.070000000000000000",/"inflation_min": "0.000000000000000000",/g' $TEMP_DIR/all/$CONFIG_SUBDIR/genesis.json
+    sed -i'' -e 's/"goal_bonded": "0.670000000000000000",/"goal_bonded": "1.000000000000000000",/g' $TEMP_DIR/all/$CONFIG_SUBDIR/genesis.json
+    sed -i'' -e 's/pex = true/pex = false/g' $TEMP_DIR/all/$CONFIG_SUBDIR/config.toml
+    sed -i'' -e 's/create_empty_blocks = true/create_empty_blocks = false/g' $TEMP_DIR/all/$CONFIG_SUBDIR/config.toml
+    sed -i'' -e 's/create_empty_blocks_interval = "0s"/create_empty_blocks_interval = "30s"/g' $TEMP_DIR/all/$CONFIG_SUBDIR/config.toml
+    # TODO: uncomment before going into production
+    # sed -i'' -e 's/skip_timeout_commit = false/skip_timeout_commit = true/g' $TEMP_DIR/all/$CONFIG_SUBDIR/config.toml
+}
+
 copy() {
     cp $TEMP_DIR/all/$CONFIG_SUBDIR/*toml $REPO_DIR/network/local/$1/config
     cp $TEMP_DIR/all/$CONFIG_SUBDIR/*json $REPO_DIR/network/local/$1/config
@@ -79,6 +90,7 @@ copy() {
 run() {
     # Out directory is only used for generating genesis.json
     genOut
+    replace
 
     # Initialize validators, each validator has its own directory
     # this directory will later be used to run the validator node
