@@ -1,11 +1,11 @@
 # Build the sequencer binary
 FROM golang:1.20.3-alpine3.17 as sequencer
+LABEL stage=sequencer-builder
 RUN apk add --update make build-base curl git
 
 RUN go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@latest
 
 WORKDIR /app
-COPY .git .git
 COPY .gopath~ .gopath~
 COPY Makefile .
 COPY go.mod .
@@ -17,6 +17,7 @@ COPY tools tools
 COPY x x
 COPY cmd cmd
 COPY testutil testutil
+COPY .git .git
 
 RUN make build
 
