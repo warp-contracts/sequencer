@@ -76,6 +76,7 @@ docker-build: all | ; $(info $(M) building docker container) @
 	DOCKER_BUILDKIT=0 docker build -t "warpredstone/sequencer:latest" .
 	# DOCKER_BUILDKIT=0 docker build -t "warpredstone/sequencer:$(VERSION)" .
 	rm -rf vendor
+	docker images --filter label=stage=sequencer-builder -q | tail -n +2 | xargs docker image rm
 
 .PHONY: docker-push
 docker-push: all | ; $(info $(M) building docker container) @ 
