@@ -31,18 +31,18 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Parse DataItem from request body
 	err := msg.DataItem.UnmarshalFromReader(r.Body)
 	if err != nil {
-		http.Error(w, fmt.Sprintf("failed to parse data item: %s", err.Error()), http.StatusBadRequest)
+		BadRequestError(w, err, "parse data item error")
 		return
 	}
 
 	// Wrap message with Cosmos transaction, validate and broadcast transaction
 	response, err := types.BroadcastDataItem(h.ctx, msg)
 	if err != nil {
-		http.Error(w, "failed to broadcast transaction", http.StatusInternalServerError)
+		InternalServerErrorString(w, "failed to broadcast transaction", "broadcast transaction error")
 		return
 	}
 	if response.Code != 0 {
-		http.Error(w, "failed to broadcast transaction: " + response.RawLog, http.StatusInternalServerError)
+		InternalServerErrorString(w, response.RawLog, "broadcast transaction error")
 		return
 	}
 
@@ -51,13 +51,13 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		DataItemId:      msg.DataItem.Id.Base64(),
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		InternalServerError(w, err, "response encoding error")
 		return
 	}
 
 	_, err = fmt.Fprintf(w, "%s", jsonResponse)
 	if err != nil {
-		http.Error(w, "failed to write response", http.StatusInternalServerError)
+		InternalServerError(w, err, "response writing error")
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
