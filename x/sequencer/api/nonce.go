@@ -42,32 +42,32 @@ func (h nonceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var request NonceRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		BadRequestError(w, err, "request decoding error")
 		return
 	}
 
 	err = h.validate.Struct(request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		BadRequestError(w, err, "invalid request")
 		return
 	}
 
 	publicKey, err := getPublicKey(request)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		BadRequestError(w, err, "public key problem")
 		return
 	}
 
 	response := getAddressWithNonce(h.ctx, publicKey)
 	jsonResponse, err := json.Marshal(response)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		InternalServerError(w, err, "response encoding error")
 		return
 	}
 
 	_, err = fmt.Fprintf(w, "%s", jsonResponse)
 	if err != nil {
-		http.Error(w, "failed to write response", http.StatusInternalServerError)
+		InternalServerError(w, err, "response writing error")
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
