@@ -119,5 +119,6 @@ func (msg *MsgDeleteLastArweaveBlock) ValidateBasic() error {
 	if err != nil {
 		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
 	return nil
 }

@@ -23,6 +23,9 @@ message MsgDataItemResponse {}
 
 message MsgCreateLastArweaveBlock {
   string creator = 1;
+  uint64 height = 2;
+  uint64 timestamp = 3;
+  bytes hash = 4;
 }
 
 message MsgCreateLastArweaveBlockResponse {}
@@ -35,6 +38,7 @@ message MsgUpdateLastArweaveBlockResponse {}
 
 message MsgDeleteLastArweaveBlock {
   string creator = 1;
+  bytes hash = 2;
 }
 
 message MsgDeleteLastArweaveBlockResponse {}
