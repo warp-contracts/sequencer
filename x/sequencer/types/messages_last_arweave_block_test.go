@@ -21,9 +21,12 @@ func TestMsgCreateLastArweaveBlock_ValidateBasic(t *testing.T) {
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid address",
+			name: "valid",
 			msg: MsgCreateLastArweaveBlock{
-				Creator: sample.AccAddress(),
+				Creator:   sample.AccAddress(),
+				Timestamp: 1690809540,
+				Height:    1431216,
+				Hash:      []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
 			},
 		},
 	}
@@ -83,9 +86,10 @@ func TestMsgDeleteLastArweaveBlock_ValidateBasic(t *testing.T) {
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
-			name: "valid address",
+			name: "valid",
 			msg: MsgDeleteLastArweaveBlock{
 				Creator: sample.AccAddress(),
+				Hash:    []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
 			},
 		},
 	}

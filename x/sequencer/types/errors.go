@@ -24,4 +24,7 @@ var (
 	ErrNotEmptyFeePayer       = errors.Register(ModuleName, 1113, "not empty fee payer")
 	ErrNotEmptyFeeGranter     = errors.Register(ModuleName, 1114, "not empty fee granter")
 	ErrNotEmptyTip            = errors.Register(ModuleName, 1115, "not empty tip")
+	ErrBadArweaveHashLength   = errors.Register(ModuleName, 1116, "invalid arewave block hash length")
+	ErrBadArweaveHeight       = errors.Register(ModuleName, 1117, "invalid arewave block height")
+	ErrBadArweaveTimestamp    = errors.Register(ModuleName, 1118, "invalid arewave block timestamp")
 )

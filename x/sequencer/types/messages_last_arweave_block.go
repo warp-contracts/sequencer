@@ -46,6 +46,19 @@ func (msg *MsgCreateLastArweaveBlock) ValidateBasic() error {
 	if err != nil {
 		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
+
+	if len(msg.Hash) != 32 {
+		return ErrBadArweaveHashLength
+	}
+
+	if msg.Height < 1231216 {
+		return ErrBadArweaveHeight
+	}
+
+	if msg.Timestamp < 1690809540 {
+		return ErrBadArweaveTimestamp
+	}
+
 	return nil
 }
 
@@ -120,5 +133,8 @@ func (msg *MsgDeleteLastArweaveBlock) ValidateBasic() error {
 		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
 	}
 
+	if len(msg.Hash) != 32 {
+		return ErrBadArweaveHashLength
+	}
 	return nil
 }
