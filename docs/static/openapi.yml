@@ -46452,6 +46452,15 @@ paths:
                 properties:
                   creator:
                     type: string
+                  height:
+                    type: string
+                    format: uint64
+                  timestamp:
+                    type: string
+                    format: uint64
+                  hash:
+                    type: string
+                    format: byte
         default:
           description: An unexpected error response.
           schema:
@@ -75252,6 +75261,15 @@ definitions:
     properties:
       creator:
         type: string
+      height:
+        type: string
+        format: uint64
+      timestamp:
+        type: string
+        format: uint64
+      hash:
+        type: string
+        format: byte
   sequencer.sequencer.MsgCreateLastArweaveBlockResponse:
     type: object
   sequencer.sequencer.MsgDataItemResponse:
@@ -75271,6 +75289,15 @@ definitions:
         properties:
           creator:
             type: string
+          height:
+            type: string
+            format: uint64
+          timestamp:
+            type: string
+            format: uint64
+          hash:
+            type: string
+            format: byte
   sequencer.sequencer.QueryParamsResponse:
     type: object
     properties:

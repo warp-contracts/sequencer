@@ -19,7 +19,10 @@ func (k msgServer) CreateLastArweaveBlock(goCtx context.Context, msg *types.MsgC
 	}
 
 	var lastArweaveBlock = types.LastArweaveBlock{
-		Creator: msg.Creator,
+		Creator:   msg.Creator,
+		Height:    msg.Height,
+		Hash:      msg.Hash,
+		Timestamp: msg.Timestamp,
 	}
 
 	k.SetLastArweaveBlock(
@@ -44,7 +47,10 @@ func (k msgServer) UpdateLastArweaveBlock(goCtx context.Context, msg *types.MsgU
 	}
 
 	var lastArweaveBlock = types.LastArweaveBlock{
-		Creator: msg.Creator,
+		Creator:   msg.Creator,
+		Height:    msg.Height,
+		Hash:      msg.Hash,
+		Timestamp: msg.Timestamp,
 	}
 
 	k.SetLastArweaveBlock(ctx, lastArweaveBlock)
