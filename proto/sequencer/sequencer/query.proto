@@ -1,26 +1,43 @@
 syntax = "proto3";
+
 package sequencer.sequencer;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "sequencer/sequencer/params.proto";
+import "sequencer/sequencer/last_arweave_block.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
 // Query defines the gRPC querier service.
 service Query {
+  
   // Parameters queries the parameters of the module.
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/warp-contracts/sequencer/sequencer/params";
+  
+  }
+  
+  // Queries a LastArweaveBlock by index.
+  rpc LastArweaveBlock (QueryGetLastArweaveBlockRequest) returns (QueryGetLastArweaveBlockResponse) {
+    option (google.api.http).get = "/warp-contracts/sequencer/sequencer/last_arweave_block";
+  
   }
 }
-
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
 
 // QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
+  
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
 }
+
+message QueryGetLastArweaveBlockRequest {}
+
+message QueryGetLastArweaveBlockResponse {
+  LastArweaveBlock LastArweaveBlock = 1 [(gogoproto.nullable) = false];
+}
+
