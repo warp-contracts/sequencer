@@ -103,32 +103,287 @@ func (m *MsgDataItemResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDataItemResponse proto.InternalMessageInfo
 
+type MsgCreateLastArweaveBlock struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+}
+
+func (m *MsgCreateLastArweaveBlock) Reset()         { *m = MsgCreateLastArweaveBlock{} }
+func (m *MsgCreateLastArweaveBlock) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateLastArweaveBlock) ProtoMessage()    {}
+func (*MsgCreateLastArweaveBlock) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0ca98cc63da9ee56, []int{2}
+}
+func (m *MsgCreateLastArweaveBlock) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateLastArweaveBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateLastArweaveBlock.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateLastArweaveBlock) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateLastArweaveBlock.Merge(m, src)
+}
+func (m *MsgCreateLastArweaveBlock) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateLastArweaveBlock) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateLastArweaveBlock.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateLastArweaveBlock proto.InternalMessageInfo
+
+func (m *MsgCreateLastArweaveBlock) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+type MsgCreateLastArweaveBlockResponse struct {
+}
+
+func (m *MsgCreateLastArweaveBlockResponse) Reset()         { *m = MsgCreateLastArweaveBlockResponse{} }
+func (m *MsgCreateLastArweaveBlockResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateLastArweaveBlockResponse) ProtoMessage()    {}
+func (*MsgCreateLastArweaveBlockResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0ca98cc63da9ee56, []int{3}
+}
+func (m *MsgCreateLastArweaveBlockResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateLastArweaveBlockResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateLastArweaveBlockResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateLastArweaveBlockResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateLastArweaveBlockResponse.Merge(m, src)
+}
+func (m *MsgCreateLastArweaveBlockResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateLastArweaveBlockResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateLastArweaveBlockResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateLastArweaveBlockResponse proto.InternalMessageInfo
+
+type MsgUpdateLastArweaveBlock struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+}
+
+func (m *MsgUpdateLastArweaveBlock) Reset()         { *m = MsgUpdateLastArweaveBlock{} }
+func (m *MsgUpdateLastArweaveBlock) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateLastArweaveBlock) ProtoMessage()    {}
+func (*MsgUpdateLastArweaveBlock) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0ca98cc63da9ee56, []int{4}
+}
+func (m *MsgUpdateLastArweaveBlock) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateLastArweaveBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateLastArweaveBlock.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateLastArweaveBlock) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateLastArweaveBlock.Merge(m, src)
+}
+func (m *MsgUpdateLastArweaveBlock) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateLastArweaveBlock) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateLastArweaveBlock.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateLastArweaveBlock proto.InternalMessageInfo
+
+func (m *MsgUpdateLastArweaveBlock) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+type MsgUpdateLastArweaveBlockResponse struct {
+}
+
+func (m *MsgUpdateLastArweaveBlockResponse) Reset()         { *m = MsgUpdateLastArweaveBlockResponse{} }
+func (m *MsgUpdateLastArweaveBlockResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateLastArweaveBlockResponse) ProtoMessage()    {}
+func (*MsgUpdateLastArweaveBlockResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0ca98cc63da9ee56, []int{5}
+}
+func (m *MsgUpdateLastArweaveBlockResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateLastArweaveBlockResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateLastArweaveBlockResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateLastArweaveBlockResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateLastArweaveBlockResponse.Merge(m, src)
+}
+func (m *MsgUpdateLastArweaveBlockResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateLastArweaveBlockResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateLastArweaveBlockResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateLastArweaveBlockResponse proto.InternalMessageInfo
+
+type MsgDeleteLastArweaveBlock struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+}
+
+func (m *MsgDeleteLastArweaveBlock) Reset()         { *m = MsgDeleteLastArweaveBlock{} }
+func (m *MsgDeleteLastArweaveBlock) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteLastArweaveBlock) ProtoMessage()    {}
+func (*MsgDeleteLastArweaveBlock) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0ca98cc63da9ee56, []int{6}
+}
+func (m *MsgDeleteLastArweaveBlock) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteLastArweaveBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteLastArweaveBlock.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteLastArweaveBlock) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteLastArweaveBlock.Merge(m, src)
+}
+func (m *MsgDeleteLastArweaveBlock) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteLastArweaveBlock) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteLastArweaveBlock.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteLastArweaveBlock proto.InternalMessageInfo
+
+func (m *MsgDeleteLastArweaveBlock) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+type MsgDeleteLastArweaveBlockResponse struct {
+}
+
+func (m *MsgDeleteLastArweaveBlockResponse) Reset()         { *m = MsgDeleteLastArweaveBlockResponse{} }
+func (m *MsgDeleteLastArweaveBlockResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgDeleteLastArweaveBlockResponse) ProtoMessage()    {}
+func (*MsgDeleteLastArweaveBlockResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0ca98cc63da9ee56, []int{7}
+}
+func (m *MsgDeleteLastArweaveBlockResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgDeleteLastArweaveBlockResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgDeleteLastArweaveBlockResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgDeleteLastArweaveBlockResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgDeleteLastArweaveBlockResponse.Merge(m, src)
+}
+func (m *MsgDeleteLastArweaveBlockResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgDeleteLastArweaveBlockResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgDeleteLastArweaveBlockResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgDeleteLastArweaveBlockResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgDataItem)(nil), "sequencer.sequencer.MsgDataItem")
 	proto.RegisterType((*MsgDataItemResponse)(nil), "sequencer.sequencer.MsgDataItemResponse")
+	proto.RegisterType((*MsgCreateLastArweaveBlock)(nil), "sequencer.sequencer.MsgCreateLastArweaveBlock")
+	proto.RegisterType((*MsgCreateLastArweaveBlockResponse)(nil), "sequencer.sequencer.MsgCreateLastArweaveBlockResponse")
+	proto.RegisterType((*MsgUpdateLastArweaveBlock)(nil), "sequencer.sequencer.MsgUpdateLastArweaveBlock")
+	proto.RegisterType((*MsgUpdateLastArweaveBlockResponse)(nil), "sequencer.sequencer.MsgUpdateLastArweaveBlockResponse")
+	proto.RegisterType((*MsgDeleteLastArweaveBlock)(nil), "sequencer.sequencer.MsgDeleteLastArweaveBlock")
+	proto.RegisterType((*MsgDeleteLastArweaveBlockResponse)(nil), "sequencer.sequencer.MsgDeleteLastArweaveBlockResponse")
 }
 
 func init() { proto.RegisterFile("sequencer/sequencer/tx.proto", fileDescriptor_0ca98cc63da9ee56) }
 
 var fileDescriptor_0ca98cc63da9ee56 = []byte{
-	// 270 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x29, 0x4e, 0x2d, 0x2c,
-	0x4d, 0xcd, 0x4b, 0x4e, 0x2d, 0xd2, 0x47, 0xb0, 0x4a, 0x2a, 0xf4, 0x0a, 0x8a, 0xf2, 0x4b, 0xf2,
-	0x85, 0x84, 0xe1, 0x62, 0x7a, 0x70, 0x96, 0x94, 0x48, 0x7a, 0x7e, 0x7a, 0x3e, 0x58, 0x5e, 0x1f,
-	0xc4, 0x82, 0x28, 0x95, 0x92, 0x4c, 0xce, 0x2f, 0xce, 0xcd, 0x2f, 0x8e, 0x87, 0x48, 0x40, 0x38,
-	0x10, 0x29, 0xa5, 0x02, 0x2e, 0x6e, 0xdf, 0xe2, 0x74, 0x97, 0xc4, 0x92, 0x44, 0xcf, 0x92, 0xd4,
-	0x5c, 0xa1, 0x44, 0x2e, 0xce, 0x94, 0xc4, 0x92, 0xc4, 0xf8, 0xcc, 0x92, 0xd4, 0x5c, 0x09, 0x46,
-	0x05, 0x46, 0x0d, 0x1e, 0x27, 0x97, 0x13, 0xf7, 0xe4, 0x19, 0x6e, 0xdd, 0x93, 0xb7, 0x49, 0xcf,
-	0x2c, 0xc9, 0x28, 0x4d, 0xd2, 0x4b, 0xce, 0xcf, 0xd5, 0x2f, 0x4f, 0x2c, 0x2a, 0xd0, 0x4d, 0xce,
-	0xcf, 0x2b, 0x29, 0x4a, 0x4c, 0x2e, 0x29, 0xd6, 0x2f, 0xae, 0x84, 0x38, 0xb2, 0x28, 0x59, 0xbf,
-	0xb4, 0x24, 0x33, 0xa7, 0x58, 0x3f, 0xa9, 0x34, 0x2f, 0x25, 0xa7, 0x48, 0xcf, 0x09, 0x44, 0xa5,
-	0x82, 0x0c, 0x0e, 0xe2, 0x48, 0x81, 0x5a, 0xa1, 0x24, 0xca, 0x25, 0x8c, 0x64, 0x63, 0x50, 0x6a,
-	0x71, 0x41, 0x7e, 0x5e, 0x71, 0xaa, 0x51, 0x2c, 0x17, 0xb3, 0x6f, 0x71, 0xba, 0x50, 0x18, 0x17,
-	0x07, 0xdc, 0x31, 0x0a, 0x7a, 0x58, 0xbc, 0xa8, 0x87, 0xa4, 0x59, 0x4a, 0x83, 0x90, 0x0a, 0x98,
-	0xf1, 0x4e, 0xfe, 0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c, 0xe3,
-	0x84, 0xc7, 0x72, 0x0c, 0x17, 0x1e, 0xcb, 0x31, 0xdc, 0x78, 0x2c, 0xc7, 0x10, 0x65, 0x8a, 0xc7,
-	0x5f, 0xf0, 0x50, 0xaf, 0x40, 0x8e, 0x81, 0xca, 0x82, 0xd4, 0xe2, 0x24, 0x36, 0x70, 0xf8, 0x19,
-	0x03, 0x02, 0x00, 0x00, 0xff, 0xff, 0x0b, 0x9b, 0x6f, 0x11, 0xa5, 0x01, 0x00, 0x00,
+	// 407 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x94, 0x41, 0x4f, 0xe2, 0x40,
+	0x14, 0xc7, 0xdb, 0x90, 0xec, 0xc2, 0xec, 0x9e, 0xca, 0xae, 0x81, 0xc6, 0x14, 0xac, 0x17, 0x0e,
+	0xda, 0x26, 0x1a, 0x3c, 0x79, 0xb1, 0x72, 0x31, 0x91, 0x98, 0x90, 0xe8, 0xc1, 0x4b, 0x33, 0x9d,
+	0x4e, 0x2a, 0xb1, 0xed, 0xd4, 0x99, 0xa9, 0xc0, 0xcd, 0x8f, 0xe0, 0xc7, 0xe2, 0xc8, 0xd1, 0x78,
+	0x20, 0x06, 0x12, 0x3f, 0x87, 0x69, 0x0b, 0x15, 0x49, 0x07, 0x23, 0xa7, 0xbe, 0xe9, 0xfb, 0xbf,
+	0xff, 0xfb, 0x65, 0x5e, 0x5f, 0xc1, 0x2e, 0xc3, 0x0f, 0x31, 0x0e, 0x11, 0xa6, 0xe6, 0x67, 0xc4,
+	0x87, 0x46, 0x44, 0x09, 0x27, 0x4a, 0x35, 0x7f, 0x67, 0xe4, 0x91, 0xfa, 0xcf, 0x23, 0x1e, 0x49,
+	0xf3, 0x66, 0x12, 0x65, 0x52, 0xb5, 0x8e, 0x08, 0x0b, 0x08, 0xb3, 0xb3, 0x44, 0x76, 0x58, 0xa4,
+	0x0e, 0x8a, 0x7a, 0xf8, 0x90, 0x71, 0x1b, 0xd2, 0x01, 0x86, 0x8f, 0xd8, 0x76, 0x7c, 0x82, 0xee,
+	0x33, 0xb5, 0x1e, 0x81, 0x3f, 0x5d, 0xe6, 0x75, 0x20, 0x87, 0x17, 0x1c, 0x07, 0x0a, 0x04, 0x15,
+	0x17, 0x72, 0x68, 0xf7, 0x39, 0x0e, 0x6a, 0x72, 0x53, 0x6e, 0xfd, 0xb5, 0x3a, 0xe3, 0x69, 0x43,
+	0x7a, 0x9d, 0x36, 0x4e, 0xbd, 0x3e, 0xbf, 0x8b, 0x1d, 0x03, 0x91, 0xc0, 0x1c, 0x40, 0x1a, 0x1d,
+	0x22, 0x12, 0x72, 0x0a, 0x11, 0x67, 0x26, 0x1b, 0x65, 0xed, 0x28, 0x32, 0x63, 0xde, 0xf7, 0x99,
+	0xe9, 0xc4, 0xa1, 0xeb, 0x53, 0xc3, 0x4a, 0x1e, 0x38, 0x31, 0xee, 0x95, 0xdd, 0x45, 0x0b, 0xfd,
+	0x3f, 0xa8, 0xae, 0x74, 0xec, 0x61, 0x16, 0x91, 0x90, 0x61, 0xbd, 0x0d, 0xea, 0x5d, 0xe6, 0x9d,
+	0x53, 0x0c, 0x39, 0xbe, 0x84, 0x8c, 0x9f, 0x65, 0xb0, 0x56, 0xc2, 0xaa, 0xd4, 0xc0, 0x6f, 0x94,
+	0x64, 0x08, 0x4d, 0xa1, 0x2a, 0xbd, 0xe5, 0x51, 0xdf, 0x07, 0x7b, 0xc2, 0xb2, 0x35, 0xef, 0xeb,
+	0xc8, 0xdd, 0xc6, 0xbb, 0xb8, 0x6c, 0xcd, 0xbb, 0x83, 0x7d, 0xbc, 0x85, 0x77, 0x71, 0xd9, 0xd2,
+	0xfb, 0xe8, 0xbd, 0x04, 0x4a, 0x5d, 0xe6, 0x29, 0x37, 0xa0, 0x9c, 0x4f, 0xa8, 0x69, 0x14, 0x7c,
+	0x25, 0xc6, 0xca, 0x8d, 0xaa, 0xad, 0xef, 0x14, 0x4b, 0x7f, 0xe5, 0x49, 0x06, 0x3b, 0x82, 0x1b,
+	0x37, 0x44, 0x26, 0xc5, 0x7a, 0xf5, 0xe4, 0x67, 0xfa, 0x2f, 0x08, 0x82, 0xc1, 0x08, 0x11, 0x8a,
+	0xf5, 0x62, 0x84, 0xcd, 0x13, 0x4c, 0x11, 0x04, 0xf3, 0x13, 0x22, 0x14, 0xeb, 0xc5, 0x08, 0x9b,
+	0x07, 0x6d, 0x5d, 0x8d, 0x67, 0x9a, 0x3c, 0x99, 0x69, 0xf2, 0xdb, 0x4c, 0x93, 0x9f, 0xe7, 0x9a,
+	0x34, 0x99, 0x6b, 0xd2, 0xcb, 0x5c, 0x93, 0x6e, 0xdb, 0x1b, 0xb6, 0x2e, 0xdf, 0xee, 0xe1, 0xea,
+	0xdf, 0x64, 0x14, 0x61, 0xe6, 0xfc, 0x4a, 0xb7, 0xfb, 0xf8, 0x23, 0x00, 0x00, 0xff, 0xff, 0xf9,
+	0x95, 0x9c, 0x9c, 0x71, 0x04, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -144,6 +399,9 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
 	DataItem(ctx context.Context, in *MsgDataItem, opts ...grpc.CallOption) (*MsgDataItemResponse, error)
+	CreateLastArweaveBlock(ctx context.Context, in *MsgCreateLastArweaveBlock, opts ...grpc.CallOption) (*MsgCreateLastArweaveBlockResponse, error)
+	UpdateLastArweaveBlock(ctx context.Context, in *MsgUpdateLastArweaveBlock, opts ...grpc.CallOption) (*MsgUpdateLastArweaveBlockResponse, error)
+	DeleteLastArweaveBlock(ctx context.Context, in *MsgDeleteLastArweaveBlock, opts ...grpc.CallOption) (*MsgDeleteLastArweaveBlockResponse, error)
 }
 
 type msgClient struct {
@@ -163,9 +421,39 @@ func (c *msgClient) DataItem(ctx context.Context, in *MsgDataItem, opts ...grpc.
 	return out, nil
 }
 
+func (c *msgClient) CreateLastArweaveBlock(ctx context.Context, in *MsgCreateLastArweaveBlock, opts ...grpc.CallOption) (*MsgCreateLastArweaveBlockResponse, error) {
+	out := new(MsgCreateLastArweaveBlockResponse)
+	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Msg/CreateLastArweaveBlock", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateLastArweaveBlock(ctx context.Context, in *MsgUpdateLastArweaveBlock, opts ...grpc.CallOption) (*MsgUpdateLastArweaveBlockResponse, error) {
+	out := new(MsgUpdateLastArweaveBlockResponse)
+	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Msg/UpdateLastArweaveBlock", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) DeleteLastArweaveBlock(ctx context.Context, in *MsgDeleteLastArweaveBlock, opts ...grpc.CallOption) (*MsgDeleteLastArweaveBlockResponse, error) {
+	out := new(MsgDeleteLastArweaveBlockResponse)
+	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Msg/DeleteLastArweaveBlock", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	DataItem(context.Context, *MsgDataItem) (*MsgDataItemResponse, error)
+	CreateLastArweaveBlock(context.Context, *MsgCreateLastArweaveBlock) (*MsgCreateLastArweaveBlockResponse, error)
+	UpdateLastArweaveBlock(context.Context, *MsgUpdateLastArweaveBlock) (*MsgUpdateLastArweaveBlockResponse, error)
+	DeleteLastArweaveBlock(context.Context, *MsgDeleteLastArweaveBlock) (*MsgDeleteLastArweaveBlockResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -174,6 +462,15 @@ type UnimplementedMsgServer struct {
 
 func (*UnimplementedMsgServer) DataItem(ctx context.Context, req *MsgDataItem) (*MsgDataItemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DataItem not implemented")
+}
+func (*UnimplementedMsgServer) CreateLastArweaveBlock(ctx context.Context, req *MsgCreateLastArweaveBlock) (*MsgCreateLastArweaveBlockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateLastArweaveBlock not implemented")
+}
+func (*UnimplementedMsgServer) UpdateLastArweaveBlock(ctx context.Context, req *MsgUpdateLastArweaveBlock) (*MsgUpdateLastArweaveBlockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateLastArweaveBlock not implemented")
+}
+func (*UnimplementedMsgServer) DeleteLastArweaveBlock(ctx context.Context, req *MsgDeleteLastArweaveBlock) (*MsgDeleteLastArweaveBlockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLastArweaveBlock not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -198,6 +495,60 @@ func _Msg_DataItem_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateLastArweaveBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateLastArweaveBlock)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateLastArweaveBlock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sequencer.sequencer.Msg/CreateLastArweaveBlock",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateLastArweaveBlock(ctx, req.(*MsgCreateLastArweaveBlock))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateLastArweaveBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateLastArweaveBlock)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateLastArweaveBlock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sequencer.sequencer.Msg/UpdateLastArweaveBlock",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateLastArweaveBlock(ctx, req.(*MsgUpdateLastArweaveBlock))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_DeleteLastArweaveBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgDeleteLastArweaveBlock)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).DeleteLastArweaveBlock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/sequencer.sequencer.Msg/DeleteLastArweaveBlock",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).DeleteLastArweaveBlock(ctx, req.(*MsgDeleteLastArweaveBlock))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "sequencer.sequencer.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -205,6 +556,18 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DataItem",
 			Handler:    _Msg_DataItem_Handler,
+		},
+		{
+			MethodName: "CreateLastArweaveBlock",
+			Handler:    _Msg_CreateLastArweaveBlock_Handler,
+		},
+		{
+			MethodName: "UpdateLastArweaveBlock",
+			Handler:    _Msg_UpdateLastArweaveBlock_Handler,
+		},
+		{
+			MethodName: "DeleteLastArweaveBlock",
+			Handler:    _Msg_DeleteLastArweaveBlock_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -267,6 +630,165 @@ func (m *MsgDataItemResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgCreateLastArweaveBlock) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateLastArweaveBlock) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateLastArweaveBlock) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCreateLastArweaveBlockResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateLastArweaveBlockResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateLastArweaveBlockResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateLastArweaveBlock) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateLastArweaveBlock) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateLastArweaveBlock) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateLastArweaveBlockResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateLastArweaveBlockResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateLastArweaveBlockResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteLastArweaveBlock) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteLastArweaveBlock) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteLastArweaveBlock) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgDeleteLastArweaveBlockResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgDeleteLastArweaveBlockResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgDeleteLastArweaveBlockResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -290,6 +812,72 @@ func (m *MsgDataItem) Size() (n int) {
 }
 
 func (m *MsgDataItemResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgCreateLastArweaveBlock) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgCreateLastArweaveBlockResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpdateLastArweaveBlock) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUpdateLastArweaveBlockResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgDeleteLastArweaveBlock) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgDeleteLastArweaveBlockResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -414,6 +1002,402 @@ func (m *MsgDataItemResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgDataItemResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateLastArweaveBlock) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateLastArweaveBlock: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateLastArweaveBlock: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateLastArweaveBlockResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateLastArweaveBlockResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateLastArweaveBlockResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateLastArweaveBlock) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateLastArweaveBlock: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateLastArweaveBlock: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateLastArweaveBlockResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateLastArweaveBlockResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateLastArweaveBlockResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteLastArweaveBlock) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteLastArweaveBlock: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteLastArweaveBlock: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgDeleteLastArweaveBlockResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgDeleteLastArweaveBlockResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgDeleteLastArweaveBlockResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

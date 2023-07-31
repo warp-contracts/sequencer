@@ -46437,6 +46437,41 @@ paths:
                         }
       tags:
         - Query
+  /warp-contracts/sequencer/sequencer/last_arweave_block:
+    get:
+      summary: Queries a LastArweaveBlock by index.
+      operationId: SequencerSequencerLastArweaveBlock
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              LastArweaveBlock:
+                type: object
+                properties:
+                  creator:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
   /warp-contracts/sequencer/sequencer/params:
     get:
       summary: Parameters queries the parameters of the module.
@@ -75212,11 +75247,30 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  sequencer.sequencer.LastArweaveBlock:
+    type: object
+    properties:
+      creator:
+        type: string
+  sequencer.sequencer.MsgCreateLastArweaveBlockResponse:
+    type: object
   sequencer.sequencer.MsgDataItemResponse:
+    type: object
+  sequencer.sequencer.MsgDeleteLastArweaveBlockResponse:
+    type: object
+  sequencer.sequencer.MsgUpdateLastArweaveBlockResponse:
     type: object
   sequencer.sequencer.Params:
     type: object
     description: Params defines the parameters for the module.
+  sequencer.sequencer.QueryGetLastArweaveBlockResponse:
+    type: object
+    properties:
+      LastArweaveBlock:
+        type: object
+        properties:
+          creator:
+            type: string
   sequencer.sequencer.QueryParamsResponse:
     type: object
     properties:

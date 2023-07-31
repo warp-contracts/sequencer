@@ -31,6 +31,9 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(CmdDataItem())
+	cmd.AddCommand(CmdCreateLastArweaveBlock())
+	cmd.AddCommand(CmdUpdateLastArweaveBlock())
+	cmd.AddCommand(CmdDeleteLastArweaveBlock())
 	// this line is used by starport scaffolding # 1
 
 	return cmd

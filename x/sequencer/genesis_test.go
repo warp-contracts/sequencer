@@ -14,6 +14,7 @@ func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
 
+		LastArweaveBlock: &types.LastArweaveBlock{},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -25,5 +26,6 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(&genesisState)
 	nullify.Fill(got)
 
+	require.Equal(t, genesisState.LastArweaveBlock, got.LastArweaveBlock)
 	// this line is used by starport scaffolding # genesis/test/assert
 }
