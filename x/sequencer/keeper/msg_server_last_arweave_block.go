@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -14,7 +15,7 @@ func (k msgServer) CreateLastArweaveBlock(goCtx context.Context, msg *types.MsgC
 	// Check if the value already exists
 	_, isFound := k.GetLastArweaveBlock(ctx)
 	if isFound {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "already set")
+		return nil, errors.Wrap(sdkerrors.ErrInvalidRequest, "already set")
 	}
 
 	var lastArweaveBlock = types.LastArweaveBlock{
@@ -34,12 +35,12 @@ func (k msgServer) UpdateLastArweaveBlock(goCtx context.Context, msg *types.MsgU
 	// Check if the value exists
 	valFound, isFound := k.GetLastArweaveBlock(ctx)
 	if !isFound {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, "not set")
+		return nil, errors.Wrap(sdkerrors.ErrKeyNotFound, "not set")
 	}
 
 	// Checks if the the msg creator is the same as the current owner
 	if msg.Creator != valFound.Creator {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
+		return nil, errors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
 	var lastArweaveBlock = types.LastArweaveBlock{
@@ -57,12 +58,12 @@ func (k msgServer) DeleteLastArweaveBlock(goCtx context.Context, msg *types.MsgD
 	// Check if the value exists
 	valFound, isFound := k.GetLastArweaveBlock(ctx)
 	if !isFound {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, "not set")
+		return nil, errors.Wrap(sdkerrors.ErrKeyNotFound, "not set")
 	}
 
 	// Checks if the the msg creator is the same as the current owner
 	if msg.Creator != valFound.Creator {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
+		return nil, errors.Wrap(sdkerrors.ErrUnauthorized, "incorrect owner")
 	}
 
 	k.RemoveLastArweaveBlock(ctx)
