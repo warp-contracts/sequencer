@@ -9,7 +9,7 @@ import (
 )
 
 func BroadcastDataItem(ctx client.Context, dataItem MsgDataItem) (*sdk.TxResponse, error) {
-	tx, err := createTxWithDataItem(ctx, dataItem)
+	tx, err := CreateTxWithDataItem(ctx.TxConfig, dataItem)
 	if err != nil {
 		return nil, err
 	}
@@ -23,8 +23,8 @@ func BroadcastDataItem(ctx client.Context, dataItem MsgDataItem) (*sdk.TxRespons
 	return ctx.BroadcastTx(txBytes)
 }
 
-func createTxWithDataItem(ctx client.Context, dataItem MsgDataItem) (tx authsigning.Tx, err error) {
-	txBuilder := ctx.TxConfig.NewTxBuilder()
+func CreateTxWithDataItem(txConfig client.TxConfig, dataItem MsgDataItem) (tx authsigning.Tx, err error) {
+	txBuilder := txConfig.NewTxBuilder()
 
 	err = txBuilder.SetMsgs(&dataItem)
 	if err != nil {

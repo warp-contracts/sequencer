@@ -17,6 +17,7 @@ service Msg {
 }
 message MsgDataItem {
   bytes data_item = 1 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem", (gogoproto.nullable) = false];
+  string sort_key = 2;
 }
 
 message MsgDataItemResponse {}

@@ -1,6 +1,8 @@
 package app
 
 import (
+	"crypto/rand"
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -26,6 +28,7 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/mempool"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -114,6 +117,7 @@ import (
 	sequencerapi "github.com/warp-contracts/sequencer/x/sequencer/api"
 	sequencermodulekeeper "github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	sequencermoduletypes "github.com/warp-contracts/sequencer/x/sequencer/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/warp-contracts/sequencer/app/params"
@@ -290,6 +294,18 @@ func New(
 	bApp.SetVersion(version.Version)
 	bApp.SetInterfaceRegistry(interfaceRegistry)
 	bApp.SetTxEncoder(txConfig.TxEncoder())
+
+	// Initialize mempool
+	var seed int64
+	err := binary.Read(rand.Reader, binary.BigEndian, &seed)
+	if err != nil {
+		panic(err)
+	}
+	mempool := mempool.NewSenderNonceMempool(
+		mempool.SenderNonceMaxTxOpt(100),
+		mempool.SenderNonceSeedOpt(seed),
+	)
+	bApp.SetMempool(mempool)
 
 	keys := sdk.NewKVStoreKeys(
 		authtypes.StoreKey, authz.ModuleName, banktypes.StoreKey, stakingtypes.StoreKey,
@@ -527,6 +543,10 @@ func New(
 		app.GetSubspace(sequencermoduletypes.ModuleName),
 	)
 	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper)
+
+	// Initialize proposer
+	abciPropHandler := NewProposer(txConfig, mempool, bApp, app.SequencerKeeper)
+	bApp.SetPrepareProposal(abciPropHandler.PrepareProposalHandler())
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
