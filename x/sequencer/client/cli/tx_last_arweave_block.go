@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -8,11 +10,12 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
+// TODO: to be removed after the Proposer automatically adds such messages
 func CmdLastArweaveBlock() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "last-arweave-block",
+		Use:   "last-arweave-block [height] [timestamp] [hash]",
 		Short: "Set last_arweave_block",
-		Args:  cobra.ExactArgs(0),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -20,7 +23,19 @@ func CmdLastArweaveBlock() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgLastArweaveBlock(clientCtx.GetFromAddress().String())
+			height, err := strconv.ParseUint(args[0], 0, 64)
+			if err != nil {
+				return err
+			}
+			
+			timestamp, err := strconv.ParseUint(args[1], 0, 64)
+			if err != nil {
+				return err
+			}
+
+			hash := []byte(args[2])
+
+			msg := types.NewMsgLastArweaveBlock(clientCtx.GetFromAddress().String(), height, timestamp, hash)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

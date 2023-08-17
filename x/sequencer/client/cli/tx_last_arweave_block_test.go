@@ -29,6 +29,9 @@ func TestLastArweaveBlock(t *testing.T) {
 		{
 			desc: "valid",
 			args: []string{
+				"1431216",
+				"1690809540",
+				"12345678901234567890123456789012",
 				fmt.Sprintf("--%s=%s", flags.FlagFrom, val.Address.String()),
 				fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
 				fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
