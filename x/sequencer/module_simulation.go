@@ -26,17 +26,8 @@ const (
 	opWeightMsgDataItem          = "op_weight_msg_data_item"
 	defaultWeightMsgDataItem int = 100
 
-	opWeightMsgCreateLastArweaveBlock = "op_weight_msg_last_arweave_block"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgCreateLastArweaveBlock int = 100
-
-	opWeightMsgUpdateLastArweaveBlock = "op_weight_msg_last_arweave_block"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgUpdateLastArweaveBlock int = 100
-
-	opWeightMsgDeleteLastArweaveBlock = "op_weight_msg_last_arweave_block"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgDeleteLastArweaveBlock int = 100
+	opWeightMsgLastArweaveBlock = "op_weight_msg_arweave_block"
+	defaultWeightMsgLastArweaveBlock int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )
@@ -77,37 +68,15 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgCreateLastArweaveBlock int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgCreateLastArweaveBlock, &weightMsgCreateLastArweaveBlock, nil,
+	var weightMsgLastArweaveBlock int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgLastArweaveBlock, &weightMsgLastArweaveBlock, nil,
 		func(_ *rand.Rand) {
-			weightMsgCreateLastArweaveBlock = defaultWeightMsgCreateLastArweaveBlock
+			weightMsgLastArweaveBlock = defaultWeightMsgLastArweaveBlock
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgCreateLastArweaveBlock,
-		sequencersimulation.SimulateMsgCreateLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgUpdateLastArweaveBlock int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateLastArweaveBlock, &weightMsgUpdateLastArweaveBlock, nil,
-		func(_ *rand.Rand) {
-			weightMsgUpdateLastArweaveBlock = defaultWeightMsgUpdateLastArweaveBlock
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgUpdateLastArweaveBlock,
-		sequencersimulation.SimulateMsgUpdateLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgDeleteLastArweaveBlock int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDeleteLastArweaveBlock, &weightMsgDeleteLastArweaveBlock, nil,
-		func(_ *rand.Rand) {
-			weightMsgDeleteLastArweaveBlock = defaultWeightMsgDeleteLastArweaveBlock
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgDeleteLastArweaveBlock,
-		sequencersimulation.SimulateMsgDeleteLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgLastArweaveBlock,
+		sequencersimulation.SimulateMsgLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation
@@ -127,26 +96,10 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			},
 		),
 		simulation.NewWeightedProposalMsg(
-			opWeightMsgCreateLastArweaveBlock,
-			defaultWeightMsgCreateLastArweaveBlock,
+			opWeightMsgLastArweaveBlock,
+			defaultWeightMsgLastArweaveBlock,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
-				sequencersimulation.SimulateMsgCreateLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper)
-				return nil
-			},
-		),
-		simulation.NewWeightedProposalMsg(
-			opWeightMsgUpdateLastArweaveBlock,
-			defaultWeightMsgUpdateLastArweaveBlock,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
-				sequencersimulation.SimulateMsgUpdateLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper)
-				return nil
-			},
-		),
-		simulation.NewWeightedProposalMsg(
-			opWeightMsgDeleteLastArweaveBlock,
-			defaultWeightMsgDeleteLastArweaveBlock,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
-				sequencersimulation.SimulateMsgDeleteLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper)
+				sequencersimulation.SimulateMsgLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),

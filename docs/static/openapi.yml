@@ -75252,13 +75252,9 @@ definitions:
     properties:
       creator:
         type: string
-  sequencer.sequencer.MsgCreateLastArweaveBlockResponse:
-    type: object
   sequencer.sequencer.MsgDataItemResponse:
     type: object
-  sequencer.sequencer.MsgDeleteLastArweaveBlockResponse:
-    type: object
-  sequencer.sequencer.MsgUpdateLastArweaveBlockResponse:
+  sequencer.sequencer.MsgLastArweaveBlockResponse:
     type: object
   sequencer.sequencer.Params:
     type: object
