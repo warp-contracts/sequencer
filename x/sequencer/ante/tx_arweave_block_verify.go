@@ -8,7 +8,7 @@ import (
 )
 
 // It checks if the transaction representing an Arweave block contains messages in the following order:
-// - the first message is block information (MsgLastArweaveBlock)
+// - the first message is block information (MsgArweaveBlockInfo)
 // - subsequent messages are L1 interactions (MsgDataItem)
 type ArweaveBlockTxDecorator struct {
 }
@@ -50,7 +50,7 @@ func verifyArweaveBlockTx(tx sdk.Tx) error {
 }
 
 func isArweaveBlockInfo(msg sdk.Msg) bool {
-	_, isBlockInfo := msg.(*types.MsgLastArweaveBlock)
+	_, isBlockInfo := msg.(*types.MsgArweaveBlockInfo)
 	return isBlockInfo
 }
 

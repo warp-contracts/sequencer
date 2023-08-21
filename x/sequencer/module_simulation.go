@@ -26,8 +26,8 @@ const (
 	opWeightMsgDataItem          = "op_weight_msg_data_item"
 	defaultWeightMsgDataItem int = 100
 
-	opWeightMsgLastArweaveBlock = "op_weight_msg_arweave_block"
-	defaultWeightMsgLastArweaveBlock int = 100
+	opWeightMsgArweaveBlockInfo = "op_weight_msg_arweave_block"
+	defaultWeightMsgArweaveBlockInfo int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )
@@ -68,15 +68,15 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgLastArweaveBlock int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgLastArweaveBlock, &weightMsgLastArweaveBlock, nil,
+	var weightMsgArweaveBlockInfo int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgArweaveBlockInfo, &weightMsgArweaveBlockInfo, nil,
 		func(_ *rand.Rand) {
-			weightMsgLastArweaveBlock = defaultWeightMsgLastArweaveBlock
+			weightMsgArweaveBlockInfo = defaultWeightMsgArweaveBlockInfo
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgLastArweaveBlock,
-		sequencersimulation.SimulateMsgLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgArweaveBlockInfo,
+		sequencersimulation.SimulateMsgArweaveBlockInfo(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation
@@ -96,10 +96,10 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			},
 		),
 		simulation.NewWeightedProposalMsg(
-			opWeightMsgLastArweaveBlock,
-			defaultWeightMsgLastArweaveBlock,
+			opWeightMsgArweaveBlockInfo,
+			defaultWeightMsgArweaveBlockInfo,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
-				sequencersimulation.SimulateMsgLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper)
+				sequencersimulation.SimulateMsgArweaveBlockInfo(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),

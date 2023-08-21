@@ -11,9 +11,9 @@ import (
 )
 
 // TODO: to be removed after the Proposer automatically adds such messages
-func CmdLastArweaveBlock() *cobra.Command {
+func CmdArweaveBlockInfo() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "last-arweave-block [height] [timestamp] [hash]",
+		Use:   "arweave-block-info [height] [timestamp] [hash]",
 		Short: "Set last_arweave_block",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
@@ -27,7 +27,7 @@ func CmdLastArweaveBlock() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			
+
 			timestamp, err := strconv.ParseUint(args[1], 0, 64)
 			if err != nil {
 				return err
@@ -35,7 +35,7 @@ func CmdLastArweaveBlock() *cobra.Command {
 
 			hash := []byte(args[2])
 
-			msg := types.NewMsgLastArweaveBlock(clientCtx.GetFromAddress().String(), height, timestamp, hash)
+			msg := types.NewMsgArweaveBlockInfo(clientCtx.GetFromAddress().String(), height, timestamp, hash)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

@@ -11,7 +11,7 @@ option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 // Msg defines the Msg service.
 service Msg {
   rpc DataItem               (MsgDataItem              ) returns (MsgDataItemResponse              );
-  rpc LastArweaveBlock (MsgLastArweaveBlock) returns (MsgLastArweaveBlockResponse);
+  rpc ArweaveBlockInfo (MsgArweaveBlockInfo) returns (MsgArweaveBlockInfoResponse);
 }
 
 enum InteractionType {
@@ -26,11 +26,11 @@ message MsgDataItem {
 
 message MsgDataItemResponse {}
 
-message MsgLastArweaveBlock {
+message MsgArweaveBlockInfo {
   string creator = 1;
   uint64 height = 2;
   uint64 timestamp = 3;
   bytes hash = 4;
 }
 
-message MsgLastArweaveBlockResponse {}
+message MsgArweaveBlockInfoResponse {}

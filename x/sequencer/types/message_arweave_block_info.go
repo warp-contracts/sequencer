@@ -7,13 +7,13 @@ import (
 )
 
 const (
-	TypeMsgLastArweaveBlock = "last_arweave_block"
+	TypeMsgArweaveBlockInfo = "arweave_block_info"
 )
 
-var _ sdk.Msg = &MsgLastArweaveBlock{}
+var _ sdk.Msg = &MsgArweaveBlockInfo{}
 
-func NewMsgLastArweaveBlock(creator string, height uint64, timestamp uint64, hash []byte) *MsgLastArweaveBlock {
-	return &MsgLastArweaveBlock{
+func NewMsgArweaveBlockInfo(creator string, height uint64, timestamp uint64, hash []byte) *MsgArweaveBlockInfo {
+	return &MsgArweaveBlockInfo{
 		Creator: creator,
 		Height: height,
 		Timestamp: timestamp,
@@ -21,15 +21,15 @@ func NewMsgLastArweaveBlock(creator string, height uint64, timestamp uint64, has
 	}
 }
 
-func (msg *MsgLastArweaveBlock) Route() string {
+func (msg *MsgArweaveBlockInfo) Route() string {
 	return RouterKey
 }
 
-func (msg *MsgLastArweaveBlock) Type() string {
-	return TypeMsgLastArweaveBlock
+func (msg *MsgArweaveBlockInfo) Type() string {
+	return TypeMsgArweaveBlockInfo
 }
 
-func (msg *MsgLastArweaveBlock) GetSigners() []sdk.AccAddress {
+func (msg *MsgArweaveBlockInfo) GetSigners() []sdk.AccAddress {
 	creator, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		panic(err)
@@ -37,12 +37,12 @@ func (msg *MsgLastArweaveBlock) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{creator}
 }
 
-func (msg *MsgLastArweaveBlock) GetSignBytes() []byte {
+func (msg *MsgArweaveBlockInfo) GetSignBytes() []byte {
 	bz := ModuleCdc.MustMarshalJSON(msg)
 	return sdk.MustSortJSON(bz)
 }
 
-func (msg *MsgLastArweaveBlock) ValidateBasic() error {
+func (msg *MsgArweaveBlockInfo) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)

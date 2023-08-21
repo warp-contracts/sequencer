@@ -10,7 +10,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func (k msgServer) LastArweaveBlock(goCtx context.Context, msg *types.MsgLastArweaveBlock) (*types.MsgLastArweaveBlockResponse, error) {
+func (k msgServer) ArweaveBlockInfo(goCtx context.Context, msg *types.MsgArweaveBlockInfo) (*types.MsgArweaveBlockInfoResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	var newValue = types.LastArweaveBlock{
@@ -46,5 +46,5 @@ func (k msgServer) LastArweaveBlock(goCtx context.Context, msg *types.MsgLastArw
 	k.SetLastArweaveBlock(
 		ctx,
 		newValue)
-	return &types.MsgLastArweaveBlockResponse{}, nil
+	return &types.MsgArweaveBlockInfoResponse{}, nil
 }

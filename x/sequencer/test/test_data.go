@@ -82,6 +82,6 @@ func createExampleDataItem(t *testing.T, signer bundlr.Signer, interactionType t
 
 var ExampleArweaveBlockHash = []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2}
 
-func ArweaveBlockInfo() types.MsgLastArweaveBlock {
-	return types.MsgLastArweaveBlock{Creator: "creator", Height: 1431216, Timestamp: 1692353416, Hash: ExampleArweaveBlockHash}
+func ArweaveBlockInfo() types.MsgArweaveBlockInfo {
+	return types.MsgArweaveBlockInfo{Creator: "creator", Height: 1431216, Timestamp: 1692353416, Hash: ExampleArweaveBlockHash}
 }

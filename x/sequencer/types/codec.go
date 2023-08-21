@@ -11,7 +11,7 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgDataItem{}, "sequencer/DataItem", nil)
-	cdc.RegisterConcrete(&MsgLastArweaveBlock{}, "sequencer/LastArweaveBlock", nil)
+	cdc.RegisterConcrete(&MsgArweaveBlockInfo{}, "sequencer/LastArweaveBlock", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -21,7 +21,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	cryptocodec.RegisterInterfaces(registry)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgLastArweaveBlock{},
+		&MsgArweaveBlockInfo{},
 	)
 	// this line is used by starport scaffolding # 3
 
