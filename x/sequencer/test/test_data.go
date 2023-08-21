@@ -1,4 +1,4 @@
-package ante
+package test
 
 import (
 	"testing"
@@ -30,25 +30,41 @@ const EMPTY_ARWEAVE_WALLET = `{
 
 const ETHEREUM_PRIVATE_KEY = `0xf4a2b939592564feb35ab10a8e04f6f2fe0943579fb3c9c33505298978b74893`
 
-func newTxBuilder() client.TxBuilder {
+func NewTxBuilder() client.TxBuilder {
 	return testutil.MakeTestEncodingConfig().TxConfig.NewTxBuilder()
 }
 
-func arweaveDataItem(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
+func arweaveInteraction(t *testing.T, interactionType types.InteractionType, tags ...bundlr.Tag) types.MsgDataItem {
 	signer, err := bundlr.NewArweaveSigner(EMPTY_ARWEAVE_WALLET)
 	require.NoError(t, err)
 
-	return createExampleDataItem(t, signer, tags...)
+	return createExampleDataItem(t, signer, interactionType, tags...)
 }
 
-func ethereumDataItem(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
+func ArweaveL1Interaction(t *testing.T) types.MsgDataItem {
+	return arweaveInteraction(t, types.InteractionType_L1)
+}
+
+func ArweaveL2Interaction(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
+	return arweaveInteraction(t, types.InteractionType_L2, tags...)
+}
+
+func ethereumInteraction(t *testing.T, interactionType types.InteractionType, tags ...bundlr.Tag) types.MsgDataItem {
 	signer, err := bundlr.NewEthereumSigner(ETHEREUM_PRIVATE_KEY)
 	require.NoError(t, err)
 
-	return createExampleDataItem(t, signer, tags...)
+	return createExampleDataItem(t, signer, interactionType, tags...)
 }
 
-func createExampleDataItem(t *testing.T, signer bundlr.Signer, tags ...bundlr.Tag) types.MsgDataItem {
+func EthereumL1Interaction(t *testing.T) types.MsgDataItem {
+	return ethereumInteraction(t, types.InteractionType_L1)
+}
+
+func EthereumL2Interaction(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
+	return ethereumInteraction(t, types.InteractionType_L1, tags...)
+}
+
+func createExampleDataItem(t *testing.T, signer bundlr.Signer, interactionType types.InteractionType, tags ...bundlr.Tag) types.MsgDataItem {
 	dataItem := bundlr.BundleItem{
 		Target: arweave.Base64String(tool.RandomString(32)),
 		Anchor: arweave.Base64String(tool.RandomString(32)),
@@ -59,7 +75,13 @@ func createExampleDataItem(t *testing.T, signer bundlr.Signer, tags ...bundlr.Ta
 	require.NoError(t, err)
 
 	return types.MsgDataItem{
-		DataItem: dataItem,
-		InteractionType: types.InteractionType_L2,
+		DataItem:        dataItem,
+		InteractionType: interactionType,
 	}
+}
+
+var ExampleArweaveBlockHash = []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2}
+
+func ArweaveBlockInfo() types.MsgLastArweaveBlock {
+	return types.MsgLastArweaveBlock{Creator: "creator", Height: 1431216, Timestamp: 1692353416, Hash: ExampleArweaveBlockHash}
 }

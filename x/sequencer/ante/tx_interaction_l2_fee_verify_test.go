@@ -9,12 +9,13 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 
+	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 func newTxBuilderWithDataItem(t *testing.T) (client.TxBuilder, *types.MsgDataItem) {
-	dataItem := arweaveDataItem(t)
-	txBuilder := newTxBuilder()
+	dataItem := test.ArweaveL2Interaction(t)
+	txBuilder := test.NewTxBuilder()
 	err := txBuilder.SetMsgs(&dataItem)
 	require.NoError(t, err)
 	return txBuilder, &dataItem

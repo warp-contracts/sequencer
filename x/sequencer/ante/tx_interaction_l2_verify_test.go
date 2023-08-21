@@ -9,11 +9,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 
+	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 func createTxWithMsgs(t *testing.T, msgs ...sdk.Msg) authsigning.Tx {
-	txBuilder := newTxBuilder()
+	txBuilder := test.NewTxBuilder()
 
 	err := txBuilder.SetMsgs(msgs...)
 	require.NoError(t, err)
@@ -22,7 +23,7 @@ func createTxWithMsgs(t *testing.T, msgs ...sdk.Msg) authsigning.Tx {
 }
 
 func TestGetDataItemMsgOneDataItem(t *testing.T) {
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	tx := createTxWithMsgs(t, &dataItem)
 
 	result, err := GetL2Interaction(tx)
@@ -41,7 +42,7 @@ func TestGetDataItemMsgNoMsgs(t *testing.T) {
 }
 
 func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	tx := createTxWithMsgs(t, &dataItem, &dataItem)
 
 	result, err := GetL2Interaction(tx)
@@ -51,7 +52,7 @@ func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
 }
 
 func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	msg := testdata.NewTestMsg(dataItem.GetCreator())
 	tx := createTxWithMsgs(t, &dataItem, msg)
 
@@ -62,7 +63,7 @@ func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
 }
 
 func TestGetDataItemMsgDataItemAfterMsg(t *testing.T) {
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	msg := testdata.NewTestMsg(dataItem.GetCreator())
 	tx := createTxWithMsgs(t, msg, &dataItem)
 

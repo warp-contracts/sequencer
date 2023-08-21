@@ -1,8 +1,9 @@
 package ante
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 
 	"cosmossdk.io/simapp"
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
@@ -14,6 +15,7 @@ import (
 
 	"github.com/warp-contracts/sequencer/crypto/keys/arweave"
 	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
+	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
@@ -67,7 +69,7 @@ func createEmptyEthereumSignature(t *testing.T, dataItem types.MsgDataItem, sequ
 }
 
 func createTxWithSignatures(t *testing.T, dataItem types.MsgDataItem, signatures ...signing.SignatureV2) authsigning.Tx {
-	txBuilder := newTxBuilder()
+	txBuilder := test.NewTxBuilder()
 
 	err := txBuilder.SetMsgs(&dataItem)
 	require.NoError(t, err)
@@ -80,7 +82,7 @@ func createTxWithSignatures(t *testing.T, dataItem types.MsgDataItem, signatures
 
 func TestVerifySignaturesNoSignatures(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	addCreatorAccount(t, app, ctx, dataItem)
 	tx := createTxWithSignatures(t, dataItem)
 
@@ -91,7 +93,7 @@ func TestVerifySignaturesNoSignatures(t *testing.T) {
 
 func TestVerifySignaturesTooManySignatures(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	acc := addCreatorAccount(t, app, ctx, dataItem)
 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig, sig)
@@ -103,7 +105,7 @@ func TestVerifySignaturesTooManySignatures(t *testing.T) {
 
 func TestVerifySignaturesInvalidSignMode(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	acc := addCreatorAccount(t, app, ctx, dataItem)
 	sigData := &signing.SingleSignatureData{
 		SignMode:  signing.SignMode_SIGN_MODE_UNSPECIFIED,
@@ -119,7 +121,7 @@ func TestVerifySignaturesInvalidSignMode(t *testing.T) {
 
 func TestVerifySignaturesNotEmptySignature(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	acc := addCreatorAccount(t, app, ctx, dataItem)
 	sigData := &signing.SingleSignatureData{
 		SignMode:  signing.SignMode_SIGN_MODE_DIRECT,
@@ -135,7 +137,7 @@ func TestVerifySignaturesNotEmptySignature(t *testing.T) {
 
 func TestVerifySignaturesMultiSignature(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	acc := addCreatorAccount(t, app, ctx, dataItem)
 	sigData := &signing.MultiSignatureData{}
 	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
@@ -148,7 +150,7 @@ func TestVerifySignaturesMultiSignature(t *testing.T) {
 
 func TestVerifySignaturesPublicKeyMismatch(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	acc := addCreatorAccount(t, app, ctx, dataItem)
 	_, pubKey, _ := testdata.KeyTestPubAddr()
 	sig := signing.SignatureV2{
@@ -165,7 +167,7 @@ func TestVerifySignaturesPublicKeyMismatch(t *testing.T) {
 
 func TestVerifySignaturesWrongSequence(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	acc := addCreatorAccount(t, app, ctx, dataItem)
 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence()+1)
 	tx := createTxWithSignatures(t, dataItem, sig)
@@ -177,7 +179,7 @@ func TestVerifySignaturesWrongSequence(t *testing.T) {
 
 func TestVerifySignaturesNoSequencerNonceTag(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t)
+	dataItem := test.ArweaveL2Interaction(t)
 	acc := addCreatorAccount(t, app, ctx, dataItem)
 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig)
@@ -189,7 +191,7 @@ func TestVerifySignaturesNoSequencerNonceTag(t *testing.T) {
 
 func TestVerifySignaturesSequencerNonceMismatch(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t, bundlr.Tag{Name: "Sequencer-Nonce", Value: "1"})
+	dataItem := test.ArweaveL2Interaction(t, bundlr.Tag{Name: "Sequencer-Nonce", Value: "1"})
 	acc := addCreatorAccount(t, app, ctx, dataItem)
 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig)
@@ -201,7 +203,7 @@ func TestVerifySignaturesSequencerNonceMismatch(t *testing.T) {
 
 func TestVerifySignaturesArweaveSignature(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t, bundlr.Tag{Name: "Sequencer-Nonce", Value: "5"})
+	dataItem := test.ArweaveL2Interaction(t, bundlr.Tag{Name: "Sequencer-Nonce", Value: "5"})
 	acc := addCreatorAccount(t, app, ctx, dataItem)
 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig)
@@ -213,7 +215,7 @@ func TestVerifySignaturesArweaveSignature(t *testing.T) {
 
 func TestVerifySignaturesEthereumSignature(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := ethereumDataItem(t, bundlr.Tag{Name: "Sequencer-Nonce", Value: "5"})
+	dataItem := test.EthereumL2Interaction(t, bundlr.Tag{Name: "Sequencer-Nonce", Value: "5"})
 	acc := addCreatorAccount(t, app, ctx, dataItem)
 	sig := createEmptyEthereumSignature(t, dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig)
@@ -225,7 +227,7 @@ func TestVerifySignaturesEthereumSignature(t *testing.T) {
 
 func TestVerifySignaturesNoSignerAccount(t *testing.T) {
 	app, ctx := appAndCtx(t)
-	dataItem := arweaveDataItem(t, bundlr.Tag{Name: "Sequencer-Nonce", Value: "0"})
+	dataItem := test.ArweaveL2Interaction(t, bundlr.Tag{Name: "Sequencer-Nonce", Value: "0"})
 	sig := createEmptyArweaveSignature(dataItem, 0)
 	tx := createTxWithSignatures(t, dataItem, sig)
 

@@ -18,33 +18,35 @@ func NewArweaveBlockTxDecorator() ArweaveBlockTxDecorator {
 }
 
 func (abtd ArweaveBlockTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+	return ctx, verifyArweaveBlockTx(tx)
+}
+
+func verifyArweaveBlockTx(tx sdk.Tx) error {
 	msgs := tx.GetMsgs()
 	containsBlockInfoMsg := false
 
 	for i, msg := range msgs {
 		if containsBlockInfoMsg {
 			if !isL1Interaction(msg) {
-				err := errors.Wrap(types.ErrInvalidArweaveBlockTx,
+				return errors.Wrap(types.ErrInvalidArweaveBlockTx,
 					"tx with an Arweave block can only contain block info and L1 interactions")
-				return ctx, err
 			}
 		} else {
 			if isArweaveBlockInfo(msg) {
 				if i > 0 {
-					err := errors.Wrap(types.ErrInvalidArweaveBlockTx,
+					return errors.Wrap(types.ErrInvalidArweaveBlockTx,
 						"arweave block info must be the first message in the transaction")
-					return ctx, err
 				}
 				containsBlockInfoMsg = true
 			} else if isL1Interaction(msg) {
-				err := errors.Wrap(types.ErrInvalidArweaveBlockTx,
+				return errors.Wrap(types.ErrInvalidArweaveBlockTx,
 					"L1 interaction must be in tx after block info")
-				return ctx, err
 			}
 		}
 	}
 
-	return ctx, nil
+	return nil
+
 }
 
 func isArweaveBlockInfo(msg sdk.Msg) bool {
