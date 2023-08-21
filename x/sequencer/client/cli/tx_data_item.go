@@ -30,7 +30,7 @@ const (
 
 func CmdDataItem() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "dataitem",
+		Use:   "data-item",
 		Short: "Broadcast message in Arweave's DataItem format, described in ANS-104",
 		Args:  cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {

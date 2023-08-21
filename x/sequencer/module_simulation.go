@@ -19,12 +19,15 @@ var (
 	_ = sequencersimulation.FindAccount
 	_ = simulation.MsgEntryKind
 	_ = baseapp.Paramspace
-        _ = rand.Rand{}
+	_ = rand.Rand{}
 )
 
 const (
-	opWeightMsgDataItem = "op_weight_msg_data_item"
+	opWeightMsgDataItem          = "op_weight_msg_data_item"
 	defaultWeightMsgDataItem int = 100
+
+	opWeightMsgLastArweaveBlock = "op_weight_msg_arweave_block"
+	defaultWeightMsgLastArweaveBlock int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )
@@ -47,41 +50,59 @@ func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 
 // ProposalContents doesn't return any content functions for governance proposals.
 func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalMsg {
-        return nil
+	return nil
 }
 
 // WeightedOperations returns the all the gov module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
-        operations := make([]simtypes.WeightedOperation, 0)
+	operations := make([]simtypes.WeightedOperation, 0)
 
-        var weightMsgDataItem int
-        simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDataItem, &weightMsgDataItem, nil,
-                func(_ *rand.Rand) {
-                        weightMsgDataItem = defaultWeightMsgDataItem
-                },
-        )
-        operations = append(operations, simulation.NewWeightedOperation(
-                weightMsgDataItem,
-                sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper),
-        ))
+	var weightMsgDataItem int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDataItem, &weightMsgDataItem, nil,
+		func(_ *rand.Rand) {
+			weightMsgDataItem = defaultWeightMsgDataItem
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgDataItem,
+		sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
 
-        // this line is used by starport scaffolding # simapp/module/operation
+	var weightMsgLastArweaveBlock int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgLastArweaveBlock, &weightMsgLastArweaveBlock, nil,
+		func(_ *rand.Rand) {
+			weightMsgLastArweaveBlock = defaultWeightMsgLastArweaveBlock
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgLastArweaveBlock,
+		sequencersimulation.SimulateMsgLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
 
-        return operations
+	// this line is used by starport scaffolding # simapp/module/operation
+
+	return operations
 }
 
 // ProposalMsgs returns msgs used for governance proposals for simulations.
 func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.WeightedProposalMsg {
-        return []simtypes.WeightedProposalMsg{
-                simulation.NewWeightedProposalMsg(
-                        opWeightMsgDataItem,
-                        defaultWeightMsgDataItem,
-                        func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
-                                sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper)
-                                return nil
-                        },
-                ),
-                // this line is used by starport scaffolding # simapp/module/OpMsg
-        }
+	return []simtypes.WeightedProposalMsg{
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgDataItem,
+			defaultWeightMsgDataItem,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		simulation.NewWeightedProposalMsg(
+			opWeightMsgLastArweaveBlock,
+			defaultWeightMsgLastArweaveBlock,
+			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
+				sequencersimulation.SimulateMsgLastArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper)
+				return nil
+			},
+		),
+		// this line is used by starport scaffolding # simapp/module/OpMsg
+	}
 }
-

@@ -15,8 +15,8 @@ func TestMsgDataItem_ValidateBasic(t *testing.T) {
 	}{
 		{
 			name: "empty data item",
-			msg: MsgDataItem{},
-			err: bundlr.ErrVerifyIdSignatureMismatch,
+			msg:  MsgDataItem{},
+			err:  bundlr.ErrVerifyIdSignatureMismatch,
 		},
 	}
 	for _, tt := range tests {

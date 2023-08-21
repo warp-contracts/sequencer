@@ -109,9 +109,9 @@ import (
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	"github.com/spf13/cast"
 
+	sequencermodule "github.com/warp-contracts/sequencer/x/sequencer"
 	sequencerante "github.com/warp-contracts/sequencer/x/sequencer/ante"
 	sequencerapi "github.com/warp-contracts/sequencer/x/sequencer/api"
-	sequencermodule "github.com/warp-contracts/sequencer/x/sequencer"
 	sequencermodulekeeper "github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	sequencermoduletypes "github.com/warp-contracts/sequencer/x/sequencer/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
