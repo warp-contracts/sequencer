@@ -29,4 +29,5 @@ var (
 	ErrBadArweaveHashLength          = errors.Register(ModuleName, 1118, "invalid arweave block hash length")
 	ErrArweaveBlockHeightMismatch    = errors.Register(ModuleName, 1119, "arweave block height mismatch")
 	ErrArweaveBlockTimestampMismatch = errors.Register(ModuleName, 1120, "arweave block timestamp mismatch")
+	ErrInvalidArweaveBlockTx         = errors.Register(ModuleName, 1121, "invalid arweave block tx")
 )

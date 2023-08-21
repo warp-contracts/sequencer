@@ -75256,6 +75256,12 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  sequencer.sequencer.InteractionType:
+    type: string
+    enum:
+      - L1
+      - L2
+    default: L1
   sequencer.sequencer.LastArweaveBlock:
     type: object
     properties:

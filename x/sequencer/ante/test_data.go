@@ -60,5 +60,6 @@ func createExampleDataItem(t *testing.T, signer bundlr.Signer, tags ...bundlr.Ta
 
 	return types.MsgDataItem{
 		DataItem: dataItem,
+		InteractionType: types.InteractionType_L2,
 	}
 }

@@ -13,8 +13,15 @@ service Msg {
   rpc DataItem               (MsgDataItem              ) returns (MsgDataItemResponse              );
   rpc LastArweaveBlock (MsgLastArweaveBlock) returns (MsgLastArweaveBlockResponse);
 }
+
+enum InteractionType {
+  L1 = 0;
+  L2 = 1;
+}
+
 message MsgDataItem {
   bytes data_item = 1 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem", (gogoproto.nullable) = false];
+  InteractionType interaction_type = 2;
 }
 
 message MsgDataItemResponse {}
