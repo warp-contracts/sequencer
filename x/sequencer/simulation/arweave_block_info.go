@@ -20,12 +20,12 @@ func SimulateMsgArweaveBlockInfo(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
-	
+
 		msg := &types.MsgArweaveBlockInfo{
-			Creator: simAccount.Address.String(),
-			Height: 1431216,
+			Creator:   simAccount.Address.String(),
+			Height:    1431216,
 			Timestamp: 1690809540,
-			Hash: []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
+			Hash:      []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
 		}
 
 		txCtx := simulation.OperationInput{

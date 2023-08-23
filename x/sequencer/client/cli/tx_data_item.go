@@ -65,7 +65,6 @@ func CmdDataItem() *cobra.Command {
 func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types.MsgDataItem, err error) {
 	// Message
 	msg = &types.MsgDataItem{}
-	msg.InteractionType = types.InteractionType_L2
 
 	// Data item may be signed with either Arweave or Ethereum private key
 	arweaveWalletPath := cmd.Flag(FlagArweaveWallet).Value.String()

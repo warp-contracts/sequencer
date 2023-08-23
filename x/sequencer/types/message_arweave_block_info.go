@@ -14,10 +14,10 @@ var _ sdk.Msg = &MsgArweaveBlockInfo{}
 
 func NewMsgArweaveBlockInfo(creator string, height uint64, timestamp uint64, hash []byte) *MsgArweaveBlockInfo {
 	return &MsgArweaveBlockInfo{
-		Creator: creator,
-		Height: height,
+		Creator:   creator,
+		Height:    height,
 		Timestamp: timestamp,
-		Hash: hash,
+		Hash:      hash,
 	}
 }
 

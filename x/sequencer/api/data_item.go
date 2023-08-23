@@ -27,7 +27,6 @@ func RegisterDataItemAPIRoute(clientCtx client.Context, router *mux.Router) {
 
 func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var msg types.MsgDataItem
-	msg.InteractionType = types.InteractionType_L2
 
 	// Parse DataItem from request body
 	err := msg.DataItem.UnmarshalFromReader(r.Body)

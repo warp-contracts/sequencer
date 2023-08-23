@@ -34,37 +34,25 @@ func NewTxBuilder() client.TxBuilder {
 	return testutil.MakeTestEncodingConfig().TxConfig.NewTxBuilder()
 }
 
-func arweaveInteraction(t *testing.T, interactionType types.InteractionType, tags ...bundlr.Tag) types.MsgDataItem {
-	signer, err := bundlr.NewArweaveSigner(EMPTY_ARWEAVE_WALLET)
-	require.NoError(t, err)
-
-	return createExampleDataItem(t, signer, interactionType, tags...)
-}
-
-func ArweaveL1Interaction(t *testing.T) types.MsgDataItem {
-	return arweaveInteraction(t, types.InteractionType_L1)
+func ArweaveL1Interaction(t *testing.T) types.MsgArweaveTransaction {
+	return types.MsgArweaveTransaction{}
 }
 
 func ArweaveL2Interaction(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
-	return arweaveInteraction(t, types.InteractionType_L2, tags...)
-}
-
-func ethereumInteraction(t *testing.T, interactionType types.InteractionType, tags ...bundlr.Tag) types.MsgDataItem {
-	signer, err := bundlr.NewEthereumSigner(ETHEREUM_PRIVATE_KEY)
+	signer, err := bundlr.NewArweaveSigner(EMPTY_ARWEAVE_WALLET)
 	require.NoError(t, err)
 
-	return createExampleDataItem(t, signer, interactionType, tags...)
-}
-
-func EthereumL1Interaction(t *testing.T) types.MsgDataItem {
-	return ethereumInteraction(t, types.InteractionType_L1)
+	return createExampleDataItem(t, signer, tags...)
 }
 
 func EthereumL2Interaction(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
-	return ethereumInteraction(t, types.InteractionType_L1, tags...)
+	signer, err := bundlr.NewEthereumSigner(ETHEREUM_PRIVATE_KEY)
+	require.NoError(t, err)
+
+	return createExampleDataItem(t, signer, tags...)
 }
 
-func createExampleDataItem(t *testing.T, signer bundlr.Signer, interactionType types.InteractionType, tags ...bundlr.Tag) types.MsgDataItem {
+func createExampleDataItem(t *testing.T, signer bundlr.Signer, tags ...bundlr.Tag) types.MsgDataItem {
 	dataItem := bundlr.BundleItem{
 		Target: arweave.Base64String(tool.RandomString(32)),
 		Anchor: arweave.Base64String(tool.RandomString(32)),
@@ -76,7 +64,6 @@ func createExampleDataItem(t *testing.T, signer bundlr.Signer, interactionType t
 
 	return types.MsgDataItem{
 		DataItem:        dataItem,
-		InteractionType: interactionType,
 	}
 }
 
