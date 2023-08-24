@@ -13,8 +13,7 @@ import (
 func (k msgServer) ArweaveBlockInfo(goCtx context.Context, msg *types.MsgArweaveBlockInfo) (*types.MsgArweaveBlockInfoResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	var newValue = types.LastArweaveBlock{
-		Creator:   msg.Creator,
+	var newValue = types.ArweaveBlockInfo{
 		Height:    msg.Height,
 		Timestamp: msg.Timestamp,
 		Hash:      msg.Hash,

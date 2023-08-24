@@ -46450,8 +46450,6 @@ paths:
               LastArweaveBlock:
                 type: object
                 properties:
-                  creator:
-                    type: string
                   height:
                     type: string
                     format: uint64
@@ -75256,11 +75254,9 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
-  sequencer.sequencer.LastArweaveBlock:
+  sequencer.sequencer.ArweaveBlockInfo:
     type: object
     properties:
-      creator:
-        type: string
       height:
         type: string
         format: uint64
@@ -75285,8 +75281,6 @@ definitions:
       LastArweaveBlock:
         type: object
         properties:
-          creator:
-            type: string
           height:
             type: string
             format: uint64

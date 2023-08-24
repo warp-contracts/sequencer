@@ -7,14 +7,14 @@ import (
 )
 
 // SetLastArweaveBlock set lastArweaveBlock in the store
-func (k Keeper) SetLastArweaveBlock(ctx sdk.Context, lastArweaveBlock types.LastArweaveBlock) {
+func (k Keeper) SetLastArweaveBlock(ctx sdk.Context, lastArweaveBlock types.ArweaveBlockInfo) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LastArweaveBlockKey))
 	b := k.cdc.MustMarshal(&lastArweaveBlock)
 	store.Set([]byte{0}, b)
 }
 
 // GetLastArweaveBlock returns lastArweaveBlock
-func (k Keeper) GetLastArweaveBlock(ctx sdk.Context) (val types.LastArweaveBlock, found bool) {
+func (k Keeper) GetLastArweaveBlock(ctx sdk.Context) (val types.ArweaveBlockInfo, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LastArweaveBlockKey))
 
 	b := store.Get([]byte{0})

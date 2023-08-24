@@ -4,7 +4,7 @@ package sequencer.sequencer;
 
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
-import "sequencer/sequencer/last_arweave_block.proto";
+import "sequencer/sequencer/arweave_block_info.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
