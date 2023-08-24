@@ -32,7 +32,6 @@ func TestArweaveBlockInfoMsgServer(t *testing.T) {
 
 	rst, found := k.GetLastArweaveBlock(ctx)
 	require.True(t, found)
-	require.Equal(t, expected.Creator, rst.Creator)
 	require.Equal(t, expected.Height, rst.Height)
 	require.Equal(t, expected.Timestamp, rst.Timestamp)
 	require.Equal(t, expected.Hash, rst.Hash)

@@ -38,7 +38,6 @@ func newController() (controller *sync.Controller, err error) {
 	monitor := monitor_syncer.NewMonitor().
 		WithMaxHistorySize(30)
 
-
 	watched := func() *task.Task {
 		client := arweave.NewClient(controller.Ctx, config).
 			WithTagValidator(warp.ValidateTag)
@@ -70,7 +69,6 @@ func newController() (controller *sync.Controller, err error) {
 			WithInputChannel(transactionDownloader.Output).
 			WithMonitor(monitor)
 
-
 		return task.NewTask(config, "watched").
 			WithSubtask(networkMonitor.Task).
 			WithSubtask(blockDownloader.Task).
@@ -88,7 +86,6 @@ func newController() (controller *sync.Controller, err error) {
 			}
 			return isOK
 		})
-
 
 	controller.Task = controller.Task.
 		WithSubtask(monitor.Task).

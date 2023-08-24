@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "sequencer/sequencer/params.proto";
 import "sequencer/sequencer/arweave_block_info.proto";
+import "sequencer/sequencer/next_arweave_block.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
@@ -24,6 +25,16 @@ service Query {
     option (google.api.http).get = "/warp-contracts/sequencer/sequencer/last_arweave_block";
   
   }
+  
+  // Queries a list of NextArweaveBlock items.
+  rpc NextArweaveBlock    (QueryGetNextArweaveBlockRequest) returns (QueryGetNextArweaveBlockResponse) {
+    option (google.api.http).get = "/warp-contracts/sequencer/sequencer/next_arweave_block/{height}";
+  
+  }
+  rpc NextArweaveBlockAll (QueryAllNextArweaveBlockRequest) returns (QueryAllNextArweaveBlockResponse) {
+    option (google.api.http).get = "/warp-contracts/sequencer/sequencer/next_arweave_blocks";
+  
+  }
 }
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
@@ -39,5 +50,22 @@ message QueryGetLastArweaveBlockRequest {}
 
 message QueryGetLastArweaveBlockResponse {
   ArweaveBlockInfo LastArweaveBlock = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetNextArweaveBlockRequest {
+  string height = 1;
+}
+
+message QueryGetNextArweaveBlockResponse {
+  NextArweaveBlock nextArweaveBlock = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllNextArweaveBlockRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllNextArweaveBlockResponse {
+  repeated NextArweaveBlock                       nextArweaveBlock = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination       = 2;
 }
 

@@ -1,0 +1,13 @@
+syntax = "proto3";
+package sequencer.sequencer;
+
+import "gogoproto/gogo.proto";
+import "sequencer/sequencer/arweave_block_info.proto";
+
+option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
+
+message NextArweaveBlock {
+  ArweaveBlockInfo blockInfo = 1; 
+  repeated bytes transactions = 2 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/arweave.Transaction", (gogoproto.nullable) = false];; 
+}
+

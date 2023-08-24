@@ -63,7 +63,7 @@ func createExampleDataItem(t *testing.T, signer bundlr.Signer, tags ...bundlr.Ta
 	require.NoError(t, err)
 
 	return types.MsgDataItem{
-		DataItem:        dataItem,
+		DataItem: dataItem,
 	}
 }
 

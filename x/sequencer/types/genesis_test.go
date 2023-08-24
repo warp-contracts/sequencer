@@ -23,9 +23,39 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &types.GenesisState{
 
 				LastArweaveBlock: &types.ArweaveBlockInfo{},
+				NextArweaveBlockList: []types.NextArweaveBlock{
+					{
+						BlockInfo: &types.ArweaveBlockInfo{
+							Height: 0,
+						},
+					},
+					{
+						BlockInfo: &types.ArweaveBlockInfo{
+							Height: 1,
+						},
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
+		},
+		{
+			desc: "duplicated nextArweaveBlock",
+			genState: &types.GenesisState{
+				NextArweaveBlockList: []types.NextArweaveBlock{
+					{
+						BlockInfo: &types.ArweaveBlockInfo{
+							Height: 0,
+						},
+					},
+					{
+						BlockInfo: &types.ArweaveBlockInfo{
+							Height: 0,
+						},
+					},
+				},
+			},
+			valid: false,
 		},
 		// this line is used by starport scaffolding # types/genesis/testcase
 	} {
