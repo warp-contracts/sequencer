@@ -40,6 +40,7 @@ import (
 
 	"github.com/warp-contracts/sequencer/app"
 	appparams "github.com/warp-contracts/sequencer/app/params"
+	"github.com/warp-contracts/sequencer/x/sequencer/arweave"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application
@@ -74,6 +75,9 @@ func NewRootCmd() (*cobra.Command, appparams.EncodingConfig) {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
+
+			// TODO should this be run here?
+			go arweave.Controller()
 
 			customAppTemplate, customAppConfig := initAppConfig()
 			customTMConfig := initTendermintConfig()
