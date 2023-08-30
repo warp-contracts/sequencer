@@ -218,4 +218,5 @@ require (
 replace (
 	cosmossdk.io/simapp => github.com/cosmos/cosmos-sdk/simapp v0.0.0-20230608160436-666c345ad23d
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
+	github.com/warp-contracts/syncer => /Users/michal/Projects/warp/syncer
 )

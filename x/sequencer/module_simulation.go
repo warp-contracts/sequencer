@@ -30,7 +30,6 @@ const (
 	defaultWeightMsgArweaveBlockInfo int = 100
 
 	opWeightMsgArweaveTransaction = "op_weight_msg_arweave_transaction"
-	// TODO: Determine the simulation weight value
 	defaultWeightMsgArweaveTransaction int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const

@@ -25,6 +25,7 @@ func networkWithNextArweaveBlockObjects(t *testing.T, n int) (*network.Network, 
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
+	state.LastArweaveBlock = &types.ArweaveBlockInfo{}
 	for i := 0; i < n; i++ {
 		nextArweaveBlock := types.NextArweaveBlock{
 			BlockInfo: &types.ArweaveBlockInfo{

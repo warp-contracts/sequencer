@@ -1,7 +1,13 @@
 package arweave
 
 import (
+	"math"
+	"sync/atomic"
 	"time"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 
 	"github.com/warp-contracts/syncer/src/sync"
 	"github.com/warp-contracts/syncer/src/utils/arweave"
@@ -12,27 +18,36 @@ import (
 	"github.com/warp-contracts/syncer/src/utils/warp"
 )
 
-func Controller() {
-	controller, err := newController()
-	if err != nil {
-		panic(err)
-	}
+type ArweaveBlocksController struct {
+	sync.Controller
 
-	err = controller.Start()
-	if err != nil {
-		panic(err)
-	}
-
-	// FIXME
-	<-controller.CtxRunning.Done()
-
-	controller.StopWait()
+	store  *Store
+	keeper keeper.Keeper
+	IsRunning *atomic.Bool
 }
 
-func newController() (controller *sync.Controller, err error) {
+func CreateController(keeper keeper.Keeper) *ArweaveBlocksController {
+	controller := new(ArweaveBlocksController)
+	controller.keeper = keeper
+	controller.IsRunning = &atomic.Bool{}
+
+	return controller
+}
+
+// TODO add controller stop
+func (controller *ArweaveBlocksController) StartController(initHeight uint64) {
+	controller.initController(initHeight)
+
+	err := controller.Start()
+	if err != nil {
+		panic(err)
+	}
+	controller.IsRunning.Store(true)
+}
+
+func (controller *ArweaveBlocksController) initController(initHeight uint64) {
 	var config = config.Default()
 
-	controller = new(sync.Controller)
 	controller.Task = task.NewTask(config, "controller")
 
 	monitor := monitor_syncer.NewMonitor().
@@ -49,14 +64,14 @@ func newController() (controller *sync.Controller, err error) {
 			WithClient(client).
 			WithMonitor(monitor).
 			WithInterval(config.NetworkMonitor.Period).
-			WithRequiredConfirmationBlocks(config.NetworkMonitor.RequiredConfirmationBlocks)
+			WithRequiredConfirmationBlocks(25)
 
 		blockDownloader := listener.NewBlockDownloader(config).
 			WithClient(client).
 			WithInputChannel(networkMonitor.Output).
 			WithMonitor(monitor).
 			WithBackoff(0, config.Syncer.TransactionMaxInterval).
-			WithHeightRange(1246586, 1256586) // FIXME
+			WithHeightRange(initHeight, math.MaxUint64)
 
 		transactionDownloader := listener.NewTransactionDownloader(config).
 			WithClient(client).
@@ -68,6 +83,7 @@ func newController() (controller *sync.Controller, err error) {
 		store := NewStore(config).
 			WithInputChannel(transactionDownloader.Output).
 			WithMonitor(monitor)
+		controller.store = store
 
 		return task.NewTask(config, "watched").
 			WithSubtask(networkMonitor.Task).
@@ -90,6 +106,12 @@ func newController() (controller *sync.Controller, err error) {
 	controller.Task = controller.Task.
 		WithSubtask(monitor.Task).
 		WithSubtask(watchdog.Task)
+}
 
-	return
+func (controller *ArweaveBlocksController) StoreArweaveBlocks(ctx sdk.Context) {
+	if controller.IsRunning.Load() {
+		for _, block := range controller.store.getAndClearBlocks() {
+			controller.keeper.SetNextArweaveBlock(ctx, block)
+		}	
+	}
 }

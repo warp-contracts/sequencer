@@ -16,6 +16,7 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/warp-contracts/sequencer/x/sequencer/arweave"
 	"github.com/warp-contracts/sequencer/x/sequencer/client/cli"
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -97,6 +98,7 @@ type AppModule struct {
 	keeper        keeper.Keeper
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
+	controller    *arweave.ArweaveBlocksController
 }
 
 func NewAppModule(
@@ -104,12 +106,14 @@ func NewAppModule(
 	keeper keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
+	controller *arweave.ArweaveBlocksController,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic: NewAppModuleBasic(cdc),
 		keeper:         keeper,
 		accountKeeper:  accountKeeper,
 		bankKeeper:     bankKeeper,
+		controller:     controller,
 	}
 }
 
@@ -146,6 +150,22 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 
 // EndBlock contains the logic that is automatically triggered at the end of each block
-func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
+	am.storeArweaveBlocks(ctx)
 	return []abci.ValidatorUpdate{}
+}
+
+func (am AppModule) storeArweaveBlocks(ctx sdk.Context) {
+	if am.controller != nil {
+		if !am.controller.IsRunning.Load() {
+			lastArweaveBlock, found := am.keeper.GetLastArweaveBlock(ctx)
+			if found {
+				am.controller.StartController(lastArweaveBlock.Height)
+			} else {
+				panic("Last Arweave Block is not set when the EndBlock method is called, and should be set when the blockchain is started")
+			}
+		}
+
+		am.controller.StoreArweaveBlocks(ctx)
+	}
 }
