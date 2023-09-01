@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/warp-contracts/sequencer/testutil/sample"
-	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
@@ -26,7 +25,7 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 			name: "invalid arewave block height",
 			msg: MsgArweaveBlock{
 				Creator: sample.AccAddress(),
-				BlockInfo: &types.ArweaveBlockInfo{
+				BlockInfo: &ArweaveBlockInfo{
 					Height:    0,
 					Timestamp: 1690809540,
 					Hash:      []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
@@ -37,7 +36,7 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 			name: "invalid arewave block timestamp",
 			msg: MsgArweaveBlock{
 				Creator: sample.AccAddress(),
-				BlockInfo: &types.ArweaveBlockInfo{
+				BlockInfo: &ArweaveBlockInfo{
 					Height:    1431216,
 					Timestamp: 0,
 					Hash:      []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
@@ -48,7 +47,7 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 			name: "invalid arewave block hash length",
 			msg: MsgArweaveBlock{
 				Creator: sample.AccAddress(),
-				BlockInfo: &types.ArweaveBlockInfo{
+				BlockInfo: &ArweaveBlockInfo{
 					Height:    1431216,
 					Timestamp: 0,
 					Hash:      []byte{},
@@ -59,7 +58,7 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 			name: "valid",
 			msg: MsgArweaveBlock{
 				Creator: sample.AccAddress(),
-				BlockInfo: &types.ArweaveBlockInfo{
+				BlockInfo: &ArweaveBlockInfo{
 					Height:    1431216,
 					Timestamp: 1690809540,
 					Hash:      []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},

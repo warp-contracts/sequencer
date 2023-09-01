@@ -1,36 +1,35 @@
-package types_test
+package types
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {
 	for _, tc := range []struct {
 		desc     string
-		genState *types.GenesisState
+		genState *GenesisState
 		valid    bool
 	}{
 		{
 			desc:     "default is valid",
-			genState: types.DefaultGenesis(),
+			genState: DefaultGenesis(),
 			valid:    true,
 		},
 		{
 			desc: "valid genesis state",
-			genState: &types.GenesisState{
+			genState: &GenesisState{
 
-				LastArweaveBlock: &types.ArweaveBlockInfo{},
-				NextArweaveBlockList: []types.NextArweaveBlock{
+				LastArweaveBlock: &ArweaveBlockInfo{},
+				NextArweaveBlockList: []NextArweaveBlock{
 					{
-						BlockInfo: &types.ArweaveBlockInfo{
+						BlockInfo: &ArweaveBlockInfo{
 							Height: 0,
 						},
 					},
 					{
-						BlockInfo: &types.ArweaveBlockInfo{
+						BlockInfo: &ArweaveBlockInfo{
 							Height: 1,
 						},
 					},
@@ -41,15 +40,15 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		{
 			desc: "duplicated nextArweaveBlock",
-			genState: &types.GenesisState{
-				NextArweaveBlockList: []types.NextArweaveBlock{
+			genState: &GenesisState{
+				NextArweaveBlockList: []NextArweaveBlock{
 					{
-						BlockInfo: &types.ArweaveBlockInfo{
+						BlockInfo: &ArweaveBlockInfo{
 							Height: 0,
 						},
 					},
 					{
-						BlockInfo: &types.ArweaveBlockInfo{
+						BlockInfo: &ArweaveBlockInfo{
 							Height: 0,
 						},
 					},
