@@ -14,7 +14,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/client/cli"
 )
 
-func TestLastArweaveBlock(t *testing.T) {
+func TestArweaveBlockInfo(t *testing.T) {
 	net := network.New(t)
 	val := net.Validators[0]
 	ctx := val.ClientCtx
@@ -46,7 +46,7 @@ func TestLastArweaveBlock(t *testing.T) {
 			var args []string
 			args = append(args, fields...)
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdLastArweaveBlock(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdArweaveBlockInfo(), args)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 				return

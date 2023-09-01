@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/warp-contracts/sequencer/crypto/keys/arweave"
-	"github.com/warp-contracts/sequencer/x/sequencer/ante"
+	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
 func createPrivateKey(t *testing.T) *arweave.PrivKey {
-	signer, err := bundlr.NewArweaveSigner(ante.EMPTY_ARWEAVE_WALLET)
+	signer, err := bundlr.NewArweaveSigner(test.EMPTY_ARWEAVE_WALLET)
 	require.NoError(t, err)
 	return arweave.CreatePrivateKey(*signer.PrivateKey)
 }

@@ -17,7 +17,7 @@ func NewSigVerificationDecorator(standardSigVerificationDecorator ante.SigVerifi
 
 // The standard signature verification is only executed for transactions that do not have an Arweave DataItem
 func (svd SigVerificationDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	if HasSingleDataItem(tx) {
+	if isL2Interaction(tx) {
 		return next(ctx, tx, simulate)
 	}
 	return svd.standardSigVerificationDecorator.AnteHandle(ctx, tx, simulate, next)

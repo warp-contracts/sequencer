@@ -1,8 +1,9 @@
 package ante
 
 import (
-	"cosmossdk.io/errors"
 	"fmt"
+
+	"cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -25,7 +26,7 @@ func NewSetPubKeyDecorator(standardSetPubKeyDecorator ante.SetPubKeyDecorator) S
 // For transactions containing an Arweave DataItem, an account with a set public key has already been created.
 // In this case, we only emit events that are emitted in the standard SetPubKeyDecorator.
 func (spkd SetPubKeyDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	dataItem, err := GetDataItemMsg(tx)
+	dataItem, err := GetL2Interaction(tx)
 	if err != nil {
 		return ctx, err
 	}

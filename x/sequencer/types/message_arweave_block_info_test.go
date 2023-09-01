@@ -9,21 +9,21 @@ import (
 	"github.com/warp-contracts/sequencer/testutil/sample"
 )
 
-func TestMsgLastArweaveBlock_ValidateBasic(t *testing.T) {
+func TestMsgArweaveBlockInfo_ValidateBasic(t *testing.T) {
 	tests := []struct {
 		name string
-		msg  MsgLastArweaveBlock
+		msg  MsgArweaveBlockInfo
 		err  error
 	}{
 		{
 			name: "invalid address",
-			msg: MsgLastArweaveBlock{
+			msg: MsgArweaveBlockInfo{
 				Creator: "invalid_address",
 			},
 			err: sdkerrors.ErrInvalidAddress,
 		}, {
 			name: "invalid arewave block height",
-			msg: MsgLastArweaveBlock{
+			msg: MsgArweaveBlockInfo{
 				Creator:   sample.AccAddress(),
 				Height:    0,
 				Timestamp: 1690809540,
@@ -32,7 +32,7 @@ func TestMsgLastArweaveBlock_ValidateBasic(t *testing.T) {
 			err: ErrBadArweaveHeight,
 		}, {
 			name: "invalid arewave block timestamp",
-			msg: MsgLastArweaveBlock{
+			msg: MsgArweaveBlockInfo{
 				Creator:   sample.AccAddress(),
 				Height:    1431216,
 				Timestamp: 0,
@@ -41,7 +41,7 @@ func TestMsgLastArweaveBlock_ValidateBasic(t *testing.T) {
 			err: ErrBadArweaveTimestamp,
 		}, {
 			name: "invalid arewave block hash length",
-			msg: MsgLastArweaveBlock{
+			msg: MsgArweaveBlockInfo{
 				Creator:   sample.AccAddress(),
 				Height:    1431216,
 				Timestamp: 0,
@@ -50,7 +50,7 @@ func TestMsgLastArweaveBlock_ValidateBasic(t *testing.T) {
 			err: ErrBadArweaveHashLength,
 		}, {
 			name: "valid",
-			msg: MsgLastArweaveBlock{
+			msg: MsgArweaveBlockInfo{
 				Creator:   sample.AccAddress(),
 				Height:    1431216,
 				Timestamp: 1690809540,

@@ -17,7 +17,7 @@ func NewDeductFeeDecorator(standardDeductFeeDecorator ante.DeductFeeDecorator) D
 
 // The standard fee deduction only applies to transactions that do not have an Arweave DataItem
 func (dfd DeductFeeDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	if HasSingleDataItem(tx) {
+	if isL2Interaction(tx) {
 		return next(ctx, tx, simulate)
 	}
 	return dfd.standardDeductFeeDecorator.AnteHandle(ctx, tx, simulate, next)

@@ -75270,9 +75270,11 @@ definitions:
       hash:
         type: string
         format: byte
-  sequencer.sequencer.MsgDataItemResponse:
+  sequencer.sequencer.MsgArweaveBlockInfoResponse:
     type: object
-  sequencer.sequencer.MsgLastArweaveBlockResponse:
+  sequencer.sequencer.MsgArweaveTransactionResponse:
+    type: object
+  sequencer.sequencer.MsgDataItemResponse:
     type: object
   sequencer.sequencer.Params:
     type: object

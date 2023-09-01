@@ -7,12 +7,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
-	"github.com/warp-contracts/sequencer/x/sequencer/ante"
+	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
 func createPrivateKey(t *testing.T) ethereum.PrivKey {
-	privKeyBytes, err := hexutil.Decode(ante.ETHEREUM_PRIVATE_KEY)
+	privKeyBytes, err := hexutil.Decode(test.ETHEREUM_PRIVATE_KEY)
 	require.NoError(t, err)
 	return ethereum.PrivKey{privKeyBytes}
 }
@@ -30,7 +30,7 @@ func TestSignAndVerify(t *testing.T) {
 }
 
 func createSyncerSigner(t *testing.T) *bundlr.EthereumSigner {
-	signer, err := bundlr.NewEthereumSigner(ante.ETHEREUM_PRIVATE_KEY)
+	signer, err := bundlr.NewEthereumSigner(test.ETHEREUM_PRIVATE_KEY)
 	require.NoError(t, err)
 	return signer
 }

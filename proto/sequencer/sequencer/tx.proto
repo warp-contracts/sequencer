@@ -10,20 +10,29 @@ option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
 // Msg defines the Msg service.
 service Msg {
-  rpc DataItem               (MsgDataItem              ) returns (MsgDataItemResponse              );
-  rpc LastArweaveBlock (MsgLastArweaveBlock) returns (MsgLastArweaveBlockResponse);
+  rpc DataItem           (MsgDataItem          ) returns (MsgDataItemResponse          );
+  rpc ArweaveBlockInfo   (MsgArweaveBlockInfo  ) returns (MsgArweaveBlockInfoResponse  );
+  rpc ArweaveTransaction (MsgArweaveTransaction) returns (MsgArweaveTransactionResponse);
 }
+
 message MsgDataItem {
   bytes data_item = 1 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem", (gogoproto.nullable) = false];
 }
 
 message MsgDataItemResponse {}
 
-message MsgLastArweaveBlock {
-  string creator = 1;
-  uint64 height = 2;
+message MsgArweaveBlockInfo {
+  string creator   = 1;
+  uint64 height    = 2;
   uint64 timestamp = 3;
-  bytes hash = 4;
+  bytes  hash      = 4;
 }
 
-message MsgLastArweaveBlockResponse {}
+message MsgArweaveBlockInfoResponse {}
+
+message MsgArweaveTransaction {
+  bytes transaction = 1 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/arweave.Transaction", (gogoproto.nullable) = false];
+}
+
+message MsgArweaveTransactionResponse {}
+
