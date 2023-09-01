@@ -722,8 +722,9 @@ func New(
 		sequencerante.HandlerOptions{
 			AccountKeeper:   app.AccountKeeper,
 			BankKeeper:      app.BankKeeper,
-			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			FeegrantKeeper:  app.FeeGrantKeeper,
+			SequencerKeeper: app.SequencerKeeper,
+			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
 			SigGasConsumer:  sequencerante.SigVerificationGasConsumer,
 		},
 	)

@@ -162,7 +162,7 @@ func (am AppModule) storeNextArweaveBlocks(ctx sdk.Context) {
 		if !am.controller.IsRunning.Load() {
 			lastArweaveBlock, found := am.keeper.GetLastArweaveBlock(ctx)
 			if found {
-				am.controller.StartController(lastArweaveBlock.Height)
+				am.controller.StartController(lastArweaveBlock.Height + 1)
 			} else {
 				panic("Last Arweave Block is not set when the BeginBlock method is called, and should be set when the blockchain is started")
 			}

@@ -32,4 +32,5 @@ var (
 	ErrArweaveBlockHashMismatch         = errors.Register(ModuleName, 1121, "arweave block hash mismatch")
 	ErrArweaveBlockTransactionsMismatch = errors.Register(ModuleName, 1122, "arweave block transactions mismatch")
 	ErrInvalidArweaveBlockTx            = errors.Register(ModuleName, 1123, "invalid arweave block tx")
+	ErrNoArweaveBlockTx                 = errors.Register(ModuleName, 1124, "no arweave block tx")
 )
