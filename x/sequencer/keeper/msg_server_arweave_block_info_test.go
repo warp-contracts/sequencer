@@ -21,11 +21,23 @@ func keeperCtxAndSrv(t *testing.T) (*keeper.Keeper, sdk.Context, types.MsgServer
 	return k, ctx.WithBlockHeader(blockHeader), srv
 }
 
+func setNextArweaveBlock(k *keeper.Keeper, ctx sdk.Context, msgBlockInfo *types.MsgArweaveBlockInfo) {
+	block := types.NextArweaveBlock {
+		BlockInfo: &types.ArweaveBlockInfo{
+			Height: msgBlockInfo.Height,
+			Timestamp: msgBlockInfo.Timestamp,
+			Hash: msgBlockInfo.Hash,
+		},
+	}
+	k.SetNextArweaveBlock(ctx, block)
+}
+
 func TestArweaveBlockInfoMsgServer(t *testing.T) {
 	k, ctx, srv := keeperCtxAndSrv(t)
 	wctx := sdk.WrapSDKContext(ctx)
 
 	expected := test.ArweaveBlockInfo()
+	setNextArweaveBlock(k, ctx, &expected)
 
 	_, err := srv.ArweaveBlockInfo(wctx, &expected)
 	require.NoError(t, err)
@@ -48,10 +60,11 @@ func TestArweaveBlockInfoMsgServerWithoutHoursDelay(t *testing.T) {
 }
 
 func TestArweaveBlockInfoMsgServerWithoutNextHeight(t *testing.T) {
-	_, ctx, srv := keeperCtxAndSrv(t)
+	k, ctx, srv := keeperCtxAndSrv(t)
 	wctx := sdk.WrapSDKContext(ctx)
 
 	lastArweaveBlock := &types.MsgArweaveBlockInfo{Creator: "creator", Height: 1431216, Timestamp: 1692353410, Hash: test.ExampleArweaveBlockHash}
+	setNextArweaveBlock(k, ctx, lastArweaveBlock)
 
 	_, err := srv.ArweaveBlockInfo(wctx, lastArweaveBlock)
 	require.NoError(t, err)
@@ -62,10 +75,11 @@ func TestArweaveBlockInfoMsgServerWithoutNextHeight(t *testing.T) {
 }
 
 func TestArweaveBlockInfoMsgServerWithoutLaterTimestamp(t *testing.T) {
-	_, ctx, srv := keeperCtxAndSrv(t)
+	k, ctx, srv := keeperCtxAndSrv(t)
 	wctx := sdk.WrapSDKContext(ctx)
 
 	lastArweaveBlock := &types.MsgArweaveBlockInfo{Creator: "creator", Height: 1431216, Timestamp: 1692353410, Hash: test.ExampleArweaveBlockHash}
+	setNextArweaveBlock(k, ctx, lastArweaveBlock)
 
 	_, err := srv.ArweaveBlockInfo(wctx, lastArweaveBlock)
 	require.NoError(t, err)
@@ -73,4 +87,40 @@ func TestArweaveBlockInfoMsgServerWithoutLaterTimestamp(t *testing.T) {
 	lastArweaveBlock.Height += 1
 	_, err = srv.ArweaveBlockInfo(wctx, lastArweaveBlock)
 	require.ErrorIs(t, err, types.ErrArweaveBlockTimestampMismatch)
+}
+
+func TestArweaveBlockInfoMsgServerWithoutNextArweaveBlock(t *testing.T) {
+	_, ctx, srv := keeperCtxAndSrv(t)
+	wctx := sdk.WrapSDKContext(ctx)
+
+	arweaveBlockInfo := test.ArweaveBlockInfo()
+
+	_, err := srv.ArweaveBlockInfo(wctx, &arweaveBlockInfo)
+	require.ErrorIs(t, err, types.ErrInvalidArweaveBlockTx)
+}
+
+func TestArweaveBlockInfoMsgServerTimestampMismatchWithNextArweaveBlock(t *testing.T) {
+	k, ctx, srv := keeperCtxAndSrv(t)
+	wctx := sdk.WrapSDKContext(ctx)
+
+	arweaveBlockInfo := test.ArweaveBlockInfo()
+	nextArweaveBlockInfo := arweaveBlockInfo
+	nextArweaveBlockInfo.Timestamp += 1
+	setNextArweaveBlock(k, ctx, &nextArweaveBlockInfo)
+
+	_, err := srv.ArweaveBlockInfo(wctx, &arweaveBlockInfo)
+	require.ErrorIs(t, err, types.ErrArweaveBlockTimestampMismatch)
+}
+
+func TestArweaveBlockInfoMsgServerHashMismatchWithNextArweaveBlock(t *testing.T) {
+	k, ctx, srv := keeperCtxAndSrv(t)
+	wctx := sdk.WrapSDKContext(ctx)
+
+	arweaveBlockInfo := test.ArweaveBlockInfo()
+	nextArweaveBlockInfo := arweaveBlockInfo
+	nextArweaveBlockInfo.Hash = []byte{1,2,3}
+	setNextArweaveBlock(k, ctx, &nextArweaveBlockInfo)
+
+	_, err := srv.ArweaveBlockInfo(wctx, &arweaveBlockInfo)
+	require.ErrorIs(t, err, types.ErrArweaveBlockHashMismatch)
 }

@@ -21,8 +21,8 @@ import (
 type ArweaveBlocksController struct {
 	sync.Controller
 
-	store  *Store
-	keeper keeper.Keeper
+	store     *Store
+	keeper    keeper.Keeper
 	IsRunning *atomic.Bool
 }
 
@@ -108,10 +108,10 @@ func (controller *ArweaveBlocksController) initController(initHeight uint64) {
 		WithSubtask(watchdog.Task)
 }
 
-func (controller *ArweaveBlocksController) StoreArweaveBlocks(ctx sdk.Context) {
+func (controller *ArweaveBlocksController) StoreNextArweaveBlocks(ctx sdk.Context) {
 	if controller.IsRunning.Load() {
 		for _, block := range controller.store.getAndClearBlocks() {
 			controller.keeper.SetNextArweaveBlock(ctx, block)
-		}	
+		}
 	}
 }

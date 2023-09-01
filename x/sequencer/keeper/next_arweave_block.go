@@ -38,7 +38,6 @@ func (k Keeper) GetNextArweaveBlock(
 func (k Keeper) RemoveNextArweaveBlock(
 	ctx sdk.Context,
 	height string,
-
 ) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.NextArweaveBlockKeyPrefix))
 	store.Delete(types.NextArweaveBlockKey(
