@@ -10,7 +10,6 @@ import (
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
-	github_com_warp_contracts_syncer_src_utils_arweave "github.com/warp-contracts/syncer/src/utils/arweave"
 	github_com_warp_contracts_syncer_src_utils_bundlr "github.com/warp-contracts/syncer/src/utils/bundlr"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -104,25 +103,24 @@ func (m *MsgDataItemResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgDataItemResponse proto.InternalMessageInfo
 
-type MsgArweaveBlockInfo struct {
-	Creator   string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Height    uint64 `protobuf:"varint,2,opt,name=height,proto3" json:"height,omitempty"`
-	Timestamp uint64 `protobuf:"varint,3,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Hash      []byte `protobuf:"bytes,4,opt,name=hash,proto3" json:"hash,omitempty"`
+type MsgArweaveBlock struct {
+	Creator      string                `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	BlockInfo    *ArweaveBlockInfo     `protobuf:"bytes,2,opt,name=block_info,json=blockInfo,proto3" json:"block_info,omitempty"`
+	Transactions []*ArweaveTransaction `protobuf:"bytes,3,rep,name=transactions,proto3" json:"transactions,omitempty"`
 }
 
-func (m *MsgArweaveBlockInfo) Reset()         { *m = MsgArweaveBlockInfo{} }
-func (m *MsgArweaveBlockInfo) String() string { return proto.CompactTextString(m) }
-func (*MsgArweaveBlockInfo) ProtoMessage()    {}
-func (*MsgArweaveBlockInfo) Descriptor() ([]byte, []int) {
+func (m *MsgArweaveBlock) Reset()         { *m = MsgArweaveBlock{} }
+func (m *MsgArweaveBlock) String() string { return proto.CompactTextString(m) }
+func (*MsgArweaveBlock) ProtoMessage()    {}
+func (*MsgArweaveBlock) Descriptor() ([]byte, []int) {
 	return fileDescriptor_0ca98cc63da9ee56, []int{2}
 }
-func (m *MsgArweaveBlockInfo) XXX_Unmarshal(b []byte) error {
+func (m *MsgArweaveBlock) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgArweaveBlockInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgArweaveBlock) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgArweaveBlockInfo.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgArweaveBlock.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -132,61 +130,54 @@ func (m *MsgArweaveBlockInfo) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-func (m *MsgArweaveBlockInfo) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgArweaveBlockInfo.Merge(m, src)
+func (m *MsgArweaveBlock) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgArweaveBlock.Merge(m, src)
 }
-func (m *MsgArweaveBlockInfo) XXX_Size() int {
+func (m *MsgArweaveBlock) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgArweaveBlockInfo) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgArweaveBlockInfo.DiscardUnknown(m)
+func (m *MsgArweaveBlock) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgArweaveBlock.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgArweaveBlockInfo proto.InternalMessageInfo
+var xxx_messageInfo_MsgArweaveBlock proto.InternalMessageInfo
 
-func (m *MsgArweaveBlockInfo) GetCreator() string {
+func (m *MsgArweaveBlock) GetCreator() string {
 	if m != nil {
 		return m.Creator
 	}
 	return ""
 }
 
-func (m *MsgArweaveBlockInfo) GetHeight() uint64 {
+func (m *MsgArweaveBlock) GetBlockInfo() *ArweaveBlockInfo {
 	if m != nil {
-		return m.Height
-	}
-	return 0
-}
-
-func (m *MsgArweaveBlockInfo) GetTimestamp() uint64 {
-	if m != nil {
-		return m.Timestamp
-	}
-	return 0
-}
-
-func (m *MsgArweaveBlockInfo) GetHash() []byte {
-	if m != nil {
-		return m.Hash
+		return m.BlockInfo
 	}
 	return nil
 }
 
-type MsgArweaveBlockInfoResponse struct {
+func (m *MsgArweaveBlock) GetTransactions() []*ArweaveTransaction {
+	if m != nil {
+		return m.Transactions
+	}
+	return nil
 }
 
-func (m *MsgArweaveBlockInfoResponse) Reset()         { *m = MsgArweaveBlockInfoResponse{} }
-func (m *MsgArweaveBlockInfoResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgArweaveBlockInfoResponse) ProtoMessage()    {}
-func (*MsgArweaveBlockInfoResponse) Descriptor() ([]byte, []int) {
+type MsgArweaveBlockResponse struct {
+}
+
+func (m *MsgArweaveBlockResponse) Reset()         { *m = MsgArweaveBlockResponse{} }
+func (m *MsgArweaveBlockResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgArweaveBlockResponse) ProtoMessage()    {}
+func (*MsgArweaveBlockResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_0ca98cc63da9ee56, []int{3}
 }
-func (m *MsgArweaveBlockInfoResponse) XXX_Unmarshal(b []byte) error {
+func (m *MsgArweaveBlockResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *MsgArweaveBlockInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *MsgArweaveBlockResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_MsgArweaveBlockInfoResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_MsgArweaveBlockResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -196,133 +187,55 @@ func (m *MsgArweaveBlockInfoResponse) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *MsgArweaveBlockInfoResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgArweaveBlockInfoResponse.Merge(m, src)
+func (m *MsgArweaveBlockResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgArweaveBlockResponse.Merge(m, src)
 }
-func (m *MsgArweaveBlockInfoResponse) XXX_Size() int {
+func (m *MsgArweaveBlockResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *MsgArweaveBlockInfoResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgArweaveBlockInfoResponse.DiscardUnknown(m)
+func (m *MsgArweaveBlockResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgArweaveBlockResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MsgArweaveBlockInfoResponse proto.InternalMessageInfo
-
-type MsgArweaveTransaction struct {
-	Transaction github_com_warp_contracts_syncer_src_utils_arweave.Transaction `protobuf:"bytes,1,opt,name=transaction,proto3,customtype=github.com/warp-contracts/syncer/src/utils/arweave.Transaction" json:"transaction"`
-}
-
-func (m *MsgArweaveTransaction) Reset()         { *m = MsgArweaveTransaction{} }
-func (m *MsgArweaveTransaction) String() string { return proto.CompactTextString(m) }
-func (*MsgArweaveTransaction) ProtoMessage()    {}
-func (*MsgArweaveTransaction) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0ca98cc63da9ee56, []int{4}
-}
-func (m *MsgArweaveTransaction) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgArweaveTransaction) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgArweaveTransaction.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgArweaveTransaction) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgArweaveTransaction.Merge(m, src)
-}
-func (m *MsgArweaveTransaction) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgArweaveTransaction) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgArweaveTransaction.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgArweaveTransaction proto.InternalMessageInfo
-
-type MsgArweaveTransactionResponse struct {
-}
-
-func (m *MsgArweaveTransactionResponse) Reset()         { *m = MsgArweaveTransactionResponse{} }
-func (m *MsgArweaveTransactionResponse) String() string { return proto.CompactTextString(m) }
-func (*MsgArweaveTransactionResponse) ProtoMessage()    {}
-func (*MsgArweaveTransactionResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_0ca98cc63da9ee56, []int{5}
-}
-func (m *MsgArweaveTransactionResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *MsgArweaveTransactionResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_MsgArweaveTransactionResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *MsgArweaveTransactionResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MsgArweaveTransactionResponse.Merge(m, src)
-}
-func (m *MsgArweaveTransactionResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *MsgArweaveTransactionResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_MsgArweaveTransactionResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_MsgArweaveTransactionResponse proto.InternalMessageInfo
+var xxx_messageInfo_MsgArweaveBlockResponse proto.InternalMessageInfo
 
 func init() {
 	proto.RegisterType((*MsgDataItem)(nil), "sequencer.sequencer.MsgDataItem")
 	proto.RegisterType((*MsgDataItemResponse)(nil), "sequencer.sequencer.MsgDataItemResponse")
-	proto.RegisterType((*MsgArweaveBlockInfo)(nil), "sequencer.sequencer.MsgArweaveBlockInfo")
-	proto.RegisterType((*MsgArweaveBlockInfoResponse)(nil), "sequencer.sequencer.MsgArweaveBlockInfoResponse")
-	proto.RegisterType((*MsgArweaveTransaction)(nil), "sequencer.sequencer.MsgArweaveTransaction")
-	proto.RegisterType((*MsgArweaveTransactionResponse)(nil), "sequencer.sequencer.MsgArweaveTransactionResponse")
+	proto.RegisterType((*MsgArweaveBlock)(nil), "sequencer.sequencer.MsgArweaveBlock")
+	proto.RegisterType((*MsgArweaveBlockResponse)(nil), "sequencer.sequencer.MsgArweaveBlockResponse")
 }
 
 func init() { proto.RegisterFile("sequencer/sequencer/tx.proto", fileDescriptor_0ca98cc63da9ee56) }
 
 var fileDescriptor_0ca98cc63da9ee56 = []byte{
-	// 457 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0x4d, 0x6f, 0xd3, 0x40,
-	0x10, 0x8d, 0xdb, 0xa8, 0x34, 0x53, 0x0e, 0x68, 0x4b, 0x91, 0x31, 0xad, 0x13, 0xf9, 0x14, 0x21,
-	0xb0, 0x51, 0x11, 0x37, 0x84, 0x44, 0x54, 0x21, 0xf5, 0x50, 0x21, 0x59, 0x88, 0x03, 0x97, 0x68,
-	0xb3, 0xd9, 0xda, 0x16, 0xf1, 0xae, 0xd9, 0x1d, 0xd3, 0xe6, 0xc8, 0x3f, 0xe0, 0x3f, 0x71, 0xe9,
-	0xb1, 0x47, 0xc4, 0xa1, 0x42, 0xc9, 0x1f, 0x41, 0xfe, 0xb6, 0xc0, 0xd0, 0x70, 0xf2, 0x7c, 0x3c,
-	0xbf, 0xf7, 0x3c, 0xe3, 0x81, 0x43, 0xcd, 0x3f, 0xa5, 0x5c, 0x30, 0xae, 0xbc, 0x26, 0xc2, 0x4b,
-	0x37, 0x51, 0x12, 0x25, 0xd9, 0xaf, 0x6b, 0x6e, 0x1d, 0x59, 0xf7, 0x03, 0x19, 0xc8, 0xbc, 0xef,
-	0x65, 0x51, 0x01, 0xb5, 0x1e, 0x32, 0xa9, 0x63, 0xa9, 0xa7, 0x45, 0xa3, 0x48, 0xca, 0xd6, 0x93,
-	0x2e, 0x0d, 0xaa, 0x2e, 0x38, 0xfd, 0xcc, 0xa7, 0xb3, 0x85, 0x64, 0x1f, 0xa7, 0x91, 0x38, 0x2f,
-	0x89, 0x9c, 0x04, 0xf6, 0xce, 0x74, 0x70, 0x42, 0x91, 0x9e, 0x22, 0x8f, 0x09, 0x85, 0xc1, 0x9c,
-	0x22, 0x9d, 0x46, 0xc8, 0x63, 0xd3, 0x18, 0x19, 0xe3, 0xbb, 0x93, 0x93, 0xab, 0x9b, 0x61, 0xef,
-	0xc7, 0xcd, 0xf0, 0x65, 0x10, 0x61, 0x98, 0xce, 0x5c, 0x26, 0x63, 0xef, 0x82, 0xaa, 0xe4, 0x29,
-	0x93, 0x02, 0x15, 0x65, 0xa8, 0x3d, 0xbd, 0x2c, 0xe4, 0x14, 0xf3, 0x52, 0x8c, 0x16, 0xda, 0x9b,
-	0xa5, 0x62, 0xbe, 0x50, 0xee, 0x24, 0x7b, 0xf0, 0x8c, 0xd8, 0xdf, 0x9d, 0x97, 0x12, 0xce, 0x01,
-	0xec, 0xb7, 0x14, 0x7d, 0xae, 0x13, 0x29, 0x34, 0x77, 0x96, 0x79, 0xf9, 0x75, 0xe1, 0x73, 0x92,
-	0xd9, 0x3c, 0x15, 0xe7, 0x92, 0x98, 0x70, 0x87, 0x29, 0x4e, 0x51, 0xaa, 0xdc, 0xce, 0xc0, 0xaf,
-	0x52, 0xf2, 0x00, 0x76, 0x42, 0x1e, 0x05, 0x21, 0x9a, 0x5b, 0x23, 0x63, 0xdc, 0xf7, 0xcb, 0x8c,
-	0x1c, 0xc2, 0x00, 0xa3, 0x98, 0x6b, 0xa4, 0x71, 0x62, 0x6e, 0xe7, 0xad, 0xa6, 0x40, 0x08, 0xf4,
-	0x43, 0xaa, 0x43, 0xb3, 0x9f, 0x7d, 0x9b, 0x9f, 0xc7, 0xce, 0x11, 0x3c, 0xea, 0x90, 0xae, 0x9d,
-	0x7d, 0x31, 0xe0, 0xa0, 0xe9, 0xbf, 0x53, 0x54, 0x68, 0xca, 0x30, 0x92, 0x82, 0x84, 0xb0, 0x87,
-	0x4d, 0x5a, 0xce, 0xeb, 0x4d, 0x39, 0xaf, 0x57, 0xff, 0x31, 0xaf, 0x72, 0x3d, 0x6e, 0x8b, 0xdc,
-	0x6f, 0x53, 0x3b, 0x43, 0x38, 0xea, 0xb4, 0x50, 0x99, 0x3c, 0xfe, 0xb6, 0x05, 0xdb, 0x67, 0x3a,
-	0x20, 0xef, 0x61, 0xb7, 0x5e, 0xe6, 0xc8, 0xed, 0xf8, 0xa1, 0xdc, 0xd6, 0xf0, 0xad, 0xf1, 0x6d,
-	0x88, 0x8a, 0x9f, 0x08, 0xb8, 0xf7, 0xc7, 0x6e, 0xfe, 0xfa, 0xf6, 0xef, 0x48, 0xeb, 0xd9, 0xa6,
-	0xc8, 0x5a, 0x0f, 0x81, 0x74, 0x0c, 0xfc, 0xf1, 0x2d, 0x3c, 0x2d, 0xac, 0x75, 0xbc, 0x39, 0xb6,
-	0x52, 0x9d, 0xbc, 0xbd, 0x5a, 0xd9, 0xc6, 0xf5, 0xca, 0x36, 0x7e, 0xae, 0x6c, 0xe3, 0xeb, 0xda,
-	0xee, 0x5d, 0xaf, 0xed, 0xde, 0xf7, 0xb5, 0xdd, 0xfb, 0xf0, 0xe2, 0x1f, 0xdb, 0xac, 0xaf, 0xec,
-	0xb2, 0x7d, 0xd5, 0xcb, 0x84, 0xeb, 0xd9, 0x4e, 0x7e, 0x65, 0xcf, 0x7f, 0x05, 0x00, 0x00, 0xff,
-	0xff, 0xcd, 0xa4, 0x2b, 0x55, 0xf9, 0x03, 0x00, 0x00,
+	// 412 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0xc1, 0xeb, 0xd3, 0x30,
+	0x18, 0x6d, 0x1c, 0xe8, 0x96, 0x0d, 0x84, 0x4e, 0xb1, 0x2b, 0xd2, 0x95, 0xa2, 0xd8, 0xc3, 0xd6,
+	0xc2, 0xc4, 0x9b, 0x17, 0xcb, 0x2e, 0x43, 0x86, 0x50, 0xc4, 0x83, 0x97, 0x92, 0x66, 0x59, 0x2d,
+	0xae, 0x49, 0x4d, 0x52, 0xb7, 0xfd, 0x17, 0xfe, 0x45, 0x82, 0xb7, 0x1d, 0x77, 0x14, 0x0f, 0x43,
+	0xb6, 0x7f, 0x44, 0xba, 0xae, 0x5d, 0x27, 0x73, 0xfe, 0x4e, 0x7d, 0xe9, 0xf7, 0xf2, 0xde, 0xf7,
+	0x3d, 0xbe, 0xc0, 0xa7, 0x82, 0x7c, 0xc9, 0x08, 0xc5, 0x84, 0xbb, 0x67, 0x24, 0x57, 0x4e, 0xca,
+	0x99, 0x64, 0x6a, 0xb7, 0xfa, 0xe7, 0x54, 0x48, 0x7f, 0x14, 0xb1, 0x88, 0x1d, 0xeb, 0x6e, 0x8e,
+	0x0a, 0xaa, 0xde, 0xc3, 0x4c, 0x24, 0x4c, 0x04, 0x45, 0xa1, 0x38, 0x9c, 0x4a, 0x83, 0x6b, 0x1e,
+	0x88, 0x2f, 0x09, 0xfa, 0x4a, 0x82, 0x70, 0xc1, 0xf0, 0xe7, 0x20, 0xa6, 0xf3, 0x52, 0x68, 0x78,
+	0x8b, 0x2d, 0x39, 0xa2, 0x02, 0x61, 0x19, 0x33, 0x5a, 0xd0, 0xad, 0x14, 0xb6, 0xa7, 0x22, 0x1a,
+	0x23, 0x89, 0x26, 0x92, 0x24, 0x2a, 0x82, 0xad, 0x19, 0x92, 0x28, 0x88, 0x25, 0x49, 0x34, 0x60,
+	0x02, 0xbb, 0xe3, 0x8d, 0x37, 0xbb, 0xbe, 0xf2, 0x6b, 0xd7, 0x7f, 0x1d, 0xc5, 0xf2, 0x53, 0x16,
+	0x3a, 0x98, 0x25, 0xee, 0x12, 0xf1, 0x74, 0x88, 0x19, 0x95, 0x1c, 0x61, 0x29, 0x5c, 0xb1, 0x2e,
+	0xfc, 0x38, 0x76, 0x33, 0x19, 0x2f, 0x84, 0x1b, 0x66, 0x74, 0xb6, 0xe0, 0x8e, 0x97, 0x7f, 0x48,
+	0x2e, 0xec, 0x37, 0x67, 0x27, 0x0b, 0xeb, 0x31, 0xec, 0xd6, 0x1c, 0x7d, 0x22, 0x52, 0x46, 0x05,
+	0xb1, 0xbe, 0x03, 0xf8, 0x70, 0x2a, 0xa2, 0x37, 0x45, 0xa7, 0x5e, 0x3e, 0x96, 0xaa, 0xc1, 0x07,
+	0x98, 0x13, 0x24, 0x19, 0x3f, 0xf6, 0xd2, 0xf2, 0xcb, 0xa3, 0x3a, 0x86, 0xf0, 0x3c, 0xb9, 0x76,
+	0xcf, 0x04, 0x76, 0x7b, 0xf4, 0xdc, 0xb9, 0x12, 0xb7, 0x53, 0x17, 0x9c, 0xd0, 0x39, 0xf3, 0x5b,
+	0x61, 0x09, 0xd5, 0xb7, 0xb0, 0x53, 0x4b, 0x44, 0x68, 0x0d, 0xb3, 0x61, 0xb7, 0x47, 0x2f, 0x6e,
+	0xe9, 0xbc, 0x3f, 0xf3, 0xfd, 0x8b, 0xcb, 0x56, 0x0f, 0x3e, 0xf9, 0xab, 0xff, 0x72, 0xb6, 0xd1,
+	0x0f, 0x00, 0x1b, 0x53, 0x11, 0xa9, 0x1f, 0x60, 0xb3, 0x4a, 0xda, 0xbc, 0xea, 0x52, 0x4b, 0x46,
+	0xb7, 0xff, 0xc7, 0x28, 0xf5, 0xd5, 0x10, 0x76, 0x2e, 0x72, 0x7b, 0xf6, 0xaf, 0x9b, 0x75, 0x96,
+	0x3e, 0xb8, 0x0b, 0xab, 0xf4, 0xf0, 0xde, 0x6d, 0xf6, 0x06, 0xd8, 0xee, 0x0d, 0xf0, 0x7b, 0x6f,
+	0x80, 0x6f, 0x07, 0x43, 0xd9, 0x1e, 0x0c, 0xe5, 0xe7, 0xc1, 0x50, 0x3e, 0xbe, 0xba, 0xb1, 0x18,
+	0xd5, 0x06, 0xae, 0xea, 0xef, 0x63, 0x9d, 0x12, 0x11, 0xde, 0x3f, 0x2e, 0xe0, 0xcb, 0x3f, 0x01,
+	0x00, 0x00, 0xff, 0xff, 0x07, 0x10, 0x1e, 0x2c, 0x43, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -338,8 +251,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
 	DataItem(ctx context.Context, in *MsgDataItem, opts ...grpc.CallOption) (*MsgDataItemResponse, error)
-	ArweaveBlockInfo(ctx context.Context, in *MsgArweaveBlockInfo, opts ...grpc.CallOption) (*MsgArweaveBlockInfoResponse, error)
-	ArweaveTransaction(ctx context.Context, in *MsgArweaveTransaction, opts ...grpc.CallOption) (*MsgArweaveTransactionResponse, error)
+	ArweaveBlock(ctx context.Context, in *MsgArweaveBlock, opts ...grpc.CallOption) (*MsgArweaveBlockResponse, error)
 }
 
 type msgClient struct {
@@ -359,18 +271,9 @@ func (c *msgClient) DataItem(ctx context.Context, in *MsgDataItem, opts ...grpc.
 	return out, nil
 }
 
-func (c *msgClient) ArweaveBlockInfo(ctx context.Context, in *MsgArweaveBlockInfo, opts ...grpc.CallOption) (*MsgArweaveBlockInfoResponse, error) {
-	out := new(MsgArweaveBlockInfoResponse)
-	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Msg/ArweaveBlockInfo", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *msgClient) ArweaveTransaction(ctx context.Context, in *MsgArweaveTransaction, opts ...grpc.CallOption) (*MsgArweaveTransactionResponse, error) {
-	out := new(MsgArweaveTransactionResponse)
-	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Msg/ArweaveTransaction", in, out, opts...)
+func (c *msgClient) ArweaveBlock(ctx context.Context, in *MsgArweaveBlock, opts ...grpc.CallOption) (*MsgArweaveBlockResponse, error) {
+	out := new(MsgArweaveBlockResponse)
+	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Msg/ArweaveBlock", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -380,8 +283,7 @@ func (c *msgClient) ArweaveTransaction(ctx context.Context, in *MsgArweaveTransa
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	DataItem(context.Context, *MsgDataItem) (*MsgDataItemResponse, error)
-	ArweaveBlockInfo(context.Context, *MsgArweaveBlockInfo) (*MsgArweaveBlockInfoResponse, error)
-	ArweaveTransaction(context.Context, *MsgArweaveTransaction) (*MsgArweaveTransactionResponse, error)
+	ArweaveBlock(context.Context, *MsgArweaveBlock) (*MsgArweaveBlockResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -391,11 +293,8 @@ type UnimplementedMsgServer struct {
 func (*UnimplementedMsgServer) DataItem(ctx context.Context, req *MsgDataItem) (*MsgDataItemResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DataItem not implemented")
 }
-func (*UnimplementedMsgServer) ArweaveBlockInfo(ctx context.Context, req *MsgArweaveBlockInfo) (*MsgArweaveBlockInfoResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ArweaveBlockInfo not implemented")
-}
-func (*UnimplementedMsgServer) ArweaveTransaction(ctx context.Context, req *MsgArweaveTransaction) (*MsgArweaveTransactionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ArweaveTransaction not implemented")
+func (*UnimplementedMsgServer) ArweaveBlock(ctx context.Context, req *MsgArweaveBlock) (*MsgArweaveBlockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ArweaveBlock not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -420,38 +319,20 @@ func _Msg_DataItem_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Msg_ArweaveBlockInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgArweaveBlockInfo)
+func _Msg_ArweaveBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgArweaveBlock)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MsgServer).ArweaveBlockInfo(ctx, in)
+		return srv.(MsgServer).ArweaveBlock(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/sequencer.sequencer.Msg/ArweaveBlockInfo",
+		FullMethod: "/sequencer.sequencer.Msg/ArweaveBlock",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).ArweaveBlockInfo(ctx, req.(*MsgArweaveBlockInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Msg_ArweaveTransaction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MsgArweaveTransaction)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MsgServer).ArweaveTransaction(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/sequencer.sequencer.Msg/ArweaveTransaction",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MsgServer).ArweaveTransaction(ctx, req.(*MsgArweaveTransaction))
+		return srv.(MsgServer).ArweaveBlock(ctx, req.(*MsgArweaveBlock))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -465,12 +346,8 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Msg_DataItem_Handler,
 		},
 		{
-			MethodName: "ArweaveBlockInfo",
-			Handler:    _Msg_ArweaveBlockInfo_Handler,
-		},
-		{
-			MethodName: "ArweaveTransaction",
-			Handler:    _Msg_ArweaveTransaction_Handler,
+			MethodName: "ArweaveBlock",
+			Handler:    _Msg_ArweaveBlock_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -533,7 +410,7 @@ func (m *MsgDataItemResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgArweaveBlockInfo) Marshal() (dAtA []byte, err error) {
+func (m *MsgArweaveBlock) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -543,32 +420,41 @@ func (m *MsgArweaveBlockInfo) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgArweaveBlockInfo) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgArweaveBlock) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgArweaveBlockInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgArweaveBlock) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
-	if len(m.Hash) > 0 {
-		i -= len(m.Hash)
-		copy(dAtA[i:], m.Hash)
-		i = encodeVarintTx(dAtA, i, uint64(len(m.Hash)))
-		i--
-		dAtA[i] = 0x22
+	if len(m.Transactions) > 0 {
+		for iNdEx := len(m.Transactions) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Transactions[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
 	}
-	if m.Timestamp != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Timestamp))
+	if m.BlockInfo != nil {
+		{
+			size, err := m.BlockInfo.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
 		i--
-		dAtA[i] = 0x18
-	}
-	if m.Height != 0 {
-		i = encodeVarintTx(dAtA, i, uint64(m.Height))
-		i--
-		dAtA[i] = 0x10
+		dAtA[i] = 0x12
 	}
 	if len(m.Creator) > 0 {
 		i -= len(m.Creator)
@@ -580,7 +466,7 @@ func (m *MsgArweaveBlockInfo) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
-func (m *MsgArweaveBlockInfoResponse) Marshal() (dAtA []byte, err error) {
+func (m *MsgArweaveBlockResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -590,68 +476,12 @@ func (m *MsgArweaveBlockInfoResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MsgArweaveBlockInfoResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *MsgArweaveBlockResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *MsgArweaveBlockInfoResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgArweaveTransaction) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgArweaveTransaction) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgArweaveTransaction) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size := m.Transaction.Size()
-		i -= size
-		if _, err := m.Transaction.MarshalTo(dAtA[i:]); err != nil {
-			return 0, err
-		}
-		i = encodeVarintTx(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *MsgArweaveTransactionResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *MsgArweaveTransactionResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *MsgArweaveTransactionResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *MsgArweaveBlockResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -690,7 +520,7 @@ func (m *MsgDataItemResponse) Size() (n int) {
 	return n
 }
 
-func (m *MsgArweaveBlockInfo) Size() (n int) {
+func (m *MsgArweaveBlock) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -700,40 +530,20 @@ func (m *MsgArweaveBlockInfo) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
 	}
-	if m.Height != 0 {
-		n += 1 + sovTx(uint64(m.Height))
-	}
-	if m.Timestamp != 0 {
-		n += 1 + sovTx(uint64(m.Timestamp))
-	}
-	l = len(m.Hash)
-	if l > 0 {
+	if m.BlockInfo != nil {
+		l = m.BlockInfo.Size()
 		n += 1 + l + sovTx(uint64(l))
 	}
-	return n
-}
-
-func (m *MsgArweaveBlockInfoResponse) Size() (n int) {
-	if m == nil {
-		return 0
+	if len(m.Transactions) > 0 {
+		for _, e := range m.Transactions {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
-	var l int
-	_ = l
 	return n
 }
 
-func (m *MsgArweaveTransaction) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.Transaction.Size()
-	n += 1 + l + sovTx(uint64(l))
-	return n
-}
-
-func (m *MsgArweaveTransactionResponse) Size() (n int) {
+func (m *MsgArweaveBlockResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -881,7 +691,7 @@ func (m *MsgDataItemResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgArweaveBlockInfo) Unmarshal(dAtA []byte) error {
+func (m *MsgArweaveBlock) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -904,10 +714,10 @@ func (m *MsgArweaveBlockInfo) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgArweaveBlockInfo: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgArweaveBlock: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgArweaveBlockInfo: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgArweaveBlock: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -943,10 +753,10 @@ func (m *MsgArweaveBlockInfo) Unmarshal(dAtA []byte) error {
 			m.Creator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Height", wireType)
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BlockInfo", wireType)
 			}
-			m.Height = 0
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -956,35 +766,33 @@ func (m *MsgArweaveBlockInfo) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Height |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.BlockInfo == nil {
+				m.BlockInfo = &ArweaveBlockInfo{}
+			}
+			if err := m.BlockInfo.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			m.Timestamp = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Timestamp |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Hash", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Transactions", wireType)
 			}
-			var byteLen int
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTx
@@ -994,156 +802,23 @@ func (m *MsgArweaveBlockInfo) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthTx
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthTx
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Hash = append(m.Hash[:0], dAtA[iNdEx:postIndex]...)
-			if m.Hash == nil {
-				m.Hash = []byte{}
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgArweaveBlockInfoResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgArweaveBlockInfoResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgArweaveBlockInfoResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		default:
-			iNdEx = preIndex
-			skippy, err := skipTx(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthTx
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *MsgArweaveTransaction) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowTx
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: MsgArweaveTransaction: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgArweaveTransaction: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Transaction", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowTx
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthTx
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex < 0 {
-				return ErrInvalidLengthTx
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.Transaction.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.Transactions = append(m.Transactions, &ArweaveTransaction{})
+			if err := m.Transactions[len(m.Transactions)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1168,7 +843,7 @@ func (m *MsgArweaveTransaction) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *MsgArweaveTransactionResponse) Unmarshal(dAtA []byte) error {
+func (m *MsgArweaveBlockResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1191,10 +866,10 @@ func (m *MsgArweaveTransactionResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MsgArweaveTransactionResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: MsgArweaveBlockResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MsgArweaveTransactionResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MsgArweaveBlockResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

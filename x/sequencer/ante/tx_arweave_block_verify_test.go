@@ -10,60 +10,47 @@ import (
 )
 
 func TestArweaveBlockTx(t *testing.T) {
-	blockInfo := test.ArweaveBlockInfo()
-	interaction := test.ArweaveL1Interaction(t)
-	tx := createTxWithMsgs(t, &blockInfo, &interaction)
+	block := test.ArweaveBlock()
+	tx := createTxWithMsgs(t, &block)
 
 	err := verifyArweaveBlockTx(tx)
 
 	require.NoError(t, err)
 }
 
-func TestArweaveBlockTxNoBlockInfo(t *testing.T) {
-	interaction := test.ArweaveL1Interaction(t)
-	tx := createTxWithMsgs(t, &interaction)
+func TestArweaveBlockTxWithAnotherMessageAfter(t *testing.T) {
+	block := test.ArweaveBlock()
+	dataItem := test.ArweaveL2Interaction(t)
+	tx := createTxWithMsgs(t, &block, &dataItem)
 
 	err := verifyArweaveBlockTx(tx)
 
-	require.ErrorIs(t, err, types.ErrInvalidArweaveBlockTx)
+	require.ErrorIs(t, err, types.ErrTooManyMessages)
 }
 
-func TestArweaveBlockTxOnlyBlockInfo(t *testing.T) {
-	blockInfo := test.ArweaveBlockInfo()
-	tx := createTxWithMsgs(t, &blockInfo)
+func TestArweaveBlockTxWithAnotherMessageBefore(t *testing.T) {
+	dataItem := test.ArweaveL2Interaction(t)
+	block := test.ArweaveBlock()
+	tx := createTxWithMsgs(t, &dataItem, &block)
+
+	err := verifyArweaveBlockTx(tx)
+
+	require.ErrorIs(t, err, types.ErrTooManyMessages)
+}
+
+func TestArweaveBlockTxWithoutBlock(t *testing.T) {
+	dataItem := test.ArweaveL2Interaction(t)
+	tx := createTxWithMsgs(t, &dataItem)
 
 	err := verifyArweaveBlockTx(tx)
 
 	require.NoError(t, err)
 }
 
-func TestArweaveBlockTxBlockInfoAfterL1Interaction(t *testing.T) {
-	interaction := test.ArweaveL1Interaction(t)
-	blockInfo := test.ArweaveBlockInfo()
-	tx := createTxWithMsgs(t, &interaction, &blockInfo)
+func TestArweaveBlockTxWithoutMsgs(t *testing.T) {
+	tx := createTxWithMsgs(t)
 
 	err := verifyArweaveBlockTx(tx)
 
-	require.ErrorIs(t, err, types.ErrInvalidArweaveBlockTx)
-}
-
-func TestArweaveBlockTxBlockInfoAfterL2Interaction(t *testing.T) {
-	interaction := test.ArweaveL2Interaction(t)
-	blockInfo := test.ArweaveBlockInfo()
-	tx := createTxWithMsgs(t, &interaction, &blockInfo)
-
-	err := verifyArweaveBlockTx(tx)
-
-	require.ErrorIs(t, err, types.ErrInvalidArweaveBlockTx)
-}
-
-func TestArweaveBlockTxWithL2Interaction(t *testing.T) {
-	blockInfo := test.ArweaveBlockInfo()
-	l1Interaction := test.ArweaveL1Interaction(t)
-	l2Interaction := test.ArweaveL2Interaction(t)
-	tx := createTxWithMsgs(t, &blockInfo, &l1Interaction, &l2Interaction)
-
-	err := verifyArweaveBlockTx(tx)
-
-	require.ErrorIs(t, err, types.ErrInvalidArweaveBlockTx)
+	require.NoError(t, err)
 }

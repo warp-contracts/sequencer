@@ -1,0 +1,11 @@
+syntax = "proto3";
+package sequencer.sequencer;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
+
+message ArweaveTransaction {
+  bytes transaction = 2 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/arweave.Transaction", (gogoproto.nullable) = false];
+}
+

@@ -7,9 +7,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-// It checks if the transaction representing an Arweave block contains messages in the following order:
-// - the first message is block information (MsgArweaveBlockInfo)
-// - subsequent messages are L1 interactions (MsgArweaveTransaction)
+// It checks if the transaction representing an Arweave block contains exacly one message: MsgArweaveBlock
 type ArweaveBlockTxDecorator struct {
 }
 
@@ -23,38 +21,18 @@ func (abtd ArweaveBlockTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 
 func verifyArweaveBlockTx(tx sdk.Tx) error {
 	msgs := tx.GetMsgs()
-	containsBlockInfoMsg := false
-
-	for i, msg := range msgs {
-		if containsBlockInfoMsg {
-			if !isL1Interaction(msg) {
-				return errors.Wrap(types.ErrInvalidArweaveBlockTx,
-					"tx with an Arweave block can only contain block info and L1 interactions")
+	for _, msg := range msgs {
+		_, isArweaveBlock := msg.(*types.MsgArweaveBlock)
+		if isArweaveBlock {
+			if len(msgs) > 1 {
+				err := errors.Wrapf(types.ErrTooManyMessages,
+					"transaction with arweave block can have only one message, and it has: %d", len(msgs))
+				return err
 			}
-		} else {
-			if isArweaveBlockInfo(msg) {
-				if i > 0 {
-					return errors.Wrap(types.ErrInvalidArweaveBlockTx,
-						"arweave block info must be the first message in the transaction")
-				}
-				containsBlockInfoMsg = true
-			} else if isL1Interaction(msg) {
-				return errors.Wrap(types.ErrInvalidArweaveBlockTx,
-					"L1 interaction must be in tx after block info")
-			}
+			return nil
 		}
 	}
 
 	return nil
 
-}
-
-func isArweaveBlockInfo(msg sdk.Msg) bool {
-	_, isBlockInfo := msg.(*types.MsgArweaveBlockInfo)
-	return isBlockInfo
-}
-
-func isL1Interaction(msg sdk.Msg) bool {
-	_, isArweaveTransaction := msg.(*types.MsgArweaveTransaction)
-	return isArweaveTransaction
 }

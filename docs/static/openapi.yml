@@ -75457,9 +75457,13 @@ definitions:
       hash:
         type: string
         format: byte
-  sequencer.sequencer.MsgArweaveBlockInfoResponse:
+  sequencer.sequencer.ArweaveTransaction:
     type: object
-  sequencer.sequencer.MsgArweaveTransactionResponse:
+    properties:
+      transaction:
+        type: string
+        format: byte
+  sequencer.sequencer.MsgArweaveBlockResponse:
     type: object
   sequencer.sequencer.MsgDataItemResponse:
     type: object

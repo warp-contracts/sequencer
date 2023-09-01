@@ -34,10 +34,6 @@ func NewTxBuilder() client.TxBuilder {
 	return testutil.MakeTestEncodingConfig().TxConfig.NewTxBuilder()
 }
 
-func ArweaveL1Interaction(t *testing.T) types.MsgArweaveTransaction {
-	return types.MsgArweaveTransaction{}
-}
-
 func ArweaveL2Interaction(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {
 	signer, err := bundlr.NewArweaveSigner(EMPTY_ARWEAVE_WALLET)
 	require.NoError(t, err)
@@ -69,6 +65,14 @@ func createExampleDataItem(t *testing.T, signer bundlr.Signer, tags ...bundlr.Ta
 
 var ExampleArweaveBlockHash = []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2}
 
-func ArweaveBlockInfo() types.MsgArweaveBlockInfo {
-	return types.MsgArweaveBlockInfo{Creator: "creator", Height: 1431216, Timestamp: 1692353416, Hash: ExampleArweaveBlockHash}
+func ArweaveBlock() types.MsgArweaveBlock {
+	return types.MsgArweaveBlock{
+		Creator: "creator",
+		BlockInfo: &types.ArweaveBlockInfo{
+			Height:    1431216,
+			Timestamp: 1692353416,
+			Hash:      ExampleArweaveBlockHash,
+		},
+		Transactions: []*types.ArweaveTransaction{}, // TODO: add some test transactions
+	}
 }

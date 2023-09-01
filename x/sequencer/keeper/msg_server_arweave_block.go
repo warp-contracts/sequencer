@@ -12,29 +12,37 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func (k msgServer) ArweaveBlockInfo(goCtx context.Context, msg *types.MsgArweaveBlockInfo) (*types.MsgArweaveBlockInfoResponse, error) {
+func (k msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlock) (*types.MsgArweaveBlockResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	var newValue = &types.ArweaveBlockInfo{
-		Height:    msg.Height,
-		Timestamp: msg.Timestamp,
-		Hash:      msg.Hash,
-	}
-
-	if err := k.checkBlockIsOldEnough(ctx, newValue); err != nil {
+	if err := k.setNewArweaveBlockInfo(ctx, msg.BlockInfo); err != nil {
 		return nil, err
 	}
 
-	if err := k.compareBlockWithPreviousOne(ctx, newValue); err != nil {
-		return nil, err
+	return &types.MsgArweaveBlockResponse{}, nil
+}
+
+func (k msgServer) setNewArweaveBlockInfo(ctx sdk.Context, blockInfo *types.ArweaveBlockInfo) error {
+	var newBlock = &types.ArweaveBlockInfo{
+		Height:    blockInfo.Height,
+		Timestamp: blockInfo.Timestamp,
+		Hash:      blockInfo.Hash,
 	}
 
-	if err := k.compareWithNextBlockAndRemove(ctx, newValue); err != nil {
-		return nil, err
+	if err := k.checkBlockIsOldEnough(ctx, newBlock); err != nil {
+		return err
 	}
 
-	k.SetLastArweaveBlock(ctx, *newValue)
-	return &types.MsgArweaveBlockInfoResponse{}, nil
+	if err := k.compareBlockWithPreviousOne(ctx, newBlock); err != nil {
+		return err
+	}
+
+	if err := k.compareWithNextBlockAndRemove(ctx, newBlock); err != nil {
+		return err
+	}
+
+	k.SetLastArweaveBlock(ctx, *newBlock)
+	return nil
 }
 
 func (k msgServer) checkBlockIsOldEnough(ctx sdk.Context, newValue *types.ArweaveBlockInfo) error {
