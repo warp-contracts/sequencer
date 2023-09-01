@@ -13,5 +13,5 @@ target "sequencer-dev" {
 
 target "sequencer-release" {
   inherits = ["sequencer-dev"]
-  platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64"]
 }
