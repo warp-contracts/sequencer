@@ -9,6 +9,7 @@ import (
 	"github.com/warp-contracts/syncer/src/utils/config"
 	"github.com/warp-contracts/syncer/src/utils/listener"
 	"github.com/warp-contracts/syncer/src/utils/monitoring"
+	"github.com/warp-contracts/syncer/src/utils/smartweave"
 	"github.com/warp-contracts/syncer/src/utils/task"
 )
 
@@ -67,12 +68,27 @@ func (store *Store) processPayload(payload *listener.Payload) {
 	store.mtx.Unlock()
 }
 
-func transactions(payload *listener.Payload) []syncer_arweave.Transaction {
-	txs := make([]syncer_arweave.Transaction, 0, len(payload.Transactions))
+func transactions(payload *listener.Payload) []*types.ArweaveTransaction {
+	txs := make([]*types.ArweaveTransaction, 0, len(payload.Transactions))
 	for _, tx := range payload.Transactions {
-		txs = append(txs, *tx)
+		contract := getContractFromTag(tx)
+		if contract != nil {
+			txs = append(txs, &types.ArweaveTransaction{
+				Id:       tx.ID,
+				Contract: contract,
+			})
+		}
 	}
 	return txs
+}
+
+func getContractFromTag(tx *syncer_arweave.Transaction) syncer_arweave.Base64String {
+	for _, tag := range tx.Tags {
+		if string(tag.Name) == smartweave.TagContractTxId {
+			return tag.Value
+		}
+	}
+	return nil
 }
 
 func (store *Store) getAndClearBlocks() []types.NextArweaveBlock {

@@ -15,18 +15,18 @@ import (
 func (k msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlock) (*types.MsgArweaveBlockResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if err := k.setNewArweaveBlockInfo(ctx, msg.BlockInfo); err != nil {
+	if err := k.setNewArweaveBlockInfo(ctx, msg); err != nil {
 		return nil, err
 	}
 
 	return &types.MsgArweaveBlockResponse{}, nil
 }
 
-func (k msgServer) setNewArweaveBlockInfo(ctx sdk.Context, blockInfo *types.ArweaveBlockInfo) error {
+func (k msgServer) setNewArweaveBlockInfo(ctx sdk.Context, block *types.MsgArweaveBlock) error {
 	var newBlock = &types.ArweaveBlockInfo{
-		Height:    blockInfo.Height,
-		Timestamp: blockInfo.Timestamp,
-		Hash:      blockInfo.Hash,
+		Height:    block.BlockInfo.Height,
+		Timestamp: block.BlockInfo.Timestamp,
+		Hash:      block.BlockInfo.Hash,
 	}
 
 	if err := k.checkBlockIsOldEnough(ctx, newBlock); err != nil {
@@ -37,7 +37,7 @@ func (k msgServer) setNewArweaveBlockInfo(ctx sdk.Context, blockInfo *types.Arwe
 		return err
 	}
 
-	if err := k.compareWithNextBlockAndRemove(ctx, newBlock); err != nil {
+	if err := k.compareWithNextBlockAndRemove(ctx, block); err != nil {
 		return err
 	}
 
@@ -74,17 +74,24 @@ func (k msgServer) compareBlockWithPreviousOne(ctx sdk.Context, newValue *types.
 	return nil
 }
 
-func (k msgServer) compareWithNextBlockAndRemove(ctx sdk.Context, newValue *types.ArweaveBlockInfo) error {
-	heightStr := strconv.FormatUint(newValue.Height, 10)
+func (k msgServer) compareWithNextBlockAndRemove(ctx sdk.Context, block *types.MsgArweaveBlock) error {
+	heightStr := strconv.FormatUint(block.BlockInfo.Height, 10)
 	nextArweaveBlock, isFound := k.GetNextArweaveBlock(ctx, heightStr)
 	if isFound {
-		if newValue.Timestamp != nextArweaveBlock.BlockInfo.Timestamp {
+		if block.BlockInfo.Timestamp != nextArweaveBlock.BlockInfo.Timestamp {
 			return errors.Wrap(types.ErrArweaveBlockTimestampMismatch,
 				"The timestamp of the Arweave block does not match the timestamp of the block downloaded by the Validator")
 		}
-		if !bytes.Equal(newValue.Hash, nextArweaveBlock.BlockInfo.Hash) {
+		if !bytes.Equal(block.BlockInfo.Hash, nextArweaveBlock.BlockInfo.Hash) {
 			return errors.Wrap(types.ErrArweaveBlockHashMismatch,
 				"The hash of the Arweave block does not match the hash of the block downloaded by the Validator")
+		}
+
+		if transactionsDiffer(block.Transactions, nextArweaveBlock.Transactions) {
+			return errors.Wrapf(types.ErrArweaveBlockTransactionsMismatch,
+				"Arweave block transactions do not match the block downloaded by the Validator transactions for block %d",
+			block.BlockInfo.Height)
+
 		}
 
 		k.RemoveNextArweaveBlock(ctx, heightStr)
@@ -93,4 +100,20 @@ func (k msgServer) compareWithNextBlockAndRemove(ctx sdk.Context, newValue *type
 		return errors.Wrapf(types.ErrInvalidArweaveBlockTx,
 			"The validator did not fetch the Arweave block at height %s", heightStr)
 	}
+}
+
+func transactionsDiffer(transactions1 []*types.ArweaveTransaction, transactions2 []*types.ArweaveTransaction) bool {
+	if len(transactions1) != len(transactions2) {
+		return true
+	}
+	
+	for i := 0; i < len(transactions1); i++ {
+		tx1 := transactions1[i]
+		tx2 := transactions2[i]
+		if !bytes.Equal(tx1.Id, tx2.Id) || !bytes.Equal(tx1.Contract, tx2.Contract) {
+			return true
+		}
+	}
+
+	return false
 }

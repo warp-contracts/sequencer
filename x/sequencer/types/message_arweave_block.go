@@ -51,11 +51,5 @@ func (msg *MsgArweaveBlock) ValidateBasic() error {
 		return errors.Wrap(ErrBadArweaveTimestamp, "block timestamp should be greater than 1690809539")
 	}
 
-	for _, transaction := range msg.Transactions {
-		if err := transaction.Transaction.Verify(); err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
