@@ -6,7 +6,7 @@ package types
 import (
 	context "context"
 	fmt "fmt"
-	query "github.com/cosmos/cosmos-sdk/types/query"
+	_ "github.com/cosmos/cosmos-sdk/types/query"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
@@ -193,242 +193,43 @@ func (m *QueryGetLastArweaveBlockResponse) GetLastArweaveBlock() ArweaveBlockInf
 	return ArweaveBlockInfo{}
 }
 
-type QueryGetNextArweaveBlockRequest struct {
-	Height string `protobuf:"bytes,1,opt,name=height,proto3" json:"height,omitempty"`
-}
-
-func (m *QueryGetNextArweaveBlockRequest) Reset()         { *m = QueryGetNextArweaveBlockRequest{} }
-func (m *QueryGetNextArweaveBlockRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetNextArweaveBlockRequest) ProtoMessage()    {}
-func (*QueryGetNextArweaveBlockRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6cc648c12b425b9e, []int{4}
-}
-func (m *QueryGetNextArweaveBlockRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryGetNextArweaveBlockRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryGetNextArweaveBlockRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryGetNextArweaveBlockRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetNextArweaveBlockRequest.Merge(m, src)
-}
-func (m *QueryGetNextArweaveBlockRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryGetNextArweaveBlockRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetNextArweaveBlockRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryGetNextArweaveBlockRequest proto.InternalMessageInfo
-
-func (m *QueryGetNextArweaveBlockRequest) GetHeight() string {
-	if m != nil {
-		return m.Height
-	}
-	return ""
-}
-
-type QueryGetNextArweaveBlockResponse struct {
-	NextArweaveBlock NextArweaveBlock `protobuf:"bytes,1,opt,name=nextArweaveBlock,proto3" json:"nextArweaveBlock"`
-}
-
-func (m *QueryGetNextArweaveBlockResponse) Reset()         { *m = QueryGetNextArweaveBlockResponse{} }
-func (m *QueryGetNextArweaveBlockResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetNextArweaveBlockResponse) ProtoMessage()    {}
-func (*QueryGetNextArweaveBlockResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6cc648c12b425b9e, []int{5}
-}
-func (m *QueryGetNextArweaveBlockResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryGetNextArweaveBlockResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryGetNextArweaveBlockResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryGetNextArweaveBlockResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetNextArweaveBlockResponse.Merge(m, src)
-}
-func (m *QueryGetNextArweaveBlockResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryGetNextArweaveBlockResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetNextArweaveBlockResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryGetNextArweaveBlockResponse proto.InternalMessageInfo
-
-func (m *QueryGetNextArweaveBlockResponse) GetNextArweaveBlock() NextArweaveBlock {
-	if m != nil {
-		return m.NextArweaveBlock
-	}
-	return NextArweaveBlock{}
-}
-
-type QueryAllNextArweaveBlockRequest struct {
-	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
-}
-
-func (m *QueryAllNextArweaveBlockRequest) Reset()         { *m = QueryAllNextArweaveBlockRequest{} }
-func (m *QueryAllNextArweaveBlockRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryAllNextArweaveBlockRequest) ProtoMessage()    {}
-func (*QueryAllNextArweaveBlockRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6cc648c12b425b9e, []int{6}
-}
-func (m *QueryAllNextArweaveBlockRequest) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryAllNextArweaveBlockRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryAllNextArweaveBlockRequest.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryAllNextArweaveBlockRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllNextArweaveBlockRequest.Merge(m, src)
-}
-func (m *QueryAllNextArweaveBlockRequest) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryAllNextArweaveBlockRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllNextArweaveBlockRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryAllNextArweaveBlockRequest proto.InternalMessageInfo
-
-func (m *QueryAllNextArweaveBlockRequest) GetPagination() *query.PageRequest {
-	if m != nil {
-		return m.Pagination
-	}
-	return nil
-}
-
-type QueryAllNextArweaveBlockResponse struct {
-	NextArweaveBlock []NextArweaveBlock  `protobuf:"bytes,1,rep,name=nextArweaveBlock,proto3" json:"nextArweaveBlock"`
-	Pagination       *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
-}
-
-func (m *QueryAllNextArweaveBlockResponse) Reset()         { *m = QueryAllNextArweaveBlockResponse{} }
-func (m *QueryAllNextArweaveBlockResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryAllNextArweaveBlockResponse) ProtoMessage()    {}
-func (*QueryAllNextArweaveBlockResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_6cc648c12b425b9e, []int{7}
-}
-func (m *QueryAllNextArweaveBlockResponse) XXX_Unmarshal(b []byte) error {
-	return m.Unmarshal(b)
-}
-func (m *QueryAllNextArweaveBlockResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	if deterministic {
-		return xxx_messageInfo_QueryAllNextArweaveBlockResponse.Marshal(b, m, deterministic)
-	} else {
-		b = b[:cap(b)]
-		n, err := m.MarshalToSizedBuffer(b)
-		if err != nil {
-			return nil, err
-		}
-		return b[:n], nil
-	}
-}
-func (m *QueryAllNextArweaveBlockResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllNextArweaveBlockResponse.Merge(m, src)
-}
-func (m *QueryAllNextArweaveBlockResponse) XXX_Size() int {
-	return m.Size()
-}
-func (m *QueryAllNextArweaveBlockResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllNextArweaveBlockResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_QueryAllNextArweaveBlockResponse proto.InternalMessageInfo
-
-func (m *QueryAllNextArweaveBlockResponse) GetNextArweaveBlock() []NextArweaveBlock {
-	if m != nil {
-		return m.NextArweaveBlock
-	}
-	return nil
-}
-
-func (m *QueryAllNextArweaveBlockResponse) GetPagination() *query.PageResponse {
-	if m != nil {
-		return m.Pagination
-	}
-	return nil
-}
-
 func init() {
 	proto.RegisterType((*QueryParamsRequest)(nil), "sequencer.sequencer.QueryParamsRequest")
 	proto.RegisterType((*QueryParamsResponse)(nil), "sequencer.sequencer.QueryParamsResponse")
 	proto.RegisterType((*QueryGetLastArweaveBlockRequest)(nil), "sequencer.sequencer.QueryGetLastArweaveBlockRequest")
 	proto.RegisterType((*QueryGetLastArweaveBlockResponse)(nil), "sequencer.sequencer.QueryGetLastArweaveBlockResponse")
-	proto.RegisterType((*QueryGetNextArweaveBlockRequest)(nil), "sequencer.sequencer.QueryGetNextArweaveBlockRequest")
-	proto.RegisterType((*QueryGetNextArweaveBlockResponse)(nil), "sequencer.sequencer.QueryGetNextArweaveBlockResponse")
-	proto.RegisterType((*QueryAllNextArweaveBlockRequest)(nil), "sequencer.sequencer.QueryAllNextArweaveBlockRequest")
-	proto.RegisterType((*QueryAllNextArweaveBlockResponse)(nil), "sequencer.sequencer.QueryAllNextArweaveBlockResponse")
 }
 
 func init() { proto.RegisterFile("sequencer/sequencer/query.proto", fileDescriptor_6cc648c12b425b9e) }
 
 var fileDescriptor_6cc648c12b425b9e = []byte{
-	// 590 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x95, 0x41, 0x6f, 0x12, 0x4f,
-	0x18, 0xc6, 0x99, 0xfe, 0xff, 0x25, 0x71, 0xbc, 0x34, 0x43, 0x63, 0x0c, 0x9a, 0x05, 0x37, 0xd1,
-	0x36, 0x4d, 0xdd, 0x49, 0xd1, 0xaa, 0x5c, 0x6c, 0xe0, 0x20, 0x31, 0x31, 0x8a, 0x5c, 0x4c, 0xbc,
-	0x90, 0x61, 0x33, 0x5d, 0x36, 0x2e, 0x33, 0xdb, 0x9d, 0xa1, 0xa5, 0x69, 0xbc, 0xf8, 0x05, 0x34,
-	0xf1, 0x03, 0x79, 0xd0, 0x03, 0xc7, 0x26, 0x5e, 0x3c, 0x19, 0x03, 0x1e, 0xfd, 0x10, 0x86, 0x99,
-	0xa1, 0xc0, 0xb2, 0xbb, 0x54, 0xbd, 0x0d, 0x3b, 0xcf, 0xfb, 0x3e, 0xbf, 0x07, 0xde, 0x77, 0x81,
-	0x25, 0x41, 0x8f, 0xfa, 0x94, 0xb9, 0x34, 0xc2, 0xb3, 0xd3, 0x51, 0x9f, 0x46, 0xa7, 0x4e, 0x18,
-	0x71, 0xc9, 0x51, 0xe1, 0xe2, 0xb1, 0x73, 0x71, 0x2a, 0x6e, 0x7a, 0xdc, 0xe3, 0xea, 0x1e, 0x4f,
-	0x4e, 0x5a, 0x5a, 0xbc, 0xe9, 0x71, 0xee, 0x05, 0x14, 0x93, 0xd0, 0xc7, 0x84, 0x31, 0x2e, 0x89,
-	0xf4, 0x39, 0x13, 0xe6, 0x76, 0xc7, 0xe5, 0xa2, 0xc7, 0x05, 0xee, 0x10, 0x41, 0xb5, 0x03, 0x3e,
-	0xde, 0xeb, 0x50, 0x49, 0xf6, 0x70, 0x48, 0x3c, 0x9f, 0x29, 0xb1, 0xd1, 0x96, 0x93, 0xa8, 0x42,
-	0x12, 0x91, 0xde, 0xb4, 0xdb, 0x6e, 0x92, 0x82, 0x44, 0x27, 0x94, 0x1c, 0xd3, 0x76, 0x27, 0xe0,
-	0xee, 0x9b, 0xb6, 0xcf, 0x0e, 0x79, 0x96, 0x9a, 0xd1, 0x81, 0x6c, 0x2f, 0x94, 0x68, 0xb5, 0xbd,
-	0x09, 0xd1, 0xcb, 0x09, 0x5f, 0x53, 0x19, 0xb6, 0x26, 0x05, 0x42, 0xda, 0x4d, 0x58, 0x58, 0x78,
-	0x2a, 0x42, 0xce, 0x04, 0x45, 0x55, 0x98, 0xd7, 0x60, 0xd7, 0x41, 0x19, 0x6c, 0x5f, 0xad, 0xdc,
-	0x70, 0x12, 0xbe, 0x30, 0x47, 0x17, 0xd5, 0xff, 0x1f, 0x7e, 0x2f, 0xe5, 0x5a, 0xa6, 0xc0, 0xbe,
-	0x05, 0x4b, 0xaa, 0x63, 0x83, 0xca, 0x67, 0x44, 0xc8, 0x9a, 0x46, 0xa9, 0x4f, 0x48, 0xa6, 0xa6,
-	0x67, 0xb0, 0x9c, 0x2e, 0x31, 0x04, 0xaf, 0xe0, 0x46, 0xfc, 0xce, 0xb0, 0xdc, 0x4e, 0x64, 0x99,
-	0x17, 0x3e, 0x65, 0x87, 0xdc, 0x50, 0x2d, 0x35, 0xb1, 0xab, 0x33, 0xbe, 0xe7, 0x74, 0x90, 0xc4,
-	0x87, 0xae, 0xc1, 0x7c, 0x97, 0xfa, 0x5e, 0x57, 0x2a, 0xc7, 0x2b, 0x2d, 0xf3, 0x69, 0x9e, 0x7b,
-	0xb9, 0x74, 0xc6, 0xcd, 0x62, 0x77, 0x99, 0xdc, 0xf1, 0x46, 0x53, 0xee, 0x78, 0x13, 0xdb, 0x37,
-	0xdc, 0xb5, 0x20, 0x48, 0xe3, 0x7e, 0x02, 0xe1, 0x6c, 0xe8, 0x8c, 0xeb, 0x1d, 0x47, 0x4f, 0xa8,
-	0x33, 0x99, 0x50, 0x47, 0xef, 0x80, 0x99, 0x50, 0xa7, 0x49, 0x3c, 0x6a, 0x6a, 0x5b, 0x73, 0x95,
-	0xf6, 0x17, 0x60, 0x82, 0x26, 0x7a, 0x65, 0x06, 0xfd, 0xef, 0x9f, 0x83, 0xa2, 0xc6, 0x42, 0x8a,
-	0x35, 0x95, 0x62, 0x6b, 0x65, 0x0a, 0x4d, 0x35, 0x1f, 0xa3, 0xf2, 0x6b, 0x1d, 0xae, 0xab, 0x18,
-	0xe8, 0x3d, 0x80, 0x79, 0x3d, 0xac, 0x68, 0x2b, 0x11, 0x6e, 0x79, 0x33, 0x8a, 0xdb, 0xab, 0x85,
-	0xda, 0xd3, 0xae, 0xbc, 0xfb, 0xfa, 0xf3, 0xe3, 0xda, 0x2e, 0xda, 0xc1, 0x27, 0x24, 0x0a, 0xef,
-	0xba, 0x9c, 0xc9, 0x88, 0xb8, 0x52, 0xe0, 0xf4, 0x7d, 0x47, 0x9f, 0xc0, 0xf2, 0x7c, 0xa3, 0xfb,
-	0xe9, 0x96, 0xe9, 0xdb, 0x54, 0xdc, 0xff, 0xc3, 0x2a, 0x43, 0xfd, 0x58, 0x51, 0x3f, 0x42, 0x0f,
-	0x2e, 0x43, 0x1d, 0x10, 0x11, 0x7b, 0xab, 0xa0, 0x21, 0x80, 0x1b, 0xf1, 0xdf, 0x74, 0x45, 0x82,
-	0x94, 0xb9, 0x5d, 0x91, 0x20, 0x6d, 0x02, 0xed, 0x86, 0x4a, 0x50, 0x43, 0x07, 0x97, 0x49, 0xb0,
-	0xfc, 0x5e, 0xc4, 0x67, 0x7a, 0xad, 0xdf, 0xa2, 0xcf, 0x00, 0x16, 0xe2, 0x2e, 0xb5, 0x20, 0xc8,
-	0x4a, 0x93, 0xbe, 0x85, 0x59, 0x69, 0x32, 0xf6, 0xc9, 0x3e, 0x50, 0x69, 0xaa, 0xe8, 0xe1, 0xdf,
-	0xa5, 0x11, 0xf5, 0x17, 0xc3, 0x91, 0x05, 0xce, 0x47, 0x16, 0xf8, 0x31, 0xb2, 0xc0, 0x87, 0xb1,
-	0x95, 0x3b, 0x1f, 0x5b, 0xb9, 0x6f, 0x63, 0x2b, 0xf7, 0x7a, 0xdf, 0xf3, 0x65, 0xb7, 0xdf, 0x71,
-	0x5c, 0xde, 0x4b, 0x6f, 0x3e, 0x98, 0x3b, 0xcb, 0xd3, 0x90, 0x8a, 0x4e, 0x5e, 0xfd, 0x71, 0xdc,
-	0xfb, 0x1d, 0x00, 0x00, 0xff, 0xff, 0x53, 0x38, 0xfa, 0x7e, 0x4e, 0x07, 0x00, 0x00,
+	// 413 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x92, 0x41, 0x4b, 0xe3, 0x40,
+	0x14, 0xc7, 0x93, 0xb2, 0xdb, 0xc3, 0xec, 0x65, 0x99, 0xf6, 0xb0, 0x64, 0x97, 0xb4, 0x1b, 0x10,
+	0x4b, 0xa9, 0x19, 0x5a, 0xad, 0xe8, 0x45, 0xb0, 0x17, 0x11, 0x04, 0x6b, 0x2f, 0x82, 0x97, 0x32,
+	0x09, 0xd3, 0x18, 0x6c, 0x67, 0xd2, 0xcc, 0xb4, 0xb5, 0x78, 0xf3, 0x0b, 0x28, 0xf8, 0x81, 0xbc,
+	0xf6, 0x58, 0xf0, 0x22, 0x08, 0x22, 0xad, 0x1f, 0x44, 0x92, 0x4c, 0x6b, 0x6b, 0x13, 0xd4, 0xdb,
+	0x23, 0xef, 0xff, 0xfe, 0xff, 0xdf, 0x7b, 0x19, 0x90, 0xe3, 0xa4, 0xdb, 0x23, 0xd4, 0x26, 0x3e,
+	0x7a, 0xaf, 0xba, 0x3d, 0xe2, 0x0f, 0x4d, 0xcf, 0x67, 0x82, 0xc1, 0xcc, 0xfc, 0xb3, 0x39, 0xaf,
+	0xb4, 0xac, 0xc3, 0x1c, 0x16, 0xf6, 0x51, 0x50, 0x45, 0x52, 0xed, 0x9f, 0xc3, 0x98, 0xd3, 0x26,
+	0x08, 0x7b, 0x2e, 0xc2, 0x94, 0x32, 0x81, 0x85, 0xcb, 0x28, 0x97, 0xdd, 0xa2, 0xcd, 0x78, 0x87,
+	0x71, 0x64, 0x61, 0x4e, 0xa2, 0x04, 0xd4, 0x2f, 0x5b, 0x44, 0xe0, 0x32, 0xf2, 0xb0, 0xe3, 0xd2,
+	0x50, 0x2c, 0xb5, 0xf9, 0x38, 0x2a, 0x0f, 0xfb, 0xb8, 0x33, 0x73, 0x2b, 0xc5, 0x29, 0xb0, 0x3f,
+	0x20, 0xb8, 0x4f, 0x9a, 0x56, 0x9b, 0xd9, 0x17, 0x4d, 0x97, 0xb6, 0x24, 0x99, 0x91, 0x05, 0xf0,
+	0x24, 0x48, 0xac, 0x87, 0x16, 0x8d, 0x60, 0x80, 0x0b, 0xa3, 0x0e, 0x32, 0x4b, 0x5f, 0xb9, 0xc7,
+	0x28, 0x27, 0x70, 0x17, 0xa4, 0xa3, 0xa8, 0x3f, 0x6a, 0x5e, 0x2d, 0xfc, 0xaa, 0xfc, 0x35, 0x63,
+	0x4e, 0x60, 0x46, 0x43, 0xb5, 0x1f, 0xa3, 0xe7, 0x9c, 0xd2, 0x90, 0x03, 0xc6, 0x7f, 0x90, 0x0b,
+	0x1d, 0x0f, 0x88, 0x38, 0xc2, 0x5c, 0xec, 0x47, 0x3c, 0xb5, 0x00, 0x67, 0x16, 0x7a, 0x05, 0xf2,
+	0xc9, 0x12, 0x49, 0x70, 0x0a, 0x7e, 0x7f, 0xec, 0x49, 0x96, 0xb5, 0x58, 0x96, 0x45, 0xe1, 0x21,
+	0x6d, 0x31, 0x49, 0xb5, 0x62, 0x52, 0x79, 0x4a, 0x81, 0x9f, 0x61, 0x3a, 0xbc, 0x51, 0x41, 0x3a,
+	0x5a, 0x01, 0xae, 0xc7, 0x7a, 0xae, 0xde, 0x4b, 0x2b, 0x7c, 0x2e, 0x8c, 0x16, 0x30, 0x2a, 0xd7,
+	0x0f, 0xaf, 0x77, 0xa9, 0x12, 0x2c, 0xa2, 0x01, 0xf6, 0xbd, 0x0d, 0x9b, 0x51, 0xe1, 0x63, 0x5b,
+	0x70, 0x94, 0xfc, 0x5f, 0xe1, 0xbd, 0xba, 0xba, 0x35, 0xdc, 0x4a, 0x8e, 0x4c, 0xbe, 0xb1, 0x56,
+	0xfd, 0xe6, 0x94, 0xa4, 0xde, 0x0b, 0xa9, 0x77, 0xe0, 0xf6, 0x57, 0xa8, 0xdb, 0x98, 0x8b, 0xe6,
+	0xd2, 0x83, 0xab, 0x1d, 0x8f, 0x26, 0xba, 0x3a, 0x9e, 0xe8, 0xea, 0xcb, 0x44, 0x57, 0x6f, 0xa7,
+	0xba, 0x32, 0x9e, 0xea, 0xca, 0xe3, 0x54, 0x57, 0xce, 0xaa, 0x8e, 0x2b, 0xce, 0x7b, 0x96, 0x69,
+	0xb3, 0x4e, 0xb2, 0xf7, 0xe5, 0x42, 0x2d, 0x86, 0x1e, 0xe1, 0x56, 0x3a, 0x7c, 0xbd, 0x9b, 0x6f,
+	0x01, 0x00, 0x00, 0xff, 0xff, 0xdd, 0x9f, 0x7d, 0xa6, 0xa5, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -447,9 +248,6 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// Queries a LastArweaveBlock by index.
 	LastArweaveBlock(ctx context.Context, in *QueryGetLastArweaveBlockRequest, opts ...grpc.CallOption) (*QueryGetLastArweaveBlockResponse, error)
-	// Queries a list of NextArweaveBlock items.
-	NextArweaveBlock(ctx context.Context, in *QueryGetNextArweaveBlockRequest, opts ...grpc.CallOption) (*QueryGetNextArweaveBlockResponse, error)
-	NextArweaveBlockAll(ctx context.Context, in *QueryAllNextArweaveBlockRequest, opts ...grpc.CallOption) (*QueryAllNextArweaveBlockResponse, error)
 }
 
 type queryClient struct {
@@ -478,33 +276,12 @@ func (c *queryClient) LastArweaveBlock(ctx context.Context, in *QueryGetLastArwe
 	return out, nil
 }
 
-func (c *queryClient) NextArweaveBlock(ctx context.Context, in *QueryGetNextArweaveBlockRequest, opts ...grpc.CallOption) (*QueryGetNextArweaveBlockResponse, error) {
-	out := new(QueryGetNextArweaveBlockResponse)
-	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Query/NextArweaveBlock", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *queryClient) NextArweaveBlockAll(ctx context.Context, in *QueryAllNextArweaveBlockRequest, opts ...grpc.CallOption) (*QueryAllNextArweaveBlockResponse, error) {
-	out := new(QueryAllNextArweaveBlockResponse)
-	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Query/NextArweaveBlockAll", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // QueryServer is the server API for Query service.
 type QueryServer interface {
 	// Parameters queries the parameters of the module.
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// Queries a LastArweaveBlock by index.
 	LastArweaveBlock(context.Context, *QueryGetLastArweaveBlockRequest) (*QueryGetLastArweaveBlockResponse, error)
-	// Queries a list of NextArweaveBlock items.
-	NextArweaveBlock(context.Context, *QueryGetNextArweaveBlockRequest) (*QueryGetNextArweaveBlockResponse, error)
-	NextArweaveBlockAll(context.Context, *QueryAllNextArweaveBlockRequest) (*QueryAllNextArweaveBlockResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -516,12 +293,6 @@ func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsReq
 }
 func (*UnimplementedQueryServer) LastArweaveBlock(ctx context.Context, req *QueryGetLastArweaveBlockRequest) (*QueryGetLastArweaveBlockResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LastArweaveBlock not implemented")
-}
-func (*UnimplementedQueryServer) NextArweaveBlock(ctx context.Context, req *QueryGetNextArweaveBlockRequest) (*QueryGetNextArweaveBlockResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NextArweaveBlock not implemented")
-}
-func (*UnimplementedQueryServer) NextArweaveBlockAll(ctx context.Context, req *QueryAllNextArweaveBlockRequest) (*QueryAllNextArweaveBlockResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NextArweaveBlockAll not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -564,42 +335,6 @@ func _Query_LastArweaveBlock_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_NextArweaveBlock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetNextArweaveBlockRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).NextArweaveBlock(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/sequencer.sequencer.Query/NextArweaveBlock",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).NextArweaveBlock(ctx, req.(*QueryGetNextArweaveBlockRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Query_NextArweaveBlockAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryAllNextArweaveBlockRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(QueryServer).NextArweaveBlockAll(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/sequencer.sequencer.Query/NextArweaveBlockAll",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).NextArweaveBlockAll(ctx, req.(*QueryAllNextArweaveBlockRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _Query_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "sequencer.sequencer.Query",
 	HandlerType: (*QueryServer)(nil),
@@ -611,14 +346,6 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LastArweaveBlock",
 			Handler:    _Query_LastArweaveBlock_Handler,
-		},
-		{
-			MethodName: "NextArweaveBlock",
-			Handler:    _Query_NextArweaveBlock_Handler,
-		},
-		{
-			MethodName: "NextArweaveBlockAll",
-			Handler:    _Query_NextArweaveBlockAll_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -737,153 +464,6 @@ func (m *QueryGetLastArweaveBlockResponse) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetNextArweaveBlockRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryGetNextArweaveBlockRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryGetNextArweaveBlockRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if len(m.Height) > 0 {
-		i -= len(m.Height)
-		copy(dAtA[i:], m.Height)
-		i = encodeVarintQuery(dAtA, i, uint64(len(m.Height)))
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryGetNextArweaveBlockResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryGetNextArweaveBlockResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryGetNextArweaveBlockResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	{
-		size, err := m.NextArweaveBlock.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintQuery(dAtA, i, uint64(size))
-	}
-	i--
-	dAtA[i] = 0xa
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryAllNextArweaveBlockRequest) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryAllNextArweaveBlockRequest) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryAllNextArweaveBlockRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Pagination != nil {
-		{
-			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintQuery(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0xa
-	}
-	return len(dAtA) - i, nil
-}
-
-func (m *QueryAllNextArweaveBlockResponse) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalToSizedBuffer(dAtA[:size])
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *QueryAllNextArweaveBlockResponse) MarshalTo(dAtA []byte) (int, error) {
-	size := m.Size()
-	return m.MarshalToSizedBuffer(dAtA[:size])
-}
-
-func (m *QueryAllNextArweaveBlockResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
-	i := len(dAtA)
-	_ = i
-	var l int
-	_ = l
-	if m.Pagination != nil {
-		{
-			size, err := m.Pagination.MarshalToSizedBuffer(dAtA[:i])
-			if err != nil {
-				return 0, err
-			}
-			i -= size
-			i = encodeVarintQuery(dAtA, i, uint64(size))
-		}
-		i--
-		dAtA[i] = 0x12
-	}
-	if len(m.NextArweaveBlock) > 0 {
-		for iNdEx := len(m.NextArweaveBlock) - 1; iNdEx >= 0; iNdEx-- {
-			{
-				size, err := m.NextArweaveBlock[iNdEx].MarshalToSizedBuffer(dAtA[:i])
-				if err != nil {
-					return 0, err
-				}
-				i -= size
-				i = encodeVarintQuery(dAtA, i, uint64(size))
-			}
-			i--
-			dAtA[i] = 0xa
-		}
-	}
-	return len(dAtA) - i, nil
-}
-
 func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQuery(v)
 	base := offset
@@ -932,62 +512,6 @@ func (m *QueryGetLastArweaveBlockResponse) Size() (n int) {
 	_ = l
 	l = m.LastArweaveBlock.Size()
 	n += 1 + l + sovQuery(uint64(l))
-	return n
-}
-
-func (m *QueryGetNextArweaveBlockRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = len(m.Height)
-	if l > 0 {
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	return n
-}
-
-func (m *QueryGetNextArweaveBlockResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	l = m.NextArweaveBlock.Size()
-	n += 1 + l + sovQuery(uint64(l))
-	return n
-}
-
-func (m *QueryAllNextArweaveBlockRequest) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if m.Pagination != nil {
-		l = m.Pagination.Size()
-		n += 1 + l + sovQuery(uint64(l))
-	}
-	return n
-}
-
-func (m *QueryAllNextArweaveBlockResponse) Size() (n int) {
-	if m == nil {
-		return 0
-	}
-	var l int
-	_ = l
-	if len(m.NextArweaveBlock) > 0 {
-		for _, e := range m.NextArweaveBlock {
-			l = e.Size()
-			n += 1 + l + sovQuery(uint64(l))
-		}
-	}
-	if m.Pagination != nil {
-		l = m.Pagination.Size()
-		n += 1 + l + sovQuery(uint64(l))
-	}
 	return n
 }
 
@@ -1239,377 +763,6 @@ func (m *QueryGetLastArweaveBlockResponse) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.LastArweaveBlock.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryGetNextArweaveBlockRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetNextArweaveBlockRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetNextArweaveBlockRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Height", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Height = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryGetNextArweaveBlockResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetNextArweaveBlockResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetNextArweaveBlockResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NextArweaveBlock", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if err := m.NextArweaveBlock.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryAllNextArweaveBlockRequest) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllNextArweaveBlockRequest: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllNextArweaveBlockRequest: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Pagination == nil {
-				m.Pagination = &query.PageRequest{}
-			}
-			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipQuery(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *QueryAllNextArweaveBlockResponse) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowQuery
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= uint64(b&0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllNextArweaveBlockResponse: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllNextArweaveBlockResponse: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NextArweaveBlock", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.NextArweaveBlock = append(m.NextArweaveBlock, NextArweaveBlock{})
-			if err := m.NextArweaveBlock[len(m.NextArweaveBlock)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Pagination", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowQuery
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= int(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthQuery
-			}
-			postIndex := iNdEx + msglen
-			if postIndex < 0 {
-				return ErrInvalidLengthQuery
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Pagination == nil {
-				m.Pagination = &query.PageResponse{}
-			}
-			if err := m.Pagination.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

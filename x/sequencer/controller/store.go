@@ -1,4 +1,4 @@
-package arweave
+package controller
 
 import (
 	"sync"
@@ -91,12 +91,24 @@ func getContractFromTag(tx *syncer_arweave.Transaction) syncer_arweave.Base64Str
 	return nil
 }
 
-func (store *Store) getAndClearBlocks() []types.NextArweaveBlock {
+func (store *Store)  GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
+	for _, block := range store.blocks {
+		if block.BlockInfo.Height == height {
+			return &block
+		}
+	}
+	return nil
+}
+
+func (store *Store)  removeNextArweaveBlocksUpToHeight(height uint64) {
 	store.mtx.Lock()
 	defer store.mtx.Unlock()
 
-	blocks := store.blocks
-	store.blocks = nil
-
-	return blocks
+	n := 0
+	for _, block := range store.blocks {
+		if block.BlockInfo.Height <= height {
+			n++
+		}
+	}
+	store.blocks = store.blocks[n:]
 }

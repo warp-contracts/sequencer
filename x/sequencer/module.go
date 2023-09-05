@@ -17,8 +17,8 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/warp-contracts/sequencer/x/sequencer/arweave"
 	"github.com/warp-contracts/sequencer/x/sequencer/client/cli"
+	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
@@ -96,10 +96,10 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 
-	keeper        keeper.Keeper
-	accountKeeper types.AccountKeeper
-	bankKeeper    types.BankKeeper
-	controller    *arweave.ArweaveBlocksController
+	keeper                  keeper.Keeper
+	accountKeeper           types.AccountKeeper
+	bankKeeper              types.BankKeeper
+	arweaveBlocksController controller.ArweaveBlocksController
 }
 
 func NewAppModule(
@@ -107,20 +107,20 @@ func NewAppModule(
 	keeper keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	controller *arweave.ArweaveBlocksController,
+	arweaveBlocksController controller.ArweaveBlocksController,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: NewAppModuleBasic(cdc),
-		keeper:         keeper,
-		accountKeeper:  accountKeeper,
-		bankKeeper:     bankKeeper,
-		controller:     controller,
+		AppModuleBasic:          NewAppModuleBasic(cdc),
+		keeper:                  keeper,
+		accountKeeper:           accountKeeper,
+		bankKeeper:              bankKeeper,
+		arweaveBlocksController: arweaveBlocksController,
 	}
 }
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper, am.arweaveBlocksController))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
@@ -149,7 +149,7 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
-	am.storeNextArweaveBlocks(ctx)
+	am.startArweaveBlocksController(ctx)
 }
 
 // EndBlock contains the logic that is automatically triggered at the end of each block
@@ -157,17 +157,13 @@ func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.Valid
 	return []abci.ValidatorUpdate{}
 }
 
-func (am AppModule) storeNextArweaveBlocks(ctx sdk.Context) {
-	if am.controller != nil {
-		if !am.controller.IsRunning.Load() {
-			lastArweaveBlock, found := am.keeper.GetLastArweaveBlock(ctx)
-			if found {
-				am.controller.StartController(lastArweaveBlock.Height + 1)
-			} else {
-				panic("Last Arweave Block is not set when the BeginBlock method is called, and should be set when the blockchain is started")
-			}
+func (am AppModule) startArweaveBlocksController(ctx sdk.Context) {
+	if am.arweaveBlocksController != nil && !am.arweaveBlocksController.IsRunning() {
+		lastArweaveBlock, found := am.keeper.GetLastArweaveBlock(ctx)
+		if found {
+			am.arweaveBlocksController.StartController(lastArweaveBlock.Height + 1)
+		} else {
+			panic("Last Arweave Block is not set when the BeginBlock method is called, and should be set when the blockchain is started")
 		}
-
-		am.controller.StoreNextArweaveBlocks(ctx)
 	}
 }

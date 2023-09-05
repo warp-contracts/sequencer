@@ -1,15 +1,15 @@
 package ante
 
 import (
-	"time"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	keepertest "github.com/warp-contracts/sequencer/testutil/keeper"
-	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
+	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
@@ -65,47 +65,47 @@ func TestArweaveBlockTxVerifyWithoutMsgs(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func keeperAndContext(t *testing.T, blockTimestamp int64, lastTimestamp uint64, nextTimestamp uint64) (*keeper.Keeper, sdk.Context) {
+func arweaveBlockTxDecoratorAndCtx(t *testing.T, blockTimestamp int64, lastTimestamp uint64, nextTimestamp uint64) (ArweaveBlockTxDecorator, sdk.Context) {
 	k, ctx := keepertest.SequencerKeeper(t)
 	if lastTimestamp > 0 {
 		k.SetLastArweaveBlock(ctx, types.ArweaveBlockInfo{
-			Height: 1,
+			Height:    1,
 			Timestamp: lastTimestamp,
-		})	
-	}
-	if nextTimestamp > 0 {
-		k.SetNextArweaveBlock(ctx, types.NextArweaveBlock{
-			BlockInfo: &types.ArweaveBlockInfo{
-				Height: 2,
-				Timestamp: nextTimestamp,
-			},
 		})
+	}
+	var c controller.ArweaveBlocksController
+	if nextTimestamp > 0 {
+		c = controller.MockArweaveBlocksController(&types.ArweaveBlockInfo{
+			Timestamp: nextTimestamp,
+		})
+	} else {
+		c = controller.MockArweaveBlocksController(nil)
 	}
 	blockHeader := ctx.BlockHeader()
 	blockHeader.Time = time.Unix(blockTimestamp, 0)
-	return k, ctx.WithBlockHeader(blockHeader)
+	return NewArweaveBlockTxDecorator(*k, c), ctx.WithBlockHeader(blockHeader)
 }
 
 func TestArweaveBlockTxNoNeedArweaveTx(t *testing.T) {
-	k, ctx := keeperAndContext(t, 200, 100, 300)
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 200, 100, 300)
 
-	err := shouldBlockContainArweaveTx(ctx, k)
+	err := abtd.shouldBlockContainArweaveTx(ctx)
 
 	require.NoError(t, err)
 }
 
 func TestArweaveBlockTxWithoutNextArweaveBlock(t *testing.T) {
-	k, ctx := keeperAndContext(t, 200, 100, 0)
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 200, 100, 0)
 
-	err := shouldBlockContainArweaveTx(ctx, k)
+	err := abtd.shouldBlockContainArweaveTx(ctx)
 
 	require.NoError(t, err)
 }
 
 func TestArweaveBlockTxShouldContainArweaveBlock(t *testing.T) {
-	k, ctx := keeperAndContext(t, 10000, 100, 300)
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 10000, 100, 300)
 
-	err := shouldBlockContainArweaveTx(ctx, k)
+	err := abtd.shouldBlockContainArweaveTx(ctx)
 
 	require.ErrorIs(t, err, types.ErrNoArweaveBlockTx)
 }

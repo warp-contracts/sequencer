@@ -5,7 +5,6 @@ package sequencer.sequencer;
 import "gogoproto/gogo.proto";
 import "sequencer/sequencer/params.proto";
 import "sequencer/sequencer/arweave_block_info.proto";
-import "sequencer/sequencer/next_arweave_block.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
@@ -13,6 +12,5 @@ option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 message GenesisState {
            Params           params               = 1 [(gogoproto.nullable) = false];
            ArweaveBlockInfo lastArweaveBlock     = 2;
-  repeated NextArweaveBlock nextArweaveBlockList = 3 [(gogoproto.nullable) = false];
 }
 

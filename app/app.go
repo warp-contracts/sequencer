@@ -109,10 +109,10 @@ import (
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
 	"github.com/spf13/cast"
 
-	"github.com/warp-contracts/sequencer/x/sequencer/arweave"
 	sequencermodule "github.com/warp-contracts/sequencer/x/sequencer"
 	sequencerante "github.com/warp-contracts/sequencer/x/sequencer/ante"
 	sequencerapi "github.com/warp-contracts/sequencer/x/sequencer/api"
+	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	sequencermodulekeeper "github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	sequencermoduletypes "github.com/warp-contracts/sequencer/x/sequencer/types"
 
@@ -528,11 +528,11 @@ func New(
 		keys[sequencermoduletypes.MemStoreKey],
 		app.GetSubspace(sequencermoduletypes.ModuleName),
 	)
-	var controller *arweave.ArweaveBlocksController
+	var arweaveBlocksController controller.ArweaveBlocksController
 	if appOpts.Get("test") == nil {
-		controller = arweave.CreateController(app.SequencerKeeper)
+		arweaveBlocksController = controller.CreateController()
 	}
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, controller)
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -720,12 +720,13 @@ func New(
 	// initialize BaseApp
 	anteHandler, err := sequencerante.NewAnteHandler(
 		sequencerante.HandlerOptions{
-			AccountKeeper:   app.AccountKeeper,
-			BankKeeper:      app.BankKeeper,
-			FeegrantKeeper:  app.FeeGrantKeeper,
-			SequencerKeeper: app.SequencerKeeper,
-			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-			SigGasConsumer:  sequencerante.SigVerificationGasConsumer,
+			AccountKeeper:           app.AccountKeeper,
+			ArweaveBlocksController: arweaveBlocksController,
+			BankKeeper:              app.BankKeeper,
+			FeegrantKeeper:          app.FeeGrantKeeper,
+			SequencerKeeper:         app.SequencerKeeper,
+			SignModeHandler:         encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:          sequencerante.SigVerificationGasConsumer,
 		},
 	)
 	if err != nil {

@@ -26,6 +26,14 @@ func (k Keeper) GetLastArweaveBlock(ctx sdk.Context) (val types.ArweaveBlockInfo
 	return val, true
 }
 
+func (k Keeper) MustGetLastArweaveBlock(ctx sdk.Context) types.ArweaveBlockInfo {
+	blockInfo, found := k.GetLastArweaveBlock(ctx)
+	if !found {
+		panic("LastArweaveBlock must be set")
+	}
+	return blockInfo
+}
+
 // RemoveLastArweaveBlock removes lastArweaveBlock from the store
 func (k Keeper) RemoveLastArweaveBlock(ctx sdk.Context) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LastArweaveBlockKey))

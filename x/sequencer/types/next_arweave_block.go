@@ -1,9 +1,14 @@
 package types
 
 import (
-	"fmt"
+	"time"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func (next NextArweaveBlock) GetHeightString() string {
-	return fmt.Sprintf("%d", next.BlockInfo.Height)
-}
+ func CheckArweaveBlockIsOldEnough(ctx sdk.Context, newBlockInfo *ArweaveBlockInfo) bool {
+	arweaveBlockTimestamp := time.Unix(int64(newBlockInfo.Timestamp), 0)
+	cosmosBlockTimestamp := ctx.BlockHeader().Time
+
+	return cosmosBlockTimestamp.After(arweaveBlockTimestamp.Add(time.Hour))
+ }

@@ -1,13 +1,11 @@
-package arweave
+package controller
 
 import (
 	"math"
 	"sync/atomic"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
+	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	"github.com/warp-contracts/syncer/src/sync"
 	"github.com/warp-contracts/syncer/src/utils/arweave"
@@ -18,34 +16,39 @@ import (
 	"github.com/warp-contracts/syncer/src/utils/warp"
 )
 
-type ArweaveBlocksController struct {
+type ArweaveBlocksController interface {
+	StartController(initHeight uint64)
+	IsRunning() bool
+	GetNextArweaveBlock(height uint64) *types.NextArweaveBlock
+	RemoveNextArweaveBlocksUpToHeight(height uint64)
+}
+
+type SyncerController struct {
 	sync.Controller
 
 	store     *Store
-	keeper    keeper.Keeper
-	IsRunning *atomic.Bool
+	isRunning *atomic.Bool
 }
 
-func CreateController(keeper keeper.Keeper) *ArweaveBlocksController {
-	controller := new(ArweaveBlocksController)
-	controller.keeper = keeper
-	controller.IsRunning = &atomic.Bool{}
+func CreateController() ArweaveBlocksController {
+	controller := new(SyncerController)
+	controller.isRunning = &atomic.Bool{}
 
 	return controller
 }
 
 // TODO add controller stop
-func (controller *ArweaveBlocksController) StartController(initHeight uint64) {
+func (controller *SyncerController) StartController(initHeight uint64) {
 	controller.initController(initHeight)
 
 	err := controller.Start()
 	if err != nil {
 		panic(err)
 	}
-	controller.IsRunning.Store(true)
+	controller.isRunning.Store(true)
 }
 
-func (controller *ArweaveBlocksController) initController(initHeight uint64) {
+func (controller *SyncerController) initController(initHeight uint64) {
 	var config = config.Default()
 
 	controller.Task = task.NewTask(config, "controller")
@@ -108,10 +111,14 @@ func (controller *ArweaveBlocksController) initController(initHeight uint64) {
 		WithSubtask(watchdog.Task)
 }
 
-func (controller *ArweaveBlocksController) StoreNextArweaveBlocks(ctx sdk.Context) {
-	if controller.IsRunning.Load() {
-		for _, block := range controller.store.getAndClearBlocks() {
-			controller.keeper.SetNextArweaveBlock(ctx, block)
-		}
-	}
+func (controller *SyncerController) IsRunning() bool {
+	return controller.isRunning.Load()
+}
+
+func (controller *SyncerController) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
+	return controller.store.GetNextArweaveBlock(height)
+}
+
+func (controller *SyncerController) RemoveNextArweaveBlocksUpToHeight(height uint64) {
+	controller.store.removeNextArweaveBlocksUpToHeight(height)
 }

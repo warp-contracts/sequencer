@@ -1,23 +1,23 @@
 package ante
 
 import (
-	"fmt"
-	"time"
-
 	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 // It checks if the transaction representing an Arweave block contains exacly one message: MsgArweaveBlock
+// Additionally, it checks if the Cosmos block does not lack transactions with the Arweave block.
 type ArweaveBlockTxDecorator struct {
-	keeper keeper.Keeper
+	keeper     keeper.Keeper
+	controller controller.ArweaveBlocksController
 }
 
-func NewArweaveBlockTxDecorator(keeper keeper.Keeper) ArweaveBlockTxDecorator {
-	return ArweaveBlockTxDecorator{keeper}
+func NewArweaveBlockTxDecorator(keeper keeper.Keeper, controller controller.ArweaveBlocksController) ArweaveBlockTxDecorator {
+	return ArweaveBlockTxDecorator{keeper, controller}
 }
 
 func (abtd ArweaveBlockTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
@@ -27,7 +27,7 @@ func (abtd ArweaveBlockTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 	}
 
 	if ctx.IsReCheckTx() && !foundTx {
-		if err := shouldBlockContainArweaveTx(ctx, &abtd.keeper); err != nil {
+		if err := abtd.shouldBlockContainArweaveTx(ctx); err != nil {
 			return ctx, err
 		}
 	}
@@ -49,19 +49,14 @@ func verifyArweaveBlockTx(tx sdk.Tx) (bool, error) {
 	return false, nil
 }
 
-func shouldBlockContainArweaveTx(ctx sdk.Context, keeper *keeper.Keeper) error {
-	lastArweaveBlock, _ := keeper.GetLastArweaveBlock(ctx)
-	nextHeight := fmt.Sprintf("%d", lastArweaveBlock.Height+1)
-	nextArweaveBlock, found := keeper.GetNextArweaveBlock(ctx, nextHeight)
+func (abtd ArweaveBlockTxDecorator) shouldBlockContainArweaveTx(ctx sdk.Context) error {
+	lastArweaveBlock := abtd.keeper.MustGetLastArweaveBlock(ctx)
+	nextArweaveBlock := abtd.controller.GetNextArweaveBlock(lastArweaveBlock.Height)
 
-	if found {
-		nextArweaveBlockTimestamp := time.Unix(int64(nextArweaveBlock.BlockInfo.Timestamp), 0)
-		cosmosBlockTimestamp := ctx.BlockHeader().Time
-		if cosmosBlockTimestamp.After(nextArweaveBlockTimestamp.Add(time.Hour)) {
-			return errors.Wrapf(types.ErrNoArweaveBlockTx,
-				"The first transaction of the block should contain a transaction with the Arweave block with height %s",
-				nextHeight)
-		}
+	if nextArweaveBlock != nil && types.CheckArweaveBlockIsOldEnough(ctx, nextArweaveBlock.BlockInfo) {
+		return errors.Wrapf(types.ErrNoArweaveBlockTx,
+			"The first transaction of the block should contain a transaction with the Arweave block with height %d",
+			lastArweaveBlock.Height)
 	}
 	return nil
 }

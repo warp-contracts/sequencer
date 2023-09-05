@@ -11,33 +11,24 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
+	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 )
 
-func keeperCtxAndSrv(t *testing.T) (*keeper.Keeper, sdk.Context, types.MsgServer) {
+func keeperCtxAndSrv(t *testing.T, nextBlockInfo *types.ArweaveBlockInfo) (*keeper.Keeper, sdk.Context, types.MsgServer) {
 	k, ctx := keepertest.SequencerKeeper(t)
 	blockHeader := ctx.BlockHeader()
-	blockHeader.Time = time.Unix(1692357016, 0)
-	srv := keeper.NewMsgServerImpl(*k)
+	blockHeader.Time = time.Unix(1692357017, 0)
+	
+	c := controller.MockArweaveBlocksController(nextBlockInfo)
+	
+	srv := keeper.NewMsgServerImpl(*k, c)
 	return k, ctx.WithBlockHeader(blockHeader), srv
 }
 
-func setNextArweaveBlock(k *keeper.Keeper, ctx sdk.Context, blockInfo *types.ArweaveBlockInfo) {
-	block := types.NextArweaveBlock{
-		BlockInfo: &types.ArweaveBlockInfo{
-			Height:    blockInfo.Height,
-			Timestamp: blockInfo.Timestamp,
-			Hash:      blockInfo.Hash,
-		},
-	}
-	k.SetNextArweaveBlock(ctx, block)
-}
-
 func TestArweaveBlockInfoMsgServer(t *testing.T) {
-	k, ctx, srv := keeperCtxAndSrv(t)
-	wctx := sdk.WrapSDKContext(ctx)
-
 	expected := test.ArweaveBlock()
-	setNextArweaveBlock(k, ctx, expected.BlockInfo)
+	k, ctx, srv := keeperCtxAndSrv(t, expected.BlockInfo)
+	wctx := sdk.WrapSDKContext(ctx)
 
 	_, err := srv.ArweaveBlock(wctx, &expected)
 	require.NoError(t, err)
@@ -50,7 +41,7 @@ func TestArweaveBlockInfoMsgServer(t *testing.T) {
 }
 
 func TestArweaveBlockMsgServerWithoutHoursDelay(t *testing.T) {
-	_, ctx, srv := keeperCtxAndSrv(t)
+	_, ctx, srv := keeperCtxAndSrv(t, nil)
 	wctx := sdk.WrapSDKContext(ctx)
 
 	arweaveBlock := &types.MsgArweaveBlock{
@@ -67,9 +58,6 @@ func TestArweaveBlockMsgServerWithoutHoursDelay(t *testing.T) {
 }
 
 func TestArweaveBlockInfoMsgServerWithoutNextHeight(t *testing.T) {
-	k, ctx, srv := keeperCtxAndSrv(t)
-	wctx := sdk.WrapSDKContext(ctx)
-
 	arweaveBlock := &types.MsgArweaveBlock{
 		Creator: "creator",
 		BlockInfo: &types.ArweaveBlockInfo{
@@ -78,7 +66,8 @@ func TestArweaveBlockInfoMsgServerWithoutNextHeight(t *testing.T) {
 			Hash:      test.ExampleArweaveBlockHash,
 		},
 	}
-	setNextArweaveBlock(k, ctx, arweaveBlock.BlockInfo)
+	_, ctx, srv := keeperCtxAndSrv(t, arweaveBlock.BlockInfo)
+	wctx := sdk.WrapSDKContext(ctx)
 
 	_, err := srv.ArweaveBlock(wctx, arweaveBlock)
 	require.NoError(t, err)
@@ -89,9 +78,6 @@ func TestArweaveBlockInfoMsgServerWithoutNextHeight(t *testing.T) {
 }
 
 func TestArweaveBlockInfoMsgServerWithoutLaterTimestamp(t *testing.T) {
-	k, ctx, srv := keeperCtxAndSrv(t)
-	wctx := sdk.WrapSDKContext(ctx)
-
 	lastArweaveBlock := &types.MsgArweaveBlock{
 		Creator: "creator",
 		BlockInfo: &types.ArweaveBlockInfo{
@@ -100,7 +86,8 @@ func TestArweaveBlockInfoMsgServerWithoutLaterTimestamp(t *testing.T) {
 			Hash:      test.ExampleArweaveBlockHash,
 		},
 	}
-	setNextArweaveBlock(k, ctx, lastArweaveBlock.BlockInfo)
+	_, ctx, srv := keeperCtxAndSrv(t, lastArweaveBlock.BlockInfo)
+	wctx := sdk.WrapSDKContext(ctx)
 
 	_, err := srv.ArweaveBlock(wctx, lastArweaveBlock)
 	require.NoError(t, err)
@@ -111,7 +98,7 @@ func TestArweaveBlockInfoMsgServerWithoutLaterTimestamp(t *testing.T) {
 }
 
 func TestArweaveBlockInfoMsgServerWithoutNextArweaveBlock(t *testing.T) {
-	_, ctx, srv := keeperCtxAndSrv(t)
+	_, ctx, srv := keeperCtxAndSrv(t, nil)
 	wctx := sdk.WrapSDKContext(ctx)
 
 	arweaveBlockInfo := test.ArweaveBlock()
@@ -121,26 +108,25 @@ func TestArweaveBlockInfoMsgServerWithoutNextArweaveBlock(t *testing.T) {
 }
 
 func TestArweaveBlockInfoMsgServerTimestampMismatchWithNextArweaveBlock(t *testing.T) {
-	k, ctx, srv := keeperCtxAndSrv(t)
-	wctx := sdk.WrapSDKContext(ctx)
-
 	arweaveBlockInfo := test.ArweaveBlock()
 	nextArweaveBlockInfo := arweaveBlockInfo
 	nextArweaveBlockInfo.BlockInfo.Timestamp += 1
-	setNextArweaveBlock(k, ctx, nextArweaveBlockInfo.BlockInfo)
+
+	_, ctx, srv := keeperCtxAndSrv(t, nextArweaveBlockInfo.BlockInfo)
+	wctx := sdk.WrapSDKContext(ctx)
 
 	_, err := srv.ArweaveBlock(wctx, &arweaveBlockInfo)
 	require.ErrorIs(t, err, types.ErrArweaveBlockTimestampMismatch)
 }
 
 func TestArweaveBlockInfoMsgServerHashMismatchWithNextArweaveBlock(t *testing.T) {
-	k, ctx, srv := keeperCtxAndSrv(t)
-	wctx := sdk.WrapSDKContext(ctx)
 
 	arweaveBlockInfo := test.ArweaveBlock()
 	nextArweaveBlockInfo := *arweaveBlockInfo.BlockInfo
 	nextArweaveBlockInfo.Hash = []byte{1, 2, 3}
-	setNextArweaveBlock(k, ctx, &nextArweaveBlockInfo)
+
+	_, ctx, srv := keeperCtxAndSrv(t, &nextArweaveBlockInfo)
+	wctx := sdk.WrapSDKContext(ctx)
 
 	_, err := srv.ArweaveBlock(wctx, &arweaveBlockInfo)
 	require.ErrorIs(t, err, types.ErrArweaveBlockHashMismatch)

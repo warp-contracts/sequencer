@@ -3,7 +3,6 @@ package keeper
 import (
 	"bytes"
 	"context"
-	"strconv"
 	"time"
 
 	"cosmossdk.io/errors"
@@ -23,17 +22,17 @@ func (k msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBloc
 }
 
 func (k msgServer) setNewArweaveBlockInfo(ctx sdk.Context, block *types.MsgArweaveBlock) error {
-	var newBlock = &types.ArweaveBlockInfo{
+	var newBlockInfo = &types.ArweaveBlockInfo{
 		Height:    block.BlockInfo.Height,
 		Timestamp: block.BlockInfo.Timestamp,
 		Hash:      block.BlockInfo.Hash,
 	}
 
-	if err := k.checkBlockIsOldEnough(ctx, newBlock); err != nil {
+	if err := k.checkBlockIsOldEnough(ctx, newBlockInfo); err != nil {
 		return err
 	}
 
-	if err := k.compareBlockWithPreviousOne(ctx, newBlock); err != nil {
+	if err := k.compareBlockWithPreviousOne(ctx, newBlockInfo); err != nil {
 		return err
 	}
 
@@ -41,15 +40,15 @@ func (k msgServer) setNewArweaveBlockInfo(ctx sdk.Context, block *types.MsgArwea
 		return err
 	}
 
-	k.SetLastArweaveBlock(ctx, *newBlock)
+	k.SetLastArweaveBlock(ctx, *newBlockInfo)
 	return nil
 }
 
-func (k msgServer) checkBlockIsOldEnough(ctx sdk.Context, newValue *types.ArweaveBlockInfo) error {
-	arweaveBlockTimestamp := time.Unix(int64(newValue.Timestamp), 0)
+func (k msgServer) checkBlockIsOldEnough(ctx sdk.Context, newBlockInfo *types.ArweaveBlockInfo) error {
+	arweaveBlockTimestamp := time.Unix(int64(newBlockInfo.Timestamp), 0)
 	cosmosBlockTimestamp := ctx.BlockHeader().Time
 
-	if cosmosBlockTimestamp.Before(arweaveBlockTimestamp.Add(time.Hour)) {
+	if !types.CheckArweaveBlockIsOldEnough(ctx, newBlockInfo) {
 		return errors.Wrapf(types.ErrArweaveBlockTimestampMismatch,
 			"The timestamp of the Arweave block (%s) should be one hour earlier than the Cosmos block (%s)",
 			arweaveBlockTimestamp.UTC(), cosmosBlockTimestamp.UTC())
@@ -75,9 +74,8 @@ func (k msgServer) compareBlockWithPreviousOne(ctx sdk.Context, newValue *types.
 }
 
 func (k msgServer) compareWithNextBlockAndRemove(ctx sdk.Context, block *types.MsgArweaveBlock) error {
-	heightStr := strconv.FormatUint(block.BlockInfo.Height, 10)
-	nextArweaveBlock, isFound := k.GetNextArweaveBlock(ctx, heightStr)
-	if isFound {
+	nextArweaveBlock := k.Controller.GetNextArweaveBlock(block.BlockInfo.Height)
+	if nextArweaveBlock != nil {
 		if block.BlockInfo.Timestamp != nextArweaveBlock.BlockInfo.Timestamp {
 			return errors.Wrap(types.ErrArweaveBlockTimestampMismatch,
 				"The timestamp of the Arweave block does not match the timestamp of the block downloaded by the Validator")
@@ -90,15 +88,15 @@ func (k msgServer) compareWithNextBlockAndRemove(ctx sdk.Context, block *types.M
 		if transactionsDiffer(block.Transactions, nextArweaveBlock.Transactions) {
 			return errors.Wrapf(types.ErrArweaveBlockTransactionsMismatch,
 				"Arweave block transactions do not match the block downloaded by the Validator transactions for block %d",
-			block.BlockInfo.Height)
+				block.BlockInfo.Height)
 
 		}
 
-		k.RemoveNextArweaveBlock(ctx, heightStr)
+		k.Controller.RemoveNextArweaveBlocksUpToHeight(block.BlockInfo.Height)
 		return nil
 	} else {
 		return errors.Wrapf(types.ErrInvalidArweaveBlockTx,
-			"The validator did not fetch the Arweave block at height %s", heightStr)
+			"The validator did not fetch the Arweave block at height %d", block.BlockInfo.Height)
 	}
 }
 
@@ -106,7 +104,7 @@ func transactionsDiffer(transactions1 []*types.ArweaveTransaction, transactions2
 	if len(transactions1) != len(transactions2) {
 		return true
 	}
-	
+
 	for i := 0; i < len(transactions1); i++ {
 		tx1 := transactions1[i]
 		tx2 := transactions2[i]
