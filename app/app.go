@@ -114,6 +114,7 @@ import (
 	sequencerapi "github.com/warp-contracts/sequencer/x/sequencer/api"
 	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	sequencermodulekeeper "github.com/warp-contracts/sequencer/x/sequencer/keeper"
+	sequencerprepare "github.com/warp-contracts/sequencer/x/sequencer/prepare"
 	sequencermoduletypes "github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	// this line is used by starport scaffolding # stargate/app/moduleImport
@@ -737,6 +738,7 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
+	app.SetPrepareProposal(sequencerprepare.NewPrepareProposalHandler(app.SequencerKeeper, arweaveBlocksController, app.txConfig, logger))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {

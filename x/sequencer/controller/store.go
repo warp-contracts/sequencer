@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"bytes"
+	"sort"
 	"sync"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -79,6 +81,10 @@ func transactions(payload *listener.Payload) []*types.ArweaveTransaction {
 			})
 		}
 	}
+	// sort transactions by Id
+	sort.Slice(txs, func(i, j int) bool {
+		return bytes.Compare(txs[i].Id, txs[j].Id) > 0
+	})
 	return txs
 }
 
@@ -91,7 +97,7 @@ func getContractFromTag(tx *syncer_arweave.Transaction) syncer_arweave.Base64Str
 	return nil
 }
 
-func (store *Store)  GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
+func (store *Store) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
 	for _, block := range store.blocks {
 		if block.BlockInfo.Height == height {
 			return &block
@@ -100,7 +106,7 @@ func (store *Store)  GetNextArweaveBlock(height uint64) *types.NextArweaveBlock 
 	return nil
 }
 
-func (store *Store)  removeNextArweaveBlocksUpToHeight(height uint64) {
+func (store *Store) removeNextArweaveBlocksUpToHeight(height uint64) {
 	store.mtx.Lock()
 	defer store.mtx.Unlock()
 

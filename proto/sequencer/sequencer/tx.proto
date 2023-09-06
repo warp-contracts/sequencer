@@ -22,7 +22,6 @@ message MsgDataItem {
 message MsgDataItemResponse {}
 
 message MsgArweaveBlock {
-  string creator   = 1;
   ArweaveBlockInfo block_info = 2;
   repeated ArweaveTransaction transactions = 3;
 }

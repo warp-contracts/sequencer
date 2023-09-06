@@ -67,7 +67,7 @@ func (controller *SyncerController) initController(initHeight uint64) {
 			WithClient(client).
 			WithMonitor(monitor).
 			WithInterval(config.NetworkMonitor.Period).
-			WithRequiredConfirmationBlocks(25)
+			WithRequiredConfirmationBlocks(20)
 
 		blockDownloader := listener.NewBlockDownloader(config).
 			WithClient(client).
@@ -116,9 +116,14 @@ func (controller *SyncerController) IsRunning() bool {
 }
 
 func (controller *SyncerController) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
-	return controller.store.GetNextArweaveBlock(height)
+	if controller.IsRunning() {
+		return controller.store.GetNextArweaveBlock(height)
+	}
+	return nil
 }
 
 func (controller *SyncerController) RemoveNextArweaveBlocksUpToHeight(height uint64) {
-	controller.store.removeNextArweaveBlocksUpToHeight(height)
+	if controller.IsRunning() {
+		controller.store.removeNextArweaveBlocksUpToHeight(height)
+	}
 }

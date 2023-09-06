@@ -25,5 +25,5 @@ genesis:
         bond_denom: "warptest"
     sequencer:
       lastArweaveBlock:
-        height: 1251338
-        timestamp: 1693410349
+        height: 1255884
+        timestamp: 1693997429

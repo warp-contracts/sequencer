@@ -45,7 +45,6 @@ func TestArweaveBlockMsgServerWithoutHoursDelay(t *testing.T) {
 	wctx := sdk.WrapSDKContext(ctx)
 
 	arweaveBlock := &types.MsgArweaveBlock{
-		Creator: "creator",
 		BlockInfo: &types.ArweaveBlockInfo{
 			Height:    1431216,
 			Timestamp: 1692357016,
@@ -59,7 +58,6 @@ func TestArweaveBlockMsgServerWithoutHoursDelay(t *testing.T) {
 
 func TestArweaveBlockInfoMsgServerWithoutNextHeight(t *testing.T) {
 	arweaveBlock := &types.MsgArweaveBlock{
-		Creator: "creator",
 		BlockInfo: &types.ArweaveBlockInfo{
 			Height:    1431216,
 			Timestamp: 1692353410,
@@ -79,7 +77,6 @@ func TestArweaveBlockInfoMsgServerWithoutNextHeight(t *testing.T) {
 
 func TestArweaveBlockInfoMsgServerWithoutLaterTimestamp(t *testing.T) {
 	lastArweaveBlock := &types.MsgArweaveBlock{
-		Creator: "creator",
 		BlockInfo: &types.ArweaveBlockInfo{
 			Height:    1431216,
 			Timestamp: 1692353410,

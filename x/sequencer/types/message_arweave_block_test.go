@@ -3,10 +3,7 @@ package types
 import (
 	"testing"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
-
-	"github.com/warp-contracts/sequencer/testutil/sample"
 )
 
 func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
@@ -16,15 +13,8 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 		err  error
 	}{
 		{
-			name: "invalid address",
-			msg: MsgArweaveBlock{
-				Creator: "invalid_address",
-			},
-			err: sdkerrors.ErrInvalidAddress,
-		}, {
 			name: "invalid arewave block height",
 			msg: MsgArweaveBlock{
-				Creator: sample.AccAddress(),
 				BlockInfo: &ArweaveBlockInfo{
 					Height:    0,
 					Timestamp: 1690809540,
@@ -35,7 +25,6 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 		}, {
 			name: "invalid arewave block timestamp",
 			msg: MsgArweaveBlock{
-				Creator: sample.AccAddress(),
 				BlockInfo: &ArweaveBlockInfo{
 					Height:    1431216,
 					Timestamp: 0,
@@ -46,7 +35,6 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 		}, {
 			name: "invalid arewave block hash length",
 			msg: MsgArweaveBlock{
-				Creator: sample.AccAddress(),
 				BlockInfo: &ArweaveBlockInfo{
 					Height:    1431216,
 					Timestamp: 0,
@@ -57,7 +45,6 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 		}, {
 			name: "valid",
 			msg: MsgArweaveBlock{
-				Creator: sample.AccAddress(),
 				BlockInfo: &ArweaveBlockInfo{
 					Height:    1431216,
 					Timestamp: 1690809540,

@@ -60,3 +60,14 @@ func (abtd ArweaveBlockTxDecorator) shouldBlockContainArweaveTx(ctx sdk.Context)
 	}
 	return nil
 }
+
+func isArweaveBlockTx(tx sdk.Tx) bool {
+	msgs := tx.GetMsgs()
+	for _, msg := range msgs {
+		_, isArweaveBlock := msg.(*types.MsgArweaveBlock)
+		if isArweaveBlock {
+			return true
+		}
+	}
+	return false
+}

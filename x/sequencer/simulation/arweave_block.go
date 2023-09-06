@@ -22,7 +22,6 @@ func SimulateMsgArweaveBlock(
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 
 		msg := &types.MsgArweaveBlock{
-			Creator: simAccount.Address.String(),
 			BlockInfo: &types.ArweaveBlockInfo{
 				Height:    1431216,
 				Timestamp: 1690809540,
