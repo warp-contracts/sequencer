@@ -66,6 +66,7 @@ func (store *Store) processPayload(payload *listener.Payload) {
 	}
 
 	store.mtx.Lock()
+	// TODO add saving to database
 	store.blocks = append(store.blocks, block)
 	store.mtx.Unlock()
 }

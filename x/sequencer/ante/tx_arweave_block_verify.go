@@ -26,37 +26,46 @@ func (abtd ArweaveBlockTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simul
 		return ctx, err
 	}
 
-	if ctx.IsReCheckTx() && !foundTx {
-		if err := abtd.shouldBlockContainArweaveTx(ctx); err != nil {
-			return ctx, err
+	if foundTx {
+		if ctx.IsCheckTx() {
+			return ctx, errors.Wrapf(types.ErrArweaveBlockNotFromProposer,
+				"transaction with arweave block can only be added by the Proposer")
 		}
+
+		// Valid transaction with Arweave block does not require further validation within AnteHandler
+		return ctx, nil
+	} else if err := abtd.shouldBlockContainArweaveTx(ctx); err != nil {
+		return ctx, err
 	}
-	return ctx, nil
+
+	return next(ctx, tx, simulate)
 }
 
 func verifyArweaveBlockTx(tx sdk.Tx) (bool, error) {
 	msgs := tx.GetMsgs()
 	for _, msg := range msgs {
-		_, isArweaveBlock := msg.(*types.MsgArweaveBlock)
+		arweaveBlock, isArweaveBlock := msg.(*types.MsgArweaveBlock)
 		if isArweaveBlock {
 			if len(msgs) > 1 {
 				return true, errors.Wrapf(types.ErrTooManyMessages,
 					"transaction with arweave block can have only one message, and it has: %d", len(msgs))
 			}
-			return true, nil
+			return true, arweaveBlock.ValidateBasic()
 		}
 	}
 	return false, nil
 }
 
 func (abtd ArweaveBlockTxDecorator) shouldBlockContainArweaveTx(ctx sdk.Context) error {
-	lastArweaveBlock := abtd.keeper.MustGetLastArweaveBlock(ctx)
-	nextArweaveBlock := abtd.controller.GetNextArweaveBlock(lastArweaveBlock.Height)
+	if ctx.BlockHeader().Height > 0 && !ctx.IsCheckTx() {
+		lastArweaveBlock := abtd.keeper.MustGetLastArweaveBlock(ctx)
+		nextArweaveBlock := abtd.controller.GetNextArweaveBlock(lastArweaveBlock.Height)
 
-	if nextArweaveBlock != nil && types.CheckArweaveBlockIsOldEnough(ctx, nextArweaveBlock.BlockInfo) {
-		return errors.Wrapf(types.ErrNoArweaveBlockTx,
-			"The first transaction of the block should contain a transaction with the Arweave block with height %d",
-			lastArweaveBlock.Height)
+		if nextArweaveBlock != nil && types.CheckArweaveBlockIsOldEnough(ctx, nextArweaveBlock.BlockInfo) {
+			return errors.Wrapf(types.ErrNoArweaveBlockTx,
+				"The first transaction of the block should contain a transaction with the Arweave block with height %d",
+				lastArweaveBlock.Height)
+		}
 	}
 	return nil
 }

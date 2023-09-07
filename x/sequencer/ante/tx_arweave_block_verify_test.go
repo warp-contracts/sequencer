@@ -65,7 +65,7 @@ func TestArweaveBlockTxVerifyWithoutMsgs(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func arweaveBlockTxDecoratorAndCtx(t *testing.T, blockTimestamp int64, lastTimestamp uint64, nextTimestamp uint64) (ArweaveBlockTxDecorator, sdk.Context) {
+func arweaveBlockTxDecoratorAndCtx(t *testing.T, blockHeight int64, blockTimestamp int64, lastTimestamp uint64, nextTimestamp uint64) (ArweaveBlockTxDecorator, sdk.Context) {
 	k, ctx := keepertest.SequencerKeeper(t)
 	if lastTimestamp > 0 {
 		k.SetLastArweaveBlock(ctx, types.ArweaveBlockInfo{
@@ -83,11 +83,12 @@ func arweaveBlockTxDecoratorAndCtx(t *testing.T, blockTimestamp int64, lastTimes
 	}
 	blockHeader := ctx.BlockHeader()
 	blockHeader.Time = time.Unix(blockTimestamp, 0)
+	blockHeader.Height = blockHeight
 	return NewArweaveBlockTxDecorator(*k, c), ctx.WithBlockHeader(blockHeader)
 }
 
 func TestArweaveBlockTxNoNeedArweaveTx(t *testing.T) {
-	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 200, 100, 300)
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 1, 200, 100, 300)
 
 	err := abtd.shouldBlockContainArweaveTx(ctx)
 
@@ -95,15 +96,23 @@ func TestArweaveBlockTxNoNeedArweaveTx(t *testing.T) {
 }
 
 func TestArweaveBlockTxWithoutNextArweaveBlock(t *testing.T) {
-	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 200, 100, 0)
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 1, 200, 100, 0)
 
 	err := abtd.shouldBlockContainArweaveTx(ctx)
 
 	require.NoError(t, err)
 }
 
+
+func TestArweaveBlockTxGenesisDoesNotNeedArweaveBlock(t *testing.T) {
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 0, 10000, 100, 300)
+
+	err := abtd.shouldBlockContainArweaveTx(ctx)
+
+	require.NoError(t, err)
+}
 func TestArweaveBlockTxShouldContainArweaveBlock(t *testing.T) {
-	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 10000, 100, 300)
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 1, 10000, 100, 300)
 
 	err := abtd.shouldBlockContainArweaveTx(ctx)
 

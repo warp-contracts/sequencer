@@ -22,8 +22,8 @@ message MsgDataItem {
 message MsgDataItemResponse {}
 
 message MsgArweaveBlock {
-  ArweaveBlockInfo block_info = 2;
-  repeated ArweaveTransaction transactions = 3;
+  ArweaveBlockInfo block_info = 1;
+  repeated ArweaveTransaction transactions = 2;
 }
 
 message MsgArweaveBlockResponse {}

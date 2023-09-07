@@ -49,6 +49,7 @@ func (controller *SyncerController) StartController(initHeight uint64) {
 }
 
 func (controller *SyncerController) initController(initHeight uint64) {
+	// TODO give option to override default values
 	var config = config.Default()
 
 	controller.Task = task.NewTask(config, "controller")

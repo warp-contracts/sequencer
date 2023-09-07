@@ -33,4 +33,5 @@ var (
 	ErrArweaveBlockTransactionsMismatch = errors.Register(ModuleName, 1122, "arweave block transactions mismatch")
 	ErrInvalidArweaveBlockTx            = errors.Register(ModuleName, 1123, "invalid arweave block tx")
 	ErrNoArweaveBlockTx                 = errors.Register(ModuleName, 1124, "no arweave block tx")
+	ErrArweaveBlockNotFromProposer      = errors.Register(ModuleName, 1125, "arweave block not from proposer")
 )
