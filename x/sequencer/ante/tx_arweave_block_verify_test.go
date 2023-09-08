@@ -20,7 +20,7 @@ func TestArweaveBlockTxVerify(t *testing.T) {
 
 	foundTx, err := verifyArweaveBlockTx(tx)
 
-	require.Equal(t, true, foundTx)
+	require.True(t, foundTx)
 	require.NoError(t, err)
 }
 
@@ -31,7 +31,7 @@ func TestArweaveBlockTxVerifyWithAnotherMessageAfter(t *testing.T) {
 
 	foundTx, err := verifyArweaveBlockTx(tx)
 
-	require.Equal(t, true, foundTx)
+	require.True(t, foundTx)
 	require.ErrorIs(t, err, types.ErrTooManyMessages)
 }
 
@@ -42,7 +42,7 @@ func TestArweaveBlockTxVerifyWithAnotherMessageBefore(t *testing.T) {
 
 	foundTx, err := verifyArweaveBlockTx(tx)
 
-	require.Equal(t, true, foundTx)
+	require.True(t, foundTx)
 	require.ErrorIs(t, err, types.ErrTooManyMessages)
 }
 
@@ -52,7 +52,7 @@ func TestArweaveBlockTxVerifyWithoutBlock(t *testing.T) {
 
 	foundTx, err := verifyArweaveBlockTx(tx)
 
-	require.Equal(t, false, foundTx)
+	require.False(t, foundTx)
 	require.NoError(t, err)
 }
 
@@ -61,7 +61,7 @@ func TestArweaveBlockTxVerifyWithoutMsgs(t *testing.T) {
 
 	foundTx, err := verifyArweaveBlockTx(tx)
 
-	require.Equal(t, false, foundTx)
+	require.False(t, foundTx)
 	require.NoError(t, err)
 }
 

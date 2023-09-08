@@ -22,6 +22,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Contains basic info about Arweave block
 type ArweaveBlockInfo struct {
 	Height    uint64 `protobuf:"varint,1,opt,name=height,proto3" json:"height,omitempty"`
 	Timestamp uint64 `protobuf:"varint,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`

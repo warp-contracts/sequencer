@@ -46459,6 +46459,7 @@ paths:
                   hash:
                     type: string
                     format: byte
+                title: Contains basic info about Arweave block
         default:
           description: An unexpected error response.
           schema:
@@ -75266,6 +75267,7 @@ definitions:
       hash:
         type: string
         format: byte
+    title: Contains basic info about Arweave block
   sequencer.sequencer.ArweaveTransaction:
     type: object
     properties:
@@ -75275,6 +75277,9 @@ definitions:
       contract:
         type: string
         format: byte
+    description: >-
+      Store basic information about L1 interaction needed for calculating
+      sort_key and last_sort_key.
   sequencer.sequencer.MsgArweaveBlockResponse:
     type: object
   sequencer.sequencer.MsgDataItemResponse:
@@ -75297,6 +75302,7 @@ definitions:
           hash:
             type: string
             format: byte
+        title: Contains basic info about Arweave block
   sequencer.sequencer.QueryParamsResponse:
     type: object
     properties:

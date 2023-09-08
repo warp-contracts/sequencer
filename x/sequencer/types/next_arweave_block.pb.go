@@ -22,6 +22,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// Represents an Arweave block that has been fetched by the sequencer node from the Arweave network
+// but has not yet been added to the sequencer blockchain
 type NextArweaveBlock struct {
 	BlockInfo    *ArweaveBlockInfo     `protobuf:"bytes,1,opt,name=blockInfo,proto3" json:"blockInfo,omitempty"`
 	Transactions []*ArweaveTransaction `protobuf:"bytes,2,rep,name=transactions,proto3" json:"transactions,omitempty"`

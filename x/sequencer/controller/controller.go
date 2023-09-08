@@ -2,7 +2,6 @@ package controller
 
 import (
 	"math"
-	"sync/atomic"
 	"time"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -16,10 +15,18 @@ import (
 	"github.com/warp-contracts/syncer/src/utils/warp"
 )
 
+// Controller for fetching Arweave blocks to add them to the sequencer blockchain or validate blocks added by the Proposer.
 type ArweaveBlocksController interface {
-	StartController(initHeight uint64)
+	// Starts the fetching of Arweave blocks beginning from the given height
+	Start(initHeight uint64)
+
+	// Has the controller been started?
 	IsRunning() bool
+
+	// Returns the fetched Arweave block with the given height
 	GetNextArweaveBlock(height uint64) *types.NextArweaveBlock
+
+	// Deletes all fetched Arweave blocks with height not greater than the given one
 	RemoveNextArweaveBlocksUpToHeight(height uint64)
 }
 
@@ -27,25 +34,22 @@ type SyncerController struct {
 	sync.Controller
 
 	store     *Store
-	isRunning *atomic.Bool
 }
 
-func CreateController() ArweaveBlocksController {
+func NewController() ArweaveBlocksController {
 	controller := new(SyncerController)
-	controller.isRunning = &atomic.Bool{}
 
 	return controller
 }
 
 // TODO add controller stop
-func (controller *SyncerController) StartController(initHeight uint64) {
+func (controller *SyncerController) Start(initHeight uint64) {
 	controller.initController(initHeight)
 
-	err := controller.Start()
+	err := controller.Controller.Start()
 	if err != nil {
 		panic(err)
 	}
-	controller.isRunning.Store(true)
 }
 
 func (controller *SyncerController) initController(initHeight uint64) {
@@ -54,6 +58,7 @@ func (controller *SyncerController) initController(initHeight uint64) {
 
 	controller.Task = task.NewTask(config, "controller")
 
+	// FIXME: Add monitor to prometheus
 	monitor := monitor_syncer.NewMonitor().
 		WithMaxHistorySize(30)
 
@@ -113,7 +118,7 @@ func (controller *SyncerController) initController(initHeight uint64) {
 }
 
 func (controller *SyncerController) IsRunning() bool {
-	return controller.isRunning.Load()
+	return controller.Controller.Task != nil && !controller.Controller.Task.IsStopping.Load()
 }
 
 func (controller *SyncerController) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {

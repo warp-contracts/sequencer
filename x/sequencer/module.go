@@ -149,7 +149,7 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
-	am.startArweaveBlocksController(ctx)
+	am.startOrUpdateArweaveBlocksController(ctx)
 }
 
 // EndBlock contains the logic that is automatically triggered at the end of each block
@@ -157,13 +157,21 @@ func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.Valid
 	return []abci.ValidatorUpdate{}
 }
 
-func (am AppModule) startArweaveBlocksController(ctx sdk.Context) {
-	if am.arweaveBlocksController != nil && !am.arweaveBlocksController.IsRunning() {
-		lastArweaveBlock, found := am.keeper.GetLastArweaveBlock(ctx)
-		if found {
-			am.arweaveBlocksController.StartController(lastArweaveBlock.Height + 1)
+// Starts the controller to fetch next Arweave blocks 
+// or remove blocks that have already been added to the blockchain
+func (am AppModule) startOrUpdateArweaveBlocksController(ctx sdk.Context) {
+	if am.arweaveBlocksController == nil {
+		return
+	}
+	lastArweaveBlock, found := am.keeper.GetLastArweaveBlock(ctx)
+
+	if found {
+		if am.arweaveBlocksController.IsRunning() {
+			am.arweaveBlocksController.RemoveNextArweaveBlocksUpToHeight(lastArweaveBlock.Height)
 		} else {
-			panic("Last Arweave Block is not set when the BeginBlock method is called, and should be set when the blockchain is started")
+			am.arweaveBlocksController.Start(lastArweaveBlock.Height + 1)	
 		}
+	} else {
+		panic("Last Arweave Block is not set when the BeginBlock method is called, and should be set when the blockchain is started")
 	}
 }

@@ -15,12 +15,14 @@ service Msg {
   rpc ArweaveBlock       (MsgArweaveBlock) returns (MsgArweaveBlockResponse);
 }
 
+// message with L2 interaction in the form of a data item
 message MsgDataItem {
   bytes data_item = 1 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem", (gogoproto.nullable) = false];
 }
 
 message MsgDataItemResponse {}
 
+// message with an Arweave block
 message MsgArweaveBlock {
   ArweaveBlockInfo block_info = 1;
   repeated ArweaveTransaction transactions = 2;

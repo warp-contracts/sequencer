@@ -6,6 +6,8 @@ import "sequencer/sequencer/arweave_transaction.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
+// Represents an Arweave block that has been fetched by the sequencer node from the Arweave network 
+// but has not yet been added to the sequencer blockchain
 message NextArweaveBlock {
   ArweaveBlockInfo blockInfo = 1; 
   repeated ArweaveTransaction transactions = 2; 

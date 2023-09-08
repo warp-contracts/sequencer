@@ -8,7 +8,7 @@ type ArweaveBlocksControllerMock struct {
 	block *types.NextArweaveBlock
 }
 
-func (mock ArweaveBlocksControllerMock) StartController(height uint64) {
+func (mock ArweaveBlocksControllerMock) Start(height uint64) {
 }
 
 func (mock ArweaveBlocksControllerMock) IsRunning() bool {

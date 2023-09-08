@@ -5,6 +5,8 @@ import (
 	"sort"
 	"sync"
 
+	"github.com/gammazero/deque"
+
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	syncer_arweave "github.com/warp-contracts/syncer/src/utils/arweave"
@@ -19,14 +21,15 @@ type Store struct {
 	*task.Task
 
 	monitor monitoring.Monitor
-	mtx     sync.Mutex
+	mtx     sync.RWMutex
 
 	input  chan *listener.Payload
-	blocks []types.NextArweaveBlock
+	blocks *deque.Deque[*types.NextArweaveBlock]
 }
 
 func NewStore(config *config.Config) (store *Store) {
 	store = new(Store)
+	store.blocks = deque.New[*types.NextArweaveBlock]()
 
 	store.Task = task.NewTask(config, "store").
 		WithSubtaskFunc(store.run)
@@ -67,7 +70,7 @@ func (store *Store) processPayload(payload *listener.Payload) {
 
 	store.mtx.Lock()
 	// TODO add saving to database
-	store.blocks = append(store.blocks, block)
+	store.blocks.PushBack(&block)
 	store.mtx.Unlock()
 }
 
@@ -99,9 +102,13 @@ func getContractFromTag(tx *syncer_arweave.Transaction) syncer_arweave.Base64Str
 }
 
 func (store *Store) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
-	for _, block := range store.blocks {
+	store.mtx.RLock()
+	defer store.mtx.RUnlock()
+
+	for i := 0; i < store.blocks.Len(); i++ {
+		block := store.blocks.At(i)
 		if block.BlockInfo.Height == height {
-			return &block
+			return block
 		}
 	}
 	return nil
@@ -111,11 +118,7 @@ func (store *Store) removeNextArweaveBlocksUpToHeight(height uint64) {
 	store.mtx.Lock()
 	defer store.mtx.Unlock()
 
-	n := 0
-	for _, block := range store.blocks {
-		if block.BlockInfo.Height <= height {
-			n++
-		}
+	for store.blocks.Len() > 0 && store.blocks.Front().BlockInfo.Height <= height {
+		store.blocks.PopFront()
 	}
-	store.blocks = store.blocks[n:]
 }

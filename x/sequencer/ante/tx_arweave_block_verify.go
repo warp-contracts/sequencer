@@ -57,15 +57,17 @@ func verifyArweaveBlockTx(tx sdk.Tx) (bool, error) {
 }
 
 func (abtd ArweaveBlockTxDecorator) shouldBlockContainArweaveTx(ctx sdk.Context) error {
-	if ctx.BlockHeader().Height > 0 && !ctx.IsCheckTx() {
-		lastArweaveBlock := abtd.keeper.MustGetLastArweaveBlock(ctx)
-		nextArweaveBlock := abtd.controller.GetNextArweaveBlock(lastArweaveBlock.Height)
+	if ctx.BlockHeader().Height == 0 || ctx.IsCheckTx() {
+		return nil
+	}
 
-		if nextArweaveBlock != nil && types.CheckArweaveBlockIsOldEnough(ctx, nextArweaveBlock.BlockInfo) {
-			return errors.Wrapf(types.ErrNoArweaveBlockTx,
-				"The first transaction of the block should contain a transaction with the Arweave block with height %d",
-				lastArweaveBlock.Height)
-		}
+	lastArweaveBlock := abtd.keeper.MustGetLastArweaveBlock(ctx)
+	nextArweaveBlock := abtd.controller.GetNextArweaveBlock(lastArweaveBlock.Height)
+
+	if nextArweaveBlock != nil && types.IsArweaveBlockOldEnough(ctx, nextArweaveBlock.BlockInfo) {
+		return errors.Wrapf(types.ErrNoArweaveBlockTx,
+			"The first transaction of the block should contain a transaction with the Arweave block with height %d",
+			lastArweaveBlock.Height)
 	}
 	return nil
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-// If there is an Arweave block that is over an hour old and has not yet been added to the blockchain, 
+// If there is an Arweave block that is over an hour old and has not yet been added to the blockchain,
 // a transaction containing such a block is added to the beginning of the Cosmos block proposal.
 func NewPrepareProposalHandler(keeper keeper.Keeper, arweaveController controller.ArweaveBlocksController, txConfig client.TxConfig, logger log.Logger) sdk.PrepareProposalHandler {
 	return func(ctx sdk.Context, req abci.RequestPrepareProposal) abci.ResponsePrepareProposal {
@@ -20,7 +20,7 @@ func NewPrepareProposalHandler(keeper keeper.Keeper, arweaveController controlle
 		lastBlock := keeper.MustGetLastArweaveBlock(ctx)
 		nextBlock := arweaveController.GetNextArweaveBlock(lastBlock.Height + 1)
 
-		if nextBlock != nil && types.CheckArweaveBlockIsOldEnough(ctx, nextBlock.BlockInfo) {
+		if nextBlock != nil && types.IsArweaveBlockOldEnough(ctx, nextBlock.BlockInfo) {
 			txs = append([][]byte{createArweaveTx(ctx, txConfig, nextBlock)}, txs...)
 		}
 
