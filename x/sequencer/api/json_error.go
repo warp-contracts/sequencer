@@ -24,7 +24,7 @@ func BadRequestError(w http.ResponseWriter, err error, errorType string) {
 
 // Writes a internal server error in the form of JSON to the HTTP response (takes an error as a string)
 func InternalServerErrorString(w http.ResponseWriter, err string, errorType string) {
-	jsonError := createJsonError(err, errorType, http.StatusBadRequest)
+	jsonError := createJsonError(err, errorType, http.StatusInternalServerError)
 	writeError(w, jsonError)
 }
 

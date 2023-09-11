@@ -38,7 +38,7 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Wrap message with Cosmos transaction, validate and broadcast transaction
 	response, err := types.BroadcastDataItem(h.ctx, msg)
 	if err != nil {
-		InternalServerErrorString(w, "failed to broadcast transaction", "broadcast transaction error")
+		InternalServerError(w, err, "broadcast transaction error")
 		return
 	}
 	if response.Code != 0 {

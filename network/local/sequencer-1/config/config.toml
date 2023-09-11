@@ -285,7 +285,7 @@ broadcast = true
 wal_dir = ""
 
 # Maximum number of transactions in the mempool
-size = 5000
+size = 100000
 
 # Limit the total size of all txs in the mempool.
 # This only accounts for raw transactions (e.g. given 1MB transactions and
@@ -405,7 +405,7 @@ timeout_commit = "5s"
 double_sign_check_height = 0
 
 # Make progress as soon as we have all the precommits (as if TimeoutCommit = 0)
-skip_timeout_commit = false
+skip_timeout_commit = true
 
 # EmptyBlocks mode and possible interval between empty blocks
 create_empty_blocks = false
