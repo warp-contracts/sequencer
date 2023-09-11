@@ -35,9 +35,9 @@ func TestArweaveBlockInfoMsgServer(t *testing.T) {
 
 	rst, found := k.GetLastArweaveBlock(ctx)
 	require.True(t, found)
-	require.Equal(t, expected.BlockInfo.Height, rst.Height)
-	require.Equal(t, expected.BlockInfo.Timestamp, rst.Timestamp)
-	require.Equal(t, expected.BlockInfo.Hash, rst.Hash)
+	require.Equal(t, expected.BlockInfo.Height, rst.ArweaveBlock.Height)
+	require.Equal(t, expected.BlockInfo.Timestamp, rst.ArweaveBlock.Timestamp)
+	require.Equal(t, expected.BlockInfo.Hash, rst.ArweaveBlock.Hash)
 }
 
 func TestArweaveBlockMsgServerWithoutHoursDelay(t *testing.T) {

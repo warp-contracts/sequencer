@@ -18,7 +18,7 @@ func NewPrepareProposalHandler(keeper keeper.Keeper, arweaveController controlle
 	return func(ctx sdk.Context, req abci.RequestPrepareProposal) abci.ResponsePrepareProposal {
 		txs := req.Txs
 		lastBlock := keeper.MustGetLastArweaveBlock(ctx)
-		nextBlock := arweaveController.GetNextArweaveBlock(lastBlock.Height + 1)
+		nextBlock := arweaveController.GetNextArweaveBlock(lastBlock.ArweaveBlock.Height + 1)
 
 		if nextBlock != nil && types.IsArweaveBlockOldEnough(ctx, nextBlock.BlockInfo) {
 			txs = append([][]byte{createArweaveTx(ctx, txConfig, nextBlock)}, txs...)

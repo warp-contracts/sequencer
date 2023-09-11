@@ -1,0 +1,12 @@
+syntax = "proto3";
+package sequencer.sequencer;
+
+import "sequencer/sequencer/arweave_block_info.proto";
+
+option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
+
+// Information about the latest Arweave block added to the blockchain
+message LastArweaveBlock {
+  ArweaveBlockInfo arweave_block = 1;
+  int64 sequencer_block_height = 2;
+}
