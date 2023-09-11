@@ -7,4 +7,5 @@ option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 message ArweaveTransaction {
   bytes id = 1;
   bytes contract = 2;
+  string sort_key = 3;
 }

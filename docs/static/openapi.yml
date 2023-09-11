@@ -75277,6 +75277,8 @@ definitions:
       contract:
         type: string
         format: byte
+      sort_key:
+        type: string
     description: >-
       Store basic information about L1 interaction needed for calculating
       sort_key and last_sort_key.
