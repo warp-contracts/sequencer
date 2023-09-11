@@ -46450,16 +46450,25 @@ paths:
               LastArweaveBlock:
                 type: object
                 properties:
-                  height:
+                  arweave_block:
+                    type: object
+                    properties:
+                      height:
+                        type: string
+                        format: uint64
+                      timestamp:
+                        type: string
+                        format: uint64
+                      hash:
+                        type: string
+                        format: byte
+                    title: Contains basic info about Arweave block
+                  sequencer_block_height:
                     type: string
-                    format: uint64
-                  timestamp:
-                    type: string
-                    format: uint64
-                  hash:
-                    type: string
-                    format: byte
-                title: Contains basic info about Arweave block
+                    format: int64
+                title: >-
+                  Information about the latest Arweave block added to the
+                  blockchain
         default:
           description: An unexpected error response.
           schema:
@@ -75282,6 +75291,26 @@ definitions:
     description: >-
       Store basic information about L1 interaction needed for calculating
       sort_key and last_sort_key.
+  sequencer.sequencer.LastArweaveBlock:
+    type: object
+    properties:
+      arweave_block:
+        type: object
+        properties:
+          height:
+            type: string
+            format: uint64
+          timestamp:
+            type: string
+            format: uint64
+          hash:
+            type: string
+            format: byte
+        title: Contains basic info about Arweave block
+      sequencer_block_height:
+        type: string
+        format: int64
+    title: Information about the latest Arweave block added to the blockchain
   sequencer.sequencer.MsgArweaveBlockResponse:
     type: object
   sequencer.sequencer.MsgDataItemResponse:
@@ -75295,16 +75324,23 @@ definitions:
       LastArweaveBlock:
         type: object
         properties:
-          height:
+          arweave_block:
+            type: object
+            properties:
+              height:
+                type: string
+                format: uint64
+              timestamp:
+                type: string
+                format: uint64
+              hash:
+                type: string
+                format: byte
+            title: Contains basic info about Arweave block
+          sequencer_block_height:
             type: string
-            format: uint64
-          timestamp:
-            type: string
-            format: uint64
-          hash:
-            type: string
-            format: byte
-        title: Contains basic info about Arweave block
+            format: int64
+        title: Information about the latest Arweave block added to the blockchain
   sequencer.sequencer.QueryParamsResponse:
     type: object
     properties:

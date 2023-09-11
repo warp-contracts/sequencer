@@ -40,7 +40,7 @@ func (k msgServer) setNewArweaveBlockInfo(ctx sdk.Context, block *types.MsgArwea
 		return err
 	}
 
-	k.SetLastArweaveBlock(ctx, *newBlockInfo)
+	k.setLastArweaveBlock(ctx, newBlockInfo)
 	return nil
 }
 
@@ -63,12 +63,12 @@ func (k msgServer) compareBlockWithPreviousOne(ctx sdk.Context, newValue *types.
 		return nil
 	}
 
-	if newValue.Height-oldValue.Height != 1 {
+	if newValue.Height-oldValue.ArweaveBlock.Height != 1 {
 		return errors.Wrap(types.ErrArweaveBlockHeightMismatch,
 			"The new height of the Arweave block is not the next value compared to the previous height")
 	}
 
-	if newValue.Timestamp <= oldValue.Timestamp {
+	if newValue.Timestamp <= oldValue.ArweaveBlock.Timestamp {
 		return errors.Wrap(types.ErrArweaveBlockTimestampMismatch,
 			"The timestamp of the Arweave block is not later than the previous one")
 	}
@@ -117,4 +117,12 @@ func transactionsDiffer(transactions1 []*types.ArweaveTransaction, transactions2
 	}
 
 	return false
+}
+
+func (k msgServer) setLastArweaveBlock(ctx sdk.Context, newBlockInfo *types.ArweaveBlockInfo) {
+	lastArweaveBlock := types.LastArweaveBlock {
+		ArweaveBlock: newBlockInfo,
+		SequencerBlockHeight: ctx.BlockHeight(),
+	}
+	k.SetLastArweaveBlock(ctx, lastArweaveBlock)
 }

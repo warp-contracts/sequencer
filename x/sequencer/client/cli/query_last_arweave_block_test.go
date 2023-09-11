@@ -15,11 +15,11 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func networkWithLastArweaveBlockObjects(t *testing.T) (*network.Network, types.ArweaveBlockInfo) {
+func networkWithLastArweaveBlockObjects(t *testing.T) (*network.Network, types.LastArweaveBlock) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
-	lastArweaveBlock := &types.ArweaveBlockInfo{}
+	lastArweaveBlock := &types.LastArweaveBlock{}
 	nullify.Fill(&lastArweaveBlock)
 	state.LastArweaveBlock = lastArweaveBlock
 	buf, err := cfg.Codec.MarshalJSON(&state)
@@ -39,7 +39,7 @@ func TestShowLastArweaveBlock(t *testing.T) {
 		desc string
 		args []string
 		err  error
-		obj  types.ArweaveBlockInfo
+		obj  types.LastArweaveBlock
 	}{
 		{
 			desc: "get",

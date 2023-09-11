@@ -21,7 +21,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "valid genesis state",
 			genState: &GenesisState{
 
-				LastArweaveBlock: &ArweaveBlockInfo{},
+				LastArweaveBlock: &LastArweaveBlock{},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,

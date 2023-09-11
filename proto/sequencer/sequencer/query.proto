@@ -6,7 +6,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "sequencer/sequencer/params.proto";
-import "sequencer/sequencer/arweave_block_info.proto";
+import "sequencer/sequencer/last_arweave_block.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
@@ -38,5 +38,5 @@ message QueryParamsResponse {
 message QueryGetLastArweaveBlockRequest {}
 
 message QueryGetLastArweaveBlockResponse {
-  ArweaveBlockInfo LastArweaveBlock = 1 [(gogoproto.nullable) = false];
+  LastArweaveBlock LastArweaveBlock = 1 [(gogoproto.nullable) = false];
 }

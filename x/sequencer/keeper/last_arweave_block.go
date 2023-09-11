@@ -7,14 +7,14 @@ import (
 )
 
 // SetLastArweaveBlock set lastArweaveBlock in the store
-func (k Keeper) SetLastArweaveBlock(ctx sdk.Context, lastArweaveBlock types.ArweaveBlockInfo) {
+func (k Keeper) SetLastArweaveBlock(ctx sdk.Context, lastArweaveBlock types.LastArweaveBlock) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LastArweaveBlockKey))
 	b := k.cdc.MustMarshal(&lastArweaveBlock)
 	store.Set([]byte{0}, b)
 }
 
 // GetLastArweaveBlock returns lastArweaveBlock
-func (k Keeper) GetLastArweaveBlock(ctx sdk.Context) (val types.ArweaveBlockInfo, found bool) {
+func (k Keeper) GetLastArweaveBlock(ctx sdk.Context) (val types.LastArweaveBlock, found bool) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LastArweaveBlockKey))
 
 	b := store.Get([]byte{0})
@@ -26,12 +26,12 @@ func (k Keeper) GetLastArweaveBlock(ctx sdk.Context) (val types.ArweaveBlockInfo
 	return val, true
 }
 
-func (k Keeper) MustGetLastArweaveBlock(ctx sdk.Context) types.ArweaveBlockInfo {
-	blockInfo, found := k.GetLastArweaveBlock(ctx)
+func (k Keeper) MustGetLastArweaveBlock(ctx sdk.Context) types.LastArweaveBlock {
+	lastArweaveBlock, found := k.GetLastArweaveBlock(ctx)
 	if !found {
 		panic("LastArweaveBlock must be set")
 	}
-	return blockInfo
+	return lastArweaveBlock
 }
 
 // RemoveLastArweaveBlock removes lastArweaveBlock from the store
