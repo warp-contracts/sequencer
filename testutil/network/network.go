@@ -52,6 +52,9 @@ func DefaultConfig() network.Config {
 	var (
 		encoding = app.MakeEncodingConfig()
 		chainID  = "chain-" + tmrand.NewRand().Str(6)
+		appOptions = simtestutil.AppOptionsMap{
+			"test": true,
+		}
 	)
 	return network.Config{
 		Codec:             encoding.Marshaler,
@@ -69,7 +72,7 @@ func DefaultConfig() network.Config {
 				val.GetCtx().Config.RootDir,
 				0,
 				encoding,
-				simtestutil.EmptyAppOptions{},
+				appOptions,
 				baseapp.SetPruning(pruningtypes.NewPruningOptionsFromString(val.GetAppConfig().Pruning)),
 				baseapp.SetMinGasPrices(val.GetAppConfig().MinGasPrices),
 				baseapp.SetChainID(chainID),

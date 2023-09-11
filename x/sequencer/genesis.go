@@ -8,9 +8,11 @@ import (
 
 // InitGenesis initializes the module's state from a provided genesis state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) {
-	// Set if defined
+	// Set LastArweaveBlock
 	if genState.LastArweaveBlock != nil {
 		k.SetLastArweaveBlock(ctx, *genState.LastArweaveBlock)
+	} else {
+		panic("LastArweaveBlock cannot be empty in the genesis state")
 	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)

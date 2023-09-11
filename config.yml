@@ -23,3 +23,7 @@ genesis:
     staking:
       params:
         bond_denom: "warptest"
+    sequencer:
+      lastArweaveBlock:
+        height: 1255884
+        timestamp: 1693997429

@@ -2,68 +2,119 @@ package ante
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	keepertest "github.com/warp-contracts/sequencer/testutil/keeper"
+	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func TestArweaveBlockTx(t *testing.T) {
-	blockInfo := test.ArweaveBlockInfo()
-	interaction := test.ArweaveL1Interaction(t)
-	tx := createTxWithMsgs(t, &blockInfo, &interaction)
+func TestArweaveBlockTxVerify(t *testing.T) {
+	block := test.ArweaveBlock()
+	tx := createTxWithMsgs(t, &block)
 
-	err := verifyArweaveBlockTx(tx)
+	foundTx, err := verifyArweaveBlockTx(tx)
+
+	require.True(t, foundTx)
+	require.NoError(t, err)
+}
+
+func TestArweaveBlockTxVerifyWithAnotherMessageAfter(t *testing.T) {
+	block := test.ArweaveBlock()
+	dataItem := test.ArweaveL2Interaction(t)
+	tx := createTxWithMsgs(t, &block, &dataItem)
+
+	foundTx, err := verifyArweaveBlockTx(tx)
+
+	require.True(t, foundTx)
+	require.ErrorIs(t, err, types.ErrTooManyMessages)
+}
+
+func TestArweaveBlockTxVerifyWithAnotherMessageBefore(t *testing.T) {
+	dataItem := test.ArweaveL2Interaction(t)
+	block := test.ArweaveBlock()
+	tx := createTxWithMsgs(t, &dataItem, &block)
+
+	foundTx, err := verifyArweaveBlockTx(tx)
+
+	require.True(t, foundTx)
+	require.ErrorIs(t, err, types.ErrTooManyMessages)
+}
+
+func TestArweaveBlockTxVerifyWithoutBlock(t *testing.T) {
+	dataItem := test.ArweaveL2Interaction(t)
+	tx := createTxWithMsgs(t, &dataItem)
+
+	foundTx, err := verifyArweaveBlockTx(tx)
+
+	require.False(t, foundTx)
+	require.NoError(t, err)
+}
+
+func TestArweaveBlockTxVerifyWithoutMsgs(t *testing.T) {
+	tx := createTxWithMsgs(t)
+
+	foundTx, err := verifyArweaveBlockTx(tx)
+
+	require.False(t, foundTx)
+	require.NoError(t, err)
+}
+
+func arweaveBlockTxDecoratorAndCtx(t *testing.T, blockHeight int64, blockTimestamp int64, lastTimestamp uint64, nextTimestamp uint64) (ArweaveBlockTxDecorator, sdk.Context) {
+	k, ctx := keepertest.SequencerKeeper(t)
+	if lastTimestamp > 0 {
+		k.SetLastArweaveBlock(ctx, types.ArweaveBlockInfo{
+			Height:    1,
+			Timestamp: lastTimestamp,
+		})
+	}
+	var c controller.ArweaveBlocksController
+	if nextTimestamp > 0 {
+		c = controller.MockArweaveBlocksController(&types.ArweaveBlockInfo{
+			Timestamp: nextTimestamp,
+		})
+	} else {
+		c = controller.MockArweaveBlocksController(nil)
+	}
+	blockHeader := ctx.BlockHeader()
+	blockHeader.Time = time.Unix(blockTimestamp, 0)
+	blockHeader.Height = blockHeight
+	return NewArweaveBlockTxDecorator(*k, c), ctx.WithBlockHeader(blockHeader)
+}
+
+func TestArweaveBlockTxNoNeedArweaveTx(t *testing.T) {
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 1, 200, 100, 300)
+
+	err := abtd.shouldBlockContainArweaveTx(ctx)
 
 	require.NoError(t, err)
 }
 
-func TestArweaveBlockTxNoBlockInfo(t *testing.T) {
-	interaction := test.ArweaveL1Interaction(t)
-	tx := createTxWithMsgs(t, &interaction)
+func TestArweaveBlockTxWithoutNextArweaveBlock(t *testing.T) {
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 1, 200, 100, 0)
 
-	err := verifyArweaveBlockTx(tx)
-
-	require.ErrorIs(t, err, types.ErrInvalidArweaveBlockTx)
-}
-
-func TestArweaveBlockTxOnlyBlockInfo(t *testing.T) {
-	blockInfo := test.ArweaveBlockInfo()
-	tx := createTxWithMsgs(t, &blockInfo)
-
-	err := verifyArweaveBlockTx(tx)
+	err := abtd.shouldBlockContainArweaveTx(ctx)
 
 	require.NoError(t, err)
 }
 
-func TestArweaveBlockTxBlockInfoAfterL1Interaction(t *testing.T) {
-	interaction := test.ArweaveL1Interaction(t)
-	blockInfo := test.ArweaveBlockInfo()
-	tx := createTxWithMsgs(t, &interaction, &blockInfo)
 
-	err := verifyArweaveBlockTx(tx)
+func TestArweaveBlockTxGenesisDoesNotNeedArweaveBlock(t *testing.T) {
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 0, 10000, 100, 300)
 
-	require.ErrorIs(t, err, types.ErrInvalidArweaveBlockTx)
+	err := abtd.shouldBlockContainArweaveTx(ctx)
+
+	require.NoError(t, err)
 }
+func TestArweaveBlockTxShouldContainArweaveBlock(t *testing.T) {
+	abtd, ctx := arweaveBlockTxDecoratorAndCtx(t, 1, 10000, 100, 300)
 
-func TestArweaveBlockTxBlockInfoAfterL2Interaction(t *testing.T) {
-	interaction := test.ArweaveL2Interaction(t)
-	blockInfo := test.ArweaveBlockInfo()
-	tx := createTxWithMsgs(t, &interaction, &blockInfo)
+	err := abtd.shouldBlockContainArweaveTx(ctx)
 
-	err := verifyArweaveBlockTx(tx)
-
-	require.ErrorIs(t, err, types.ErrInvalidArweaveBlockTx)
-}
-
-func TestArweaveBlockTxWithL2Interaction(t *testing.T) {
-	blockInfo := test.ArweaveBlockInfo()
-	l1Interaction := test.ArweaveL1Interaction(t)
-	l2Interaction := test.ArweaveL2Interaction(t)
-	tx := createTxWithMsgs(t, &blockInfo, &l1Interaction, &l2Interaction)
-
-	err := verifyArweaveBlockTx(tx)
-
-	require.ErrorIs(t, err, types.ErrInvalidArweaveBlockTx)
+	require.ErrorIs(t, err, types.ErrNoArweaveBlockTx)
 }

@@ -46450,8 +46450,6 @@ paths:
               LastArweaveBlock:
                 type: object
                 properties:
-                  creator:
-                    type: string
                   height:
                     type: string
                     format: uint64
@@ -46461,6 +46459,7 @@ paths:
                   hash:
                     type: string
                     format: byte
+                title: Contains basic info about Arweave block
         default:
           description: An unexpected error response.
           schema:
@@ -75256,11 +75255,9 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
-  sequencer.sequencer.LastArweaveBlock:
+  sequencer.sequencer.ArweaveBlockInfo:
     type: object
     properties:
-      creator:
-        type: string
       height:
         type: string
         format: uint64
@@ -75270,9 +75267,20 @@ definitions:
       hash:
         type: string
         format: byte
-  sequencer.sequencer.MsgArweaveBlockInfoResponse:
+    title: Contains basic info about Arweave block
+  sequencer.sequencer.ArweaveTransaction:
     type: object
-  sequencer.sequencer.MsgArweaveTransactionResponse:
+    properties:
+      id:
+        type: string
+        format: byte
+      contract:
+        type: string
+        format: byte
+    description: >-
+      Store basic information about L1 interaction needed for calculating
+      sort_key and last_sort_key.
+  sequencer.sequencer.MsgArweaveBlockResponse:
     type: object
   sequencer.sequencer.MsgDataItemResponse:
     type: object
@@ -75285,8 +75293,6 @@ definitions:
       LastArweaveBlock:
         type: object
         properties:
-          creator:
-            type: string
           height:
             type: string
             format: uint64
@@ -75296,6 +75302,7 @@ definitions:
           hash:
             type: string
             format: byte
+        title: Contains basic info about Arweave block
   sequencer.sequencer.QueryParamsResponse:
     type: object
     properties:

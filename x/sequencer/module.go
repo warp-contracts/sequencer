@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	// this line is used by starport scaffolding # 1
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -17,6 +18,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/warp-contracts/sequencer/x/sequencer/client/cli"
+	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
@@ -94,9 +96,10 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 type AppModule struct {
 	AppModuleBasic
 
-	keeper        keeper.Keeper
-	accountKeeper types.AccountKeeper
-	bankKeeper    types.BankKeeper
+	keeper                  keeper.Keeper
+	accountKeeper           types.AccountKeeper
+	bankKeeper              types.BankKeeper
+	arweaveBlocksController controller.ArweaveBlocksController
 }
 
 func NewAppModule(
@@ -104,18 +107,20 @@ func NewAppModule(
 	keeper keeper.Keeper,
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
+	arweaveBlocksController controller.ArweaveBlocksController,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic: NewAppModuleBasic(cdc),
-		keeper:         keeper,
-		accountKeeper:  accountKeeper,
-		bankKeeper:     bankKeeper,
+		AppModuleBasic:          NewAppModuleBasic(cdc),
+		keeper:                  keeper,
+		accountKeeper:           accountKeeper,
+		bankKeeper:              bankKeeper,
+		arweaveBlocksController: arweaveBlocksController,
 	}
 }
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper, am.arweaveBlocksController))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
@@ -143,9 +148,30 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 func (AppModule) ConsensusVersion() uint64 { return 1 }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
+func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
+	am.startOrUpdateArweaveBlocksController(ctx)
+}
 
 // EndBlock contains the logic that is automatically triggered at the end of each block
 func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
+}
+
+// Starts the controller to fetch next Arweave blocks 
+// or remove blocks that have already been added to the blockchain
+func (am AppModule) startOrUpdateArweaveBlocksController(ctx sdk.Context) {
+	if am.arweaveBlocksController == nil {
+		return
+	}
+	lastArweaveBlock, found := am.keeper.GetLastArweaveBlock(ctx)
+
+	if found {
+		if am.arweaveBlocksController.IsRunning() {
+			am.arweaveBlocksController.RemoveNextArweaveBlocksUpToHeight(lastArweaveBlock.Height)
+		} else {
+			am.arweaveBlocksController.Start(lastArweaveBlock.Height + 1)	
+		}
+	} else {
+		panic("Last Arweave Block is not set when the BeginBlock method is called, and should be set when the blockchain is started")
+	}
 }

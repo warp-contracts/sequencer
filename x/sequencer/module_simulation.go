@@ -26,12 +26,8 @@ const (
 	opWeightMsgDataItem          = "op_weight_msg_data_item"
 	defaultWeightMsgDataItem int = 100
 
-	opWeightMsgArweaveBlockInfo          = "op_weight_msg_arweave_block"
-	defaultWeightMsgArweaveBlockInfo int = 100
-
-	opWeightMsgArweaveTransaction = "op_weight_msg_arweave_transaction"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgArweaveTransaction int = 100
+	opWeightMsgArweaveBlock          = "op_weight_msg_arweave_block"
+	defaultWeightMsgArweaveBlock int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
 )
@@ -72,26 +68,15 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 		sequencersimulation.SimulateMsgDataItem(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
-	var weightMsgArweaveBlockInfo int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgArweaveBlockInfo, &weightMsgArweaveBlockInfo, nil,
+	var weightMsgArweaveBlock int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgArweaveBlock, &weightMsgArweaveBlock, nil,
 		func(_ *rand.Rand) {
-			weightMsgArweaveBlockInfo = defaultWeightMsgArweaveBlockInfo
+			weightMsgArweaveBlock = defaultWeightMsgArweaveBlock
 		},
 	)
 	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgArweaveBlockInfo,
-		sequencersimulation.SimulateMsgArweaveBlockInfo(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgArweaveTransaction int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgArweaveTransaction, &weightMsgArweaveTransaction, nil,
-		func(_ *rand.Rand) {
-			weightMsgArweaveTransaction = defaultWeightMsgArweaveTransaction
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgArweaveTransaction,
-		sequencersimulation.SimulateMsgArweaveTransaction(am.accountKeeper, am.bankKeeper, am.keeper),
+		weightMsgArweaveBlock,
+		sequencersimulation.SimulateMsgArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation
@@ -111,18 +96,10 @@ func (am AppModule) ProposalMsgs(simState module.SimulationState) []simtypes.Wei
 			},
 		),
 		simulation.NewWeightedProposalMsg(
-			opWeightMsgArweaveBlockInfo,
-			defaultWeightMsgArweaveBlockInfo,
+			opWeightMsgArweaveBlock,
+			defaultWeightMsgArweaveBlock,
 			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
-				sequencersimulation.SimulateMsgArweaveBlockInfo(am.accountKeeper, am.bankKeeper, am.keeper)
-				return nil
-			},
-		),
-		simulation.NewWeightedProposalMsg(
-			opWeightMsgArweaveTransaction,
-			defaultWeightMsgArweaveTransaction,
-			func(r *rand.Rand, ctx sdk.Context, accs []simtypes.Account) sdk.Msg {
-				sequencersimulation.SimulateMsgArweaveTransaction(am.accountKeeper, am.bankKeeper, am.keeper)
+				sequencersimulation.SimulateMsgArweaveBlock(am.accountKeeper, am.bankKeeper, am.keeper)
 				return nil
 			},
 		),

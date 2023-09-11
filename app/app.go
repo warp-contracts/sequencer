@@ -112,8 +112,11 @@ import (
 	sequencermodule "github.com/warp-contracts/sequencer/x/sequencer"
 	sequencerante "github.com/warp-contracts/sequencer/x/sequencer/ante"
 	sequencerapi "github.com/warp-contracts/sequencer/x/sequencer/api"
+	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	sequencermodulekeeper "github.com/warp-contracts/sequencer/x/sequencer/keeper"
+	sequencerprepare "github.com/warp-contracts/sequencer/x/sequencer/prepare"
 	sequencermoduletypes "github.com/warp-contracts/sequencer/x/sequencer/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/warp-contracts/sequencer/app/params"
@@ -526,7 +529,11 @@ func New(
 		keys[sequencermoduletypes.MemStoreKey],
 		app.GetSubspace(sequencermoduletypes.ModuleName),
 	)
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper)
+	var arweaveBlocksController controller.ArweaveBlocksController
+	if appOpts.Get("test") == nil {
+		arweaveBlocksController = controller.NewController()
+	}
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -714,11 +721,13 @@ func New(
 	// initialize BaseApp
 	anteHandler, err := sequencerante.NewAnteHandler(
 		sequencerante.HandlerOptions{
-			AccountKeeper:   app.AccountKeeper,
-			BankKeeper:      app.BankKeeper,
-			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-			FeegrantKeeper:  app.FeeGrantKeeper,
-			SigGasConsumer:  sequencerante.SigVerificationGasConsumer,
+			AccountKeeper:           app.AccountKeeper,
+			ArweaveBlocksController: arweaveBlocksController,
+			BankKeeper:              app.BankKeeper,
+			FeegrantKeeper:          app.FeeGrantKeeper,
+			SequencerKeeper:         app.SequencerKeeper,
+			SignModeHandler:         encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:          sequencerante.SigVerificationGasConsumer,
 		},
 	)
 	if err != nil {
@@ -729,6 +738,7 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
+	app.SetPrepareProposal(sequencerprepare.NewPrepareProposalHandler(app.SequencerKeeper, arweaveBlocksController, app.txConfig, logger))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {

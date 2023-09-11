@@ -12,8 +12,8 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func createTestLastArweaveBlock(keeper *keeper.Keeper, ctx sdk.Context) types.LastArweaveBlock {
-	item := types.LastArweaveBlock{}
+func createTestLastArweaveBlock(keeper *keeper.Keeper, ctx sdk.Context) types.ArweaveBlockInfo {
+	item := types.ArweaveBlockInfo{}
 	keeper.SetLastArweaveBlock(ctx, item)
 	return item
 }

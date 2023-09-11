@@ -14,7 +14,7 @@ func TestGenesis(t *testing.T) {
 	genesisState := types.GenesisState{
 		Params: types.DefaultParams(),
 
-		LastArweaveBlock: &types.LastArweaveBlock{},
+		LastArweaveBlock: &types.ArweaveBlockInfo{},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 

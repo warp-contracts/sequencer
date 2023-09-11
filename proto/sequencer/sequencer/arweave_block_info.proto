@@ -1,0 +1,11 @@
+syntax = "proto3";
+package sequencer.sequencer;
+
+option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
+
+// Contains basic info about Arweave block
+message ArweaveBlockInfo {
+  uint64 height = 1;
+  uint64 timestamp = 2;
+  bytes hash = 3;
+}

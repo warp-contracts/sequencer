@@ -12,7 +12,7 @@ func NewSetInfiniteGasMeterDecorator() SetInfiniteGasMeterDecorator {
 
 // For transactions containing an Arweave DataItem we do not check gas consumption
 func (sigmd SetInfiniteGasMeterDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	if isL2Interaction(tx) {
+	if isArweaveBlockTx(tx) || isL2Interaction(tx) {
 		newCtx = ctx.WithGasMeter(sdk.NewInfiniteGasMeter())
 	} else {
 		newCtx = ctx

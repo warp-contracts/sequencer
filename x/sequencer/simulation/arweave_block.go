@@ -12,7 +12,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func SimulateMsgArweaveBlockInfo(
+func SimulateMsgArweaveBlock(
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	k keeper.Keeper,
@@ -21,11 +21,12 @@ func SimulateMsgArweaveBlockInfo(
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		simAccount, _ := simtypes.RandomAcc(r, accs)
 
-		msg := &types.MsgArweaveBlockInfo{
-			Creator:   simAccount.Address.String(),
-			Height:    1431216,
-			Timestamp: 1690809540,
-			Hash:      []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
+		msg := &types.MsgArweaveBlock{
+			BlockInfo: &types.ArweaveBlockInfo{
+				Height:    1431216,
+				Timestamp: 1690809540,
+				Hash:      []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
+			},
 		}
 
 		txCtx := simulation.OperationInput{

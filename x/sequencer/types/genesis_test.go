@@ -1,28 +1,27 @@
-package types_test
+package types
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {
 	for _, tc := range []struct {
 		desc     string
-		genState *types.GenesisState
+		genState *GenesisState
 		valid    bool
 	}{
 		{
 			desc:     "default is valid",
-			genState: types.DefaultGenesis(),
+			genState: DefaultGenesis(),
 			valid:    true,
 		},
 		{
 			desc: "valid genesis state",
-			genState: &types.GenesisState{
+			genState: &GenesisState{
 
-				LastArweaveBlock: &types.LastArweaveBlock{},
+				LastArweaveBlock: &ArweaveBlockInfo{},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
