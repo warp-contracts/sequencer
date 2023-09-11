@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"bytes"
 	"sort"
 	"sync"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/warp-contracts/syncer/src/utils/monitoring"
 	"github.com/warp-contracts/syncer/src/utils/smartweave"
 	"github.com/warp-contracts/syncer/src/utils/task"
+	"github.com/warp-contracts/syncer/src/utils/warp"
 )
 
 type Store struct {
@@ -82,12 +82,13 @@ func transactions(payload *listener.Payload) []*types.ArweaveTransaction {
 			txs = append(txs, &types.ArweaveTransaction{
 				Id:       tx.ID,
 				Contract: contract,
+				SortKey: warp.CreateSortKey(tx.ID, payload.BlockHeight, payload.BlockHash),
 			})
 		}
 	}
-	// sort transactions by Id
+	// sort transactions by sort key
 	sort.Slice(txs, func(i, j int) bool {
-		return bytes.Compare(txs[i].Id, txs[j].Id) > 0
+		return txs[i].SortKey < txs[j].SortKey
 	})
 	return txs
 }
