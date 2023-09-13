@@ -881,6 +881,8 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	sequencerapi.RegisterDataItemAPIRoute(clientCtx, apiSvr.Router)
 	// Register the route for retrieving nonce
 	sequencerapi.RegisterNonceAPIRoute(clientCtx, apiSvr.Router)
+	// Register the route for retrieving tx by sender and nonce
+	sequencerapi.RegisterTxAPIRoute(clientCtx, apiSvr.Router)
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.

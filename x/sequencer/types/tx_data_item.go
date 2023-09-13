@@ -3,12 +3,16 @@ package types
 import (
 	"github.com/cosmos/cosmos-sdk/client"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 )
 
-func BroadcastDataItem(ctx client.Context, dataItem MsgDataItem) (*sdk.TxResponse, error) {
+type BroadcastResponse struct {
+	Code   uint32
+	RawLog string
+}
+
+func BroadcastDataItem(ctx client.Context, dataItem *MsgDataItem) (*BroadcastResponse, error) {
 	tx, err := createTxWithDataItem(ctx, dataItem)
 	if err != nil {
 		return nil, err
@@ -20,13 +24,21 @@ func BroadcastDataItem(ctx client.Context, dataItem MsgDataItem) (*sdk.TxRespons
 	}
 
 	// Validates the message and sends it out
-	return ctx.BroadcastTx(txBytes)
+	res, err := ctx.BroadcastTx(txBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return &BroadcastResponse{
+		res.Code,
+		res.RawLog,
+	}, nil
 }
 
-func createTxWithDataItem(ctx client.Context, dataItem MsgDataItem) (tx authsigning.Tx, err error) {
+func createTxWithDataItem(ctx client.Context, dataItem *MsgDataItem) (tx authsigning.Tx, err error) {
 	txBuilder := ctx.TxConfig.NewTxBuilder()
 
-	err = txBuilder.SetMsgs(&dataItem)
+	err = txBuilder.SetMsgs(dataItem)
 	if err != nil {
 		return
 	}
@@ -44,7 +56,7 @@ func createTxWithDataItem(ctx client.Context, dataItem MsgDataItem) (tx authsign
 	return
 }
 
-func getSignature(dataItem MsgDataItem) (signature txsigning.SignatureV2, err error) {
+func getSignature(dataItem *MsgDataItem) (signature txsigning.SignatureV2, err error) {
 	pubKey, err := dataItem.GetPublicKey()
 	if err != nil {
 		return
