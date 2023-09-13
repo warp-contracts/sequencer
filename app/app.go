@@ -738,7 +738,7 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.SetPrepareProposal(sequencerprepare.NewPrepareProposalHandler(app.SequencerKeeper, arweaveBlocksController, app.txConfig, logger))
+	app.SetPrepareProposal(sequencerprepare.NewPrepareProposalHandler(app.SequencerKeeper, arweaveBlocksController, app.txConfig))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
