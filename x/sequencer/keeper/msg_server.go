@@ -9,6 +9,7 @@ type msgServer struct {
 	Keeper
 
 	Controller controller.ArweaveBlocksController
+	lastSortKey *types.SortKey
 }
 
 // NewMsgServerImpl returns an implementation of the MsgServer interface
@@ -17,4 +18,4 @@ func NewMsgServerImpl(keeper Keeper, controller controller.ArweaveBlocksControll
 	return &msgServer{Keeper: keeper, Controller: controller}
 }
 
-var _ types.MsgServer = msgServer{}
+var _ types.MsgServer = &msgServer{}
