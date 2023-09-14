@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
@@ -33,6 +34,12 @@ func InternalServerError(w http.ResponseWriter, err error, errorType string) {
 	InternalServerErrorString(w, err.Error(), errorType)
 }
 
+// Returns a JSON response with a 404 status
+func NotFoundResponse(w http.ResponseWriter, message string) {
+	jsonError := createJsonError(message, "not found", http.StatusNotFound)
+	writeError(w, jsonError)
+}
+
 func createJsonError(err string, errorType string, code int) httpJsonError {
 	return httpJsonError{
 		ErrorType:    errorType,
@@ -45,10 +52,31 @@ func createJsonError(err string, errorType string, code int) httpJsonError {
 }
 
 func writeError(w http.ResponseWriter, jsonError httpJsonError) {
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.Header().Set("X-Content-Type-Options", "nosniff")
+	setHeaders(w)
 	w.WriteHeader(jsonError.Status.Code)
 	if err := json.NewEncoder(w).Encode(jsonError); err != nil {
 		panic(err)
 	}
+}
+
+// Returns a response with a 200 status
+// Encodes the provided content into JSON format
+func OkResponse(w http.ResponseWriter, response any) {
+	jsonResponse, err := json.Marshal(response)
+	if err != nil {
+		InternalServerError(w, err, "response encoding error")
+		return
+	}
+
+	_, err = fmt.Fprintf(w, "%s", jsonResponse)
+	if err != nil {
+		InternalServerError(w, err, "response writing error")
+		return
+	}
+	setHeaders(w)
+}
+
+func setHeaders(w http.ResponseWriter) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
 }

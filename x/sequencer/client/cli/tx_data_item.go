@@ -2,6 +2,7 @@ package cli
 
 import (
 	"crypto/rand"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -46,11 +47,15 @@ func CmdDataItem() *cobra.Command {
 
 			// validates the message and sends it out
 			clientCtx = clientCtx.WithBroadcastMode(cmd.Flag(flags.FlagBroadcastMode).Value.String())
-			res, err := types.BroadcastDataItem(clientCtx, *msg)
+			res, err := types.BroadcastDataItem(clientCtx, msg)
 			if err != nil {
 				return
 			}
-			return clientCtx.PrintProto(res)
+			json, err := getJsonResponse(res, msg)
+			if err != nil {
+				return err
+			}
+			return clientCtx.PrintRaw(json)
 		},
 	}
 
@@ -168,4 +173,12 @@ func getAccountSequence(clientCtx client.Context, msg *types.MsgDataItem, signer
 	}
 
 	return acc.GetSequence(), nil
+}
+
+func getJsonResponse(res *types.BroadcastResponse, msg *types.MsgDataItem) ([]byte, error) {
+	if res.Code == 0 {
+		return json.Marshal(msg.GetInfo())
+	} else {
+		return json.Marshal(res)
+	}
 }

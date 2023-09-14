@@ -84,3 +84,18 @@ func GetPublicKey(signatureType bundlr.SignatureType, owner []byte) (cryptotypes
 		return nil, bundlr.ErrUnsupportedSignatureType
 	}
 }
+
+type DataItemInfo struct {
+	DataItemId string `json:"data_item_id"`
+	Nonce      uint64 `json:"nonce"`
+	Sender     string `json:"sender"`
+}
+
+func (msg *MsgDataItem) GetInfo() DataItemInfo {
+	nonce, _ := msg.GetNonceFromTags()
+	return DataItemInfo{
+		DataItemId: msg.DataItem.Id.Base64(),
+		Nonce:      nonce,
+		Sender:     msg.GetSigners()[0].String(),
+	}
+}

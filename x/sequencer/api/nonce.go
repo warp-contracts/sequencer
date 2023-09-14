@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 	"net/http"
@@ -59,18 +58,7 @@ func (h nonceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := getAddressWithNonce(h.ctx, publicKey)
-	jsonResponse, err := json.Marshal(response)
-	if err != nil {
-		InternalServerError(w, err, "response encoding error")
-		return
-	}
-
-	_, err = fmt.Fprintf(w, "%s", jsonResponse)
-	if err != nil {
-		InternalServerError(w, err, "response writing error")
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
+	OkResponse(w, response)
 }
 
 func getPublicKey(request NonceRequest) (key cryptotypes.PubKey, err error) {

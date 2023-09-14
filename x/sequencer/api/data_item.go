@@ -1,8 +1,6 @@
 package api
 
 import (
-	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -12,11 +10,6 @@ import (
 
 type dataItemHandler struct {
 	ctx client.Context
-}
-
-type dataItemResponse struct {
-	SequencerTxHash string `json:"sequencer_tx_hash"`
-	DataItemId      string `json:"data_item_id"`
 }
 
 // The endpoint that accepts the DataItems as described in AND-104
@@ -36,7 +29,7 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Wrap message with Cosmos transaction, validate and broadcast transaction
-	response, err := types.BroadcastDataItem(h.ctx, msg)
+	response, err := types.BroadcastDataItem(h.ctx, &msg)
 	if err != nil {
 		InternalServerError(w, err, "broadcast transaction error")
 		return
@@ -46,19 +39,5 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonResponse, err := json.Marshal(dataItemResponse{
-		SequencerTxHash: response.TxHash,
-		DataItemId:      msg.DataItem.Id.Base64(),
-	})
-	if err != nil {
-		InternalServerError(w, err, "response encoding error")
-		return
-	}
-
-	_, err = fmt.Fprintf(w, "%s", jsonResponse)
-	if err != nil {
-		InternalServerError(w, err, "response writing error")
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
+	OkResponse(w, msg.GetInfo())
 }
