@@ -18,6 +18,7 @@ func keeperCtxAndSrv(t *testing.T, nextBlockInfo *types.ArweaveBlockInfo) (*keep
 	k, ctx := keepertest.SequencerKeeper(t)
 	blockHeader := ctx.BlockHeader()
 	blockHeader.Time = time.Unix(1692357017, 0)
+	blockHeader.Height = 123
 	
 	c := controller.MockArweaveBlocksController(nextBlockInfo)
 	
@@ -25,7 +26,7 @@ func keeperCtxAndSrv(t *testing.T, nextBlockInfo *types.ArweaveBlockInfo) (*keep
 	return k, ctx.WithBlockHeader(blockHeader), srv
 }
 
-func TestArweaveBlockInfoMsgServer(t *testing.T) {
+func TestArweaveBlockMsgServer(t *testing.T) {
 	expected := test.ArweaveBlock()
 	k, ctx, srv := keeperCtxAndSrv(t, expected.BlockInfo)
 	wctx := sdk.WrapSDKContext(ctx)
@@ -56,7 +57,7 @@ func TestArweaveBlockMsgServerWithoutHoursDelay(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrArweaveBlockTimestampMismatch)
 }
 
-func TestArweaveBlockInfoMsgServerWithoutNextHeight(t *testing.T) {
+func TestArweaveBlockMsgServerWithoutNextHeight(t *testing.T) {
 	arweaveBlock := &types.MsgArweaveBlock{
 		BlockInfo: &types.ArweaveBlockInfo{
 			Height:    1431216,
@@ -75,7 +76,7 @@ func TestArweaveBlockInfoMsgServerWithoutNextHeight(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrArweaveBlockHeightMismatch)
 }
 
-func TestArweaveBlockInfoMsgServerWithoutLaterTimestamp(t *testing.T) {
+func TestArweaveBlockMsgServerWithoutLaterTimestamp(t *testing.T) {
 	lastArweaveBlock := &types.MsgArweaveBlock{
 		BlockInfo: &types.ArweaveBlockInfo{
 			Height:    1431216,
@@ -94,7 +95,7 @@ func TestArweaveBlockInfoMsgServerWithoutLaterTimestamp(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrArweaveBlockTimestampMismatch)
 }
 
-func TestArweaveBlockInfoMsgServerWithoutNextArweaveBlock(t *testing.T) {
+func TestArweaveBlockMsgServerWithoutNextArweaveBlock(t *testing.T) {
 	_, ctx, srv := keeperCtxAndSrv(t, nil)
 	wctx := sdk.WrapSDKContext(ctx)
 
@@ -104,7 +105,7 @@ func TestArweaveBlockInfoMsgServerWithoutNextArweaveBlock(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrInvalidArweaveBlockTx)
 }
 
-func TestArweaveBlockInfoMsgServerTimestampMismatchWithNextArweaveBlock(t *testing.T) {
+func TestArweaveBlockMsgServerTimestampMismatchWithNextArweaveBlock(t *testing.T) {
 	arweaveBlockInfo := test.ArweaveBlock()
 	nextArweaveBlockInfo := arweaveBlockInfo
 	nextArweaveBlockInfo.BlockInfo.Timestamp += 1
@@ -116,7 +117,7 @@ func TestArweaveBlockInfoMsgServerTimestampMismatchWithNextArweaveBlock(t *testi
 	require.ErrorIs(t, err, types.ErrArweaveBlockTimestampMismatch)
 }
 
-func TestArweaveBlockInfoMsgServerHashMismatchWithNextArweaveBlock(t *testing.T) {
+func TestArweaveBlockMsgServerHashMismatchWithNextArweaveBlock(t *testing.T) {
 
 	arweaveBlockInfo := test.ArweaveBlock()
 	nextArweaveBlockInfo := *arweaveBlockInfo.BlockInfo

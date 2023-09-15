@@ -18,9 +18,9 @@ func NewPrepareProposalHandler(keeper keeper.Keeper, arweaveController controlle
 		lastBlock := keeper.MustGetLastArweaveBlock(ctx)
 		arweaveHeight := lastBlock.ArweaveBlock.Height
 		sequencerHeight := ctx.BlockHeader().Height
-		sortKey := newSortKey(arweaveHeight, sequencerHeight)
 		nextBlock := arweaveController.GetNextArweaveBlock(arweaveHeight + 1)
 		arweaveBlockTx, i := createArweaveTx(ctx, txConfig, nextBlock)
+		sortKey := types.NewSortKey(arweaveHeight + uint64(i), sequencerHeight)
 
 		result := make([][]byte, len(req.Txs) + i)
 		if arweaveBlockTx != nil {
@@ -70,7 +70,7 @@ func createArweaveTx(ctx sdk.Context, txConfig client.TxConfig, nextArweaveBlock
 
 // Sets the 'SortKey' if the transaction is an L2 interaction. 
 // Returns the original transaction otherwise.
-func setSortKeyInDataItem(txConfig client.TxConfig, txBytes []byte, sortKey *SortKey) []byte {
+func setSortKeyInDataItem(txConfig client.TxConfig, txBytes []byte, sortKey *types.SortKey) []byte {
 	tx, err := txConfig.TxDecoder()(txBytes)
 	if err != nil {
 		panic(err)
@@ -80,7 +80,7 @@ func setSortKeyInDataItem(txConfig client.TxConfig, txBytes []byte, sortKey *Sor
 		panic(err)
 	}
 	if dataItem != nil {
-		dataItem.SortKey = sortKey.getNextValue()
+		dataItem.SortKey = sortKey.GetNextValue()
 		txBuilder, err := txConfig.WrapTxBuilder(tx)
 		if err != nil {
 			panic(err)

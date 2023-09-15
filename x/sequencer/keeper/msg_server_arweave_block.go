@@ -11,7 +11,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func (k msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlock) (*types.MsgArweaveBlockResponse, error) {
+func (k *msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlock) (*types.MsgArweaveBlockResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	if err := k.setNewArweaveBlockInfo(ctx, msg); err != nil {
@@ -21,7 +21,7 @@ func (k msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBloc
 	return &types.MsgArweaveBlockResponse{}, nil
 }
 
-func (k msgServer) setNewArweaveBlockInfo(ctx sdk.Context, block *types.MsgArweaveBlock) error {
+func (k *msgServer) setNewArweaveBlockInfo(ctx sdk.Context, block *types.MsgArweaveBlock) error {
 	var newBlockInfo = &types.ArweaveBlockInfo{
 		Height:    block.BlockInfo.Height,
 		Timestamp: block.BlockInfo.Timestamp,
@@ -44,7 +44,7 @@ func (k msgServer) setNewArweaveBlockInfo(ctx sdk.Context, block *types.MsgArwea
 	return nil
 }
 
-func (k msgServer) checkBlockIsOldEnough(ctx sdk.Context, newBlockInfo *types.ArweaveBlockInfo) error {
+func (k *msgServer) checkBlockIsOldEnough(ctx sdk.Context, newBlockInfo *types.ArweaveBlockInfo) error {
 	arweaveBlockTimestamp := time.Unix(int64(newBlockInfo.Timestamp), 0)
 	cosmosBlockTimestamp := ctx.BlockHeader().Time
 
@@ -56,7 +56,7 @@ func (k msgServer) checkBlockIsOldEnough(ctx sdk.Context, newBlockInfo *types.Ar
 	return nil
 }
 
-func (k msgServer) compareBlockWithPreviousOne(ctx sdk.Context, newValue *types.ArweaveBlockInfo) error {
+func (k *msgServer) compareBlockWithPreviousOne(ctx sdk.Context, newValue *types.ArweaveBlockInfo) error {
 	oldValue, isFound := k.GetLastArweaveBlock(ctx)
 
 	if !isFound {
@@ -76,7 +76,7 @@ func (k msgServer) compareBlockWithPreviousOne(ctx sdk.Context, newValue *types.
 	return nil
 }
 
-func (k msgServer) compareWithNextBlock(ctx sdk.Context, block *types.MsgArweaveBlock) error {
+func (k *msgServer) compareWithNextBlock(ctx sdk.Context, block *types.MsgArweaveBlock) error {
 	nextArweaveBlock := k.Controller.GetNextArweaveBlock(block.BlockInfo.Height)
 
 	if nextArweaveBlock == nil {
@@ -119,7 +119,7 @@ func transactionsDiffer(transactions1 []*types.ArweaveTransaction, transactions2
 	return false
 }
 
-func (k msgServer) setLastArweaveBlock(ctx sdk.Context, newBlockInfo *types.ArweaveBlockInfo) {
+func (k *msgServer) setLastArweaveBlock(ctx sdk.Context, newBlockInfo *types.ArweaveBlockInfo) {
 	lastArweaveBlock := types.LastArweaveBlock {
 		ArweaveBlock: newBlockInfo,
 		SequencerBlockHeight: ctx.BlockHeight(),
