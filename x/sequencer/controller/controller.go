@@ -4,6 +4,8 @@ import (
 	"math"
 	"time"
 
+	"github.com/cometbft/cometbft/libs/log"
+	"github.com/sirupsen/logrus"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	"github.com/warp-contracts/syncer/src/sync"
@@ -33,12 +35,12 @@ type ArweaveBlocksController interface {
 type SyncerController struct {
 	sync.Controller
 
-	store     *Store
+	store *Store
 }
 
-func NewController() ArweaveBlocksController {
+func NewController(log log.Logger) ArweaveBlocksController {
 	controller := new(SyncerController)
-
+	InitLogger(log, logrus.InfoLevel.String())
 	return controller
 }
 

@@ -531,7 +531,7 @@ func New(
 	)
 	var arweaveBlocksController controller.ArweaveBlocksController
 	if appOpts.Get("test") == nil {
-		arweaveBlocksController = controller.NewController()
+		arweaveBlocksController = controller.NewController(logger)
 	}
 	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController)
 
