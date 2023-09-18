@@ -1,6 +1,8 @@
 package proposal
 
 import (
+	"fmt"
+
 	abci "github.com/cometbft/cometbft/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -21,13 +23,18 @@ func NewPrepareProposalHandler(keeper keeper.Keeper, arweaveController controlle
 		nextBlock := arweaveController.GetNextArweaveBlock(arweaveHeight + 1)
 		arweaveBlockTx, i := createArweaveTx(ctx, txConfig, nextBlock)
 		sortKey := types.NewSortKey(arweaveHeight+uint64(i), sequencerHeight)
+		var size int64 = 0
 
 		result := make([][]byte, len(req.Txs)+i)
 		if arweaveBlockTx != nil {
 			result[0] = arweaveBlockTx
+			size += int64(len(arweaveBlockTx))
+			if size > req.MaxTxBytes {
+				panic(fmt.Sprintf("MaxTxBytes limit (%d) is too small! It is smaller than the size of the Arweave block (%d)",
+					req.MaxTxBytes, size))
+			}
 		}
 
-		var size int64 = 0
 		txCount := i
 		for txCount < len(req.Txs)+i {
 			txBytes := setSortKeyInDataItem(txConfig, req.Txs[txCount-i], sortKey)
