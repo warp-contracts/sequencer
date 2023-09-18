@@ -10,18 +10,13 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-
-	"github.com/warp-contracts/sequencer/x/sequencer/controller"
-	sequencerkeeper "github.com/warp-contracts/sequencer/x/sequencer/keeper"
 )
 
 type HandlerOptions struct {
 	AccountKeeper           authkeeper.AccountKeeper
-	ArweaveBlocksController controller.ArweaveBlocksController
 	BankKeeper              authtypes.BankKeeper
 	ExtensionOptionChecker  ante.ExtensionOptionChecker
 	FeegrantKeeper          ante.FeegrantKeeper
-	SequencerKeeper         sequencerkeeper.Keeper
 	SignModeHandler         authsigning.SignModeHandler
 	SigGasConsumer          func(meter sdk.GasMeter, sig txsigning.SignatureV2, params authtypes.Params) error
 	TxFeeChecker            ante.TxFeeChecker
@@ -49,7 +44,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		NewSetInfiniteGasMeterDecorator(),
 		NewDataItemTxDecorator(options.AccountKeeper),
-		NewArweaveBlockTxDecorator(options.SequencerKeeper, options.ArweaveBlocksController),
+		NewArweaveBlockTxDecorator(),
 		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),

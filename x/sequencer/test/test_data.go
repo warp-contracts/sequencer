@@ -6,7 +6,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module/testutil"
+	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
@@ -32,6 +34,15 @@ const ETHEREUM_PRIVATE_KEY = `0xf4a2b939592564feb35ab10a8e04f6f2fe0943579fb3c9c3
 
 func NewTxBuilder() client.TxBuilder {
 	return testutil.MakeTestEncodingConfig().TxConfig.NewTxBuilder()
+}
+
+func CreateTxWithMsgs(t *testing.T, msgs ...sdk.Msg) authsigning.Tx {
+	txBuilder := NewTxBuilder()
+
+	err := txBuilder.SetMsgs(msgs...)
+	require.NoError(t, err)
+
+	return txBuilder.GetTx()
 }
 
 func ArweaveL2Interaction(t *testing.T, tags ...bundlr.Tag) types.MsgDataItem {

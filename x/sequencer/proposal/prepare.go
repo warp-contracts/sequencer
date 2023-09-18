@@ -1,4 +1,4 @@
-package prepare
+package proposal
 
 import (
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -20,16 +20,16 @@ func NewPrepareProposalHandler(keeper keeper.Keeper, arweaveController controlle
 		sequencerHeight := ctx.BlockHeader().Height
 		nextBlock := arweaveController.GetNextArweaveBlock(arweaveHeight + 1)
 		arweaveBlockTx, i := createArweaveTx(ctx, txConfig, nextBlock)
-		sortKey := types.NewSortKey(arweaveHeight + uint64(i), sequencerHeight)
+		sortKey := types.NewSortKey(arweaveHeight+uint64(i), sequencerHeight)
 
-		result := make([][]byte, len(req.Txs) + i)
+		result := make([][]byte, len(req.Txs)+i)
 		if arweaveBlockTx != nil {
 			result[0] = arweaveBlockTx
 		}
 
 		var size int64 = 0
 		txCount := i
-		for txCount < len(req.Txs) + i {
+		for txCount < len(req.Txs)+i {
 			txBytes := setSortKeyInDataItem(txConfig, req.Txs[txCount-i], sortKey)
 			size += int64(len(txBytes))
 			if size > req.MaxTxBytes {
@@ -42,7 +42,7 @@ func NewPrepareProposalHandler(keeper keeper.Keeper, arweaveController controlle
 	}
 }
 
-// Returns the transaction with an Arweave block if it is older than an hour and has not been added to the blockchain yet. 
+// Returns the transaction with an Arweave block if it is older than an hour and has not been added to the blockchain yet.
 // Additionally, it returns 1 if such a block exists and 0 otherwise.
 func createArweaveTx(ctx sdk.Context, txConfig client.TxConfig, nextArweaveBlock *types.NextArweaveBlock) ([]byte, int) {
 	if nextArweaveBlock == nil || !types.IsArweaveBlockOldEnough(ctx, nextArweaveBlock.BlockInfo) {
@@ -68,7 +68,7 @@ func createArweaveTx(ctx sdk.Context, txConfig client.TxConfig, nextArweaveBlock
 	return bz, 1
 }
 
-// Sets the 'SortKey' if the transaction is an L2 interaction. 
+// Sets the 'SortKey' if the transaction is an L2 interaction.
 // Returns the original transaction otherwise.
 func setSortKeyInDataItem(txConfig client.TxConfig, txBytes []byte, sortKey *types.SortKey) []byte {
 	tx, err := txConfig.TxDecoder()(txBytes)
