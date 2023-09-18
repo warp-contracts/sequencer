@@ -24,13 +24,14 @@ var (
 	rejectResponse = abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}
 )
 
-// Validates the block proposal for the presence and correctness of transactions with the Arweave block, 
+// Validates the block proposal for the presence and correctness of transactions with the Arweave block,
 // as well as the correctness of data items
 func NewProcessProposalHandler(txConfig client.TxConfig, controller controller.ArweaveBlocksController, keeper *keeper.Keeper,
 	logger log.Logger) sdk.ProcessProposalHandler {
 	handler := &processProposalHandler{controller: controller, keeper: keeper, logger: logger}
 
 	return func(ctx sdk.Context, req abci.RequestProcessProposal) abci.ResponseProcessProposal {
+		handler.initSortKeyForBlock(ctx)
 		for txIndex, txBytes := range req.Txs {
 			tx, err := txConfig.TxDecoder()(txBytes)
 			if err != nil {

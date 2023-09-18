@@ -22,13 +22,16 @@ func (h *processProposalHandler) processProposalValidateDataItem(ctx sdk.Context
 		return h.rejectProposal("invalid data item message", "err", err)
 	}
 
-	if h.lastSortKey == nil || h.lastSortKey.SequencerHeight != ctx.BlockHeight() {
-		h.lastSortKey = types.NewSortKey(h.keeper.MustGetLastArweaveBlock(ctx).ArweaveBlock.Height, ctx.BlockHeight())
+	if h.lastSortKey == nil {
+		panic("lastSortKey was not initialized")
 	}
-
 	expectedSortKey := h.lastSortKey.GetNextValue()
 	if expectedSortKey != msg.SortKey {
 		return h.rejectProposal("invalid sort key", "expected", expectedSortKey, "actual", msg.SortKey)
 	}
 	return true
+}
+
+func (h *processProposalHandler) initSortKeyForBlock(ctx sdk.Context) {
+	h.lastSortKey = types.NewSortKey(h.keeper.MustGetLastArweaveBlock(ctx).ArweaveBlock.Height, ctx.BlockHeight())
 }

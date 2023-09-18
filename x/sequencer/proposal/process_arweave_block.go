@@ -21,7 +21,11 @@ func getArweaveBlockMsg(tx sdk.Tx) *types.MsgArweaveBlock {
 }
 
 func (h *processProposalHandler) processProposalValidateArweaveBlock(ctx sdk.Context, txIndex int, tx sdk.Tx, msg *types.MsgArweaveBlock) bool {
-	return h.validateIndex(txIndex) && h.validateArweaveBlockTx(tx) && h.validateArweaveBlockMsg(ctx, msg)
+	accepted := h.validateIndex(txIndex) && h.validateArweaveBlockTx(tx) && h.validateArweaveBlockMsg(ctx, msg)
+	if accepted {
+		h.lastSortKey.IncreaseArweaveHeight()
+	}
+	return accepted
 }
 
 func (h *processProposalHandler) validateIndex(txIndex int) bool {
