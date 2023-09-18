@@ -531,7 +531,7 @@ func New(
 	)
 	var arweaveBlocksController controller.ArweaveBlocksController
 	if appOpts.Get("test") == nil {
-		arweaveBlocksController = controller.NewController(logger)
+		arweaveBlocksController = controller.NewController(logger, homePath)
 	}
 	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController)
 
@@ -721,11 +721,11 @@ func New(
 	// initialize BaseApp
 	anteHandler, err := sequencerante.NewAnteHandler(
 		sequencerante.HandlerOptions{
-			AccountKeeper:           app.AccountKeeper,
-			BankKeeper:              app.BankKeeper,
-			FeegrantKeeper:          app.FeeGrantKeeper,
-			SignModeHandler:         encodingConfig.TxConfig.SignModeHandler(),
-			SigGasConsumer:          sequencerante.SigVerificationGasConsumer,
+			AccountKeeper:   app.AccountKeeper,
+			BankKeeper:      app.BankKeeper,
+			FeegrantKeeper:  app.FeeGrantKeeper,
+			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:  sequencerante.SigVerificationGasConsumer,
 		},
 	)
 	if err != nil {

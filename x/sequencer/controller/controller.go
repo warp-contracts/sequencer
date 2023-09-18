@@ -2,6 +2,8 @@ package controller
 
 import (
 	"math"
+	"os"
+	"path"
 	"time"
 
 	"github.com/cometbft/cometbft/libs/log"
@@ -35,13 +37,28 @@ type ArweaveBlocksController interface {
 type SyncerController struct {
 	sync.Controller
 
-	store *Store
+	store  *Store
+	config *config.Config
 }
 
-func NewController(log log.Logger) ArweaveBlocksController {
+func NewController(log log.Logger, homeDir string) (out ArweaveBlocksController) {
 	controller := new(SyncerController)
 	InitLogger(log, logrus.InfoLevel.String())
-	return controller
+
+	var err error
+	filepath := path.Join(homeDir, "syncer.json")
+	if _, err := os.Stat(filepath); err != nil {
+		// Empty file path loads default config
+		filepath = ""
+	}
+
+	controller.config, err = config.Load(filepath)
+	if err != nil {
+		panic(err)
+	}
+
+	out = controller
+	return
 }
 
 // TODO add controller stop
@@ -55,55 +72,52 @@ func (controller *SyncerController) Start(initHeight uint64) {
 }
 
 func (controller *SyncerController) initController(initHeight uint64) {
-	// TODO give option to override default values
-	var config = config.Default()
-
-	controller.Task = task.NewTask(config, "controller")
+	controller.Task = task.NewTask(controller.config, "controller")
 
 	// FIXME: Add monitor to prometheus
 	monitor := monitor_syncer.NewMonitor().
 		WithMaxHistorySize(30)
 
 	watched := func() *task.Task {
-		client := arweave.NewClient(controller.Ctx, config).
+		client := arweave.NewClient(controller.Ctx, controller.config).
 			WithTagValidator(warp.ValidateTag)
 
 		monitor := monitor_syncer.NewMonitor().
 			WithMaxHistorySize(30)
 
-		networkMonitor := listener.NewNetworkMonitor(config).
+		networkMonitor := listener.NewNetworkMonitor(controller.config).
 			WithClient(client).
 			WithMonitor(monitor).
-			WithInterval(config.NetworkMonitor.Period).
+			WithInterval(controller.config.NetworkMonitor.Period).
 			WithRequiredConfirmationBlocks(20)
 
-		blockDownloader := listener.NewBlockDownloader(config).
+		blockDownloader := listener.NewBlockDownloader(controller.config).
 			WithClient(client).
 			WithInputChannel(networkMonitor.Output).
 			WithMonitor(monitor).
-			WithBackoff(0, config.Syncer.TransactionMaxInterval).
+			WithBackoff(0, controller.config.Syncer.TransactionMaxInterval).
 			WithHeightRange(initHeight, math.MaxUint64)
 
-		transactionDownloader := listener.NewTransactionDownloader(config).
+		transactionDownloader := listener.NewTransactionDownloader(controller.config).
 			WithClient(client).
 			WithInputChannel(blockDownloader.Output).
 			WithMonitor(monitor).
-			WithBackoff(0, config.Syncer.TransactionMaxInterval).
+			WithBackoff(0, controller.config.Syncer.TransactionMaxInterval).
 			WithFilterInteractions()
 
-		store := NewStore(config).
+		store := NewStore(controller.config).
 			WithInputChannel(transactionDownloader.Output).
 			WithMonitor(monitor)
 		controller.store = store
 
-		return task.NewTask(config, "watched").
+		return task.NewTask(controller.config, "watched").
 			WithSubtask(networkMonitor.Task).
 			WithSubtask(blockDownloader.Task).
 			WithSubtask(transactionDownloader.Task).
 			WithSubtask(store.Task)
 	}
 
-	watchdog := task.NewWatchdog(config).
+	watchdog := task.NewWatchdog(controller.config).
 		WithTask(watched).
 		WithIsOK(30*time.Second, func() bool {
 			isOK := monitor.IsOK()
