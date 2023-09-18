@@ -20,7 +20,10 @@ func networkWithLastArweaveBlockObjects(t *testing.T) (*network.Network, types.L
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
 	lastArweaveBlock := &types.LastArweaveBlock{}
-	nullify.Fill(&lastArweaveBlock)
+	lastArweaveBlock.ArweaveBlock = &types.ArweaveBlockInfo{
+		Height: 1,
+	}
+	lastArweaveBlock.SequencerBlockHeight = 0
 	state.LastArweaveBlock = lastArweaveBlock
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)

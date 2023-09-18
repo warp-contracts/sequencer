@@ -25,6 +25,7 @@ func TestProcessProposalValidateDataItem(t *testing.T) {
 	ctx, handler, logger, msg := ctxHandlerLoggerAndMsg(t)
 	msg.SortKey = "000001431216,0000000000123,00000000"
 
+	handler.initSortKeyForBlock(ctx)
 	result := handler.processProposalValidateDataItem(ctx, &msg)
 
 	require.True(t, result)
@@ -34,6 +35,7 @@ func TestProcessProposalValidateDataItem(t *testing.T) {
 func TestProcessProposalValidateDataItemNoSortKey(t *testing.T) {
 	ctx, handler, logger, msg := ctxHandlerLoggerAndMsg(t)
 
+	handler.initSortKeyForBlock(ctx)
 	result := handler.processProposalValidateDataItem(ctx, &msg)
 
 	require.False(t, result)
@@ -44,6 +46,7 @@ func TestProcessProposalValidateDataItemInvalidArweaveBlock(t *testing.T) {
 	ctx, handler, logger, msg := ctxHandlerLoggerAndMsg(t)
 	msg.SortKey = "000001431217,0000000000123,00000000"
 
+	handler.initSortKeyForBlock(ctx)
 	result := handler.processProposalValidateDataItem(ctx, &msg)
 
 	require.False(t, result)
@@ -54,6 +57,7 @@ func TestProcessProposalValidateDataItemInvalidSequencerBlock(t *testing.T) {
 	ctx, handler, logger, msg := ctxHandlerLoggerAndMsg(t)
 	msg.SortKey = "000001431216,0000000000124,00000000"
 
+	handler.initSortKeyForBlock(ctx)
 	result := handler.processProposalValidateDataItem(ctx, &msg)
 
 	require.False(t, result)
@@ -64,6 +68,7 @@ func TestProcessProposalValidateDataItemInvalidIndex(t *testing.T) {
 	ctx, handler, logger, msg := ctxHandlerLoggerAndMsg(t)
 	msg.SortKey = "000001431216,0000000000123,00000001"
 
+	handler.initSortKeyForBlock(ctx)
 	result := handler.processProposalValidateDataItem(ctx, &msg)
 
 	require.False(t, result)
@@ -72,6 +77,8 @@ func TestProcessProposalValidateDataItemInvalidIndex(t *testing.T) {
 
 func TestProcessProposalValidateDataItemTwoMessagesInBlock(t *testing.T) {
 	ctx, handler, logger, msg := ctxHandlerLoggerAndMsg(t)
+
+	handler.initSortKeyForBlock(ctx)
 
 	msg.SortKey = "000001431216,0000000000123,00000000"
 	result := handler.processProposalValidateDataItem(ctx, &msg)
@@ -87,6 +94,8 @@ func TestProcessProposalValidateDataItemTwoMessagesInBlock(t *testing.T) {
 func TestProcessProposalValidateDataItemTwoSameSortKeysInBlock(t *testing.T) {
 	ctx, handler, logger, msg := ctxHandlerLoggerAndMsg(t)
 
+	handler.initSortKeyForBlock(ctx)
+
 	msg.SortKey = "000001431216,0000000000123,00000000"
 	result := handler.processProposalValidateDataItem(ctx, &msg)
 	require.True(t, result)
@@ -101,7 +110,9 @@ func TestProcessProposalValidateDataItemTwoSameSortKeysInBlock(t *testing.T) {
 func TestProcessProposalValidateDataItemTwoBlocks(t *testing.T) {
 	ctx, handler, logger, msg := ctxHandlerLoggerAndMsg(t)
 
+
 	msg.SortKey = "000001431216,0000000000123,00000000"
+	handler.initSortKeyForBlock(ctx)
 	result := handler.processProposalValidateDataItem(ctx, &msg)
 	require.True(t, result)
 	require.Equal(t, logger.Msg, "")
@@ -111,7 +122,21 @@ func TestProcessProposalValidateDataItemTwoBlocks(t *testing.T) {
 	ctx = ctx.WithBlockHeader(header)
 
 	msg.SortKey = "000001431216,0000000000124,00000000"
+	handler.initSortKeyForBlock(ctx)
 	result = handler.processProposalValidateDataItem(ctx, &msg)
 	require.True(t, result)
 	require.Equal(t, logger.Msg, "")
+}
+
+func TestProcessProposalValidateDataItemPanic(t *testing.T) {
+	defer func() {
+        if r := recover(); r == nil {
+            t.Error("The function should panic in case of uninitialized lastSortKey")
+        }
+    }()
+
+	ctx, handler, _, msg := ctxHandlerLoggerAndMsg(t)
+	msg.SortKey = "000001431216,0000000000123,00000000"
+
+	handler.processProposalValidateDataItem(ctx, &msg)
 }

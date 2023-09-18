@@ -22,3 +22,7 @@ func (key *SortKey) GetNextValue() string {
 	key.Index++
 	return value
 }
+
+func (key *SortKey) IncreaseArweaveHeight() {
+	key.ArweaveHeight++
+}
