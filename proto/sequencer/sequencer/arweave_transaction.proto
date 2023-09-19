@@ -5,7 +5,7 @@ option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
 // Store basic information about L1 interaction needed for calculating sort_key and last_sort_key.
 message ArweaveTransaction {
-  bytes id = 1;
-  bytes contract = 2;
+  string id = 1;
+  string contract = 2;
   string sort_key = 3;
 }

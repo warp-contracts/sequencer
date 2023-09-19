@@ -63,7 +63,7 @@ func (store *Store) processPayload(payload *listener.Payload) {
 		BlockInfo: &types.ArweaveBlockInfo{
 			Height:    uint64(payload.BlockHeight),
 			Timestamp: uint64(payload.BlockTimestamp),
-			Hash:      payload.BlockHash,
+			Hash:      payload.BlockHash.Base64(),
 		},
 		Transactions: transactions(payload),
 	}
@@ -78,9 +78,9 @@ func transactions(payload *listener.Payload) []*types.ArweaveTransaction {
 	txs := make([]*types.ArweaveTransaction, 0, len(payload.Transactions))
 	for _, tx := range payload.Transactions {
 		contract := getContractFromTag(tx)
-		if contract != nil {
+		if contract != "" {
 			txs = append(txs, &types.ArweaveTransaction{
-				Id:       tx.ID,
+				Id:       tx.ID.Base64(),
 				Contract: contract,
 				SortKey:  warp.CreateSortKey(tx.ID, payload.BlockHeight, payload.BlockHash),
 			})
@@ -93,13 +93,13 @@ func transactions(payload *listener.Payload) []*types.ArweaveTransaction {
 	return txs
 }
 
-func getContractFromTag(tx *syncer_arweave.Transaction) syncer_arweave.Base64String {
+func getContractFromTag(tx *syncer_arweave.Transaction) string {
 	for _, tag := range tx.Tags {
 		if string(tag.Name) == smartweave.TagContractTxId {
-			return tag.Value
+			return string(tag.Value)
 		}
 	}
-	return nil
+	return ""
 }
 
 func (store *Store) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {

@@ -7,5 +7,5 @@ option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 message ArweaveBlockInfo {
   uint64 height = 1;
   uint64 timestamp = 2;
-  bytes hash = 3;
+  string hash = 3;
 }

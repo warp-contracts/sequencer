@@ -46461,7 +46461,6 @@ paths:
                         format: uint64
                       hash:
                         type: string
-                        format: byte
                     title: Contains basic info about Arweave block
                   sequencer_block_height:
                     type: string
@@ -75440,17 +75439,14 @@ definitions:
         format: uint64
       hash:
         type: string
-        format: byte
     title: Contains basic info about Arweave block
   sequencer.sequencer.ArweaveTransaction:
     type: object
     properties:
       id:
         type: string
-        format: byte
       contract:
         type: string
-        format: byte
       sort_key:
         type: string
     description: >-
@@ -75470,7 +75466,6 @@ definitions:
             format: uint64
           hash:
             type: string
-            format: byte
         title: Contains basic info about Arweave block
       sequencer_block_height:
         type: string
@@ -75545,7 +75540,6 @@ definitions:
                 format: uint64
               hash:
                 type: string
-                format: byte
             title: Contains basic info about Arweave block
           sequencer_block_height:
             type: string

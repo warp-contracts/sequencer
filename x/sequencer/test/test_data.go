@@ -74,7 +74,7 @@ func createExampleDataItem(t *testing.T, signer bundlr.Signer, tags ...bundlr.Ta
 	}
 }
 
-var ExampleArweaveBlockHash = []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2}
+var ExampleArweaveBlockHash = "C5_l8fu5rftA2lQSDgNELuVX7DDVRofDRJ8v3_OaFXE8Ne4pU5loT-Ljd7JiFL4e"
 
 func ArweaveBlock() types.MsgArweaveBlock {
 	return types.MsgArweaveBlock{

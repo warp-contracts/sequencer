@@ -18,7 +18,7 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 				BlockInfo: &ArweaveBlockInfo{
 					Height:    0,
 					Timestamp: 1690809540,
-					Hash:      []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
+					Hash:      "C5_l8fu5rftA2lQSDgNELuVX7DDVRofDRJ8v3_OaFXE8Ne4pU5loT-Ljd7JiFL4e",
 				},
 			},
 			err: ErrBadArweaveHeight,
@@ -28,7 +28,7 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 				BlockInfo: &ArweaveBlockInfo{
 					Height:    1431216,
 					Timestamp: 0,
-					Hash:      []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
+					Hash:      "C5_l8fu5rftA2lQSDgNELuVX7DDVRofDRJ8v3_OaFXE8Ne4pU5loT-Ljd7JiFL4e",
 				},
 			},
 			err: ErrBadArweaveTimestamp,
@@ -38,7 +38,7 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 				BlockInfo: &ArweaveBlockInfo{
 					Height:    1431216,
 					Timestamp: 0,
-					Hash:      []byte{},
+					Hash:      "",
 				},
 			},
 			err: ErrBadArweaveHashLength,
@@ -48,7 +48,7 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 				BlockInfo: &ArweaveBlockInfo{
 					Height:    1431216,
 					Timestamp: 1690809540,
-					Hash:      []byte{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2},
+					Hash:      "C5_l8fu5rftA2lQSDgNELuVX7DDVRofDRJ8v3_OaFXE8Ne4pU5loT-Ljd7JiFL4e",
 				},
 			},
 		},
