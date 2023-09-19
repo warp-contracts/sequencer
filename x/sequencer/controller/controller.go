@@ -63,6 +63,10 @@ func NewController(log log.Logger, homeDir string) (out ArweaveBlocksController)
 
 // TODO add controller stop
 func (controller *SyncerController) Start(initHeight uint64) {
+	if !controller.config.Syncer.Enabled {
+		return
+	}
+
 	controller.initController(initHeight)
 
 	err := controller.Controller.Start()
@@ -73,10 +77,6 @@ func (controller *SyncerController) Start(initHeight uint64) {
 
 func (controller *SyncerController) initController(initHeight uint64) {
 	controller.Task = task.NewTask(controller.config, "controller")
-
-	if !controller.config.Syncer.Enabled {
-		return
-	}
 
 	// FIXME: Add monitor to prometheus
 	monitor := monitor_syncer.NewMonitor().
@@ -93,7 +93,7 @@ func (controller *SyncerController) initController(initHeight uint64) {
 			WithClient(client).
 			WithMonitor(monitor).
 			WithInterval(controller.config.NetworkMonitor.Period).
-			WithRequiredConfirmationBlocks(20)
+			WithRequiredConfirmationBlocks(controller.config.NetworkMonitor.RequiredConfirmationBlocks)
 
 		blockDownloader := listener.NewBlockDownloader(controller.config).
 			WithClient(client).
