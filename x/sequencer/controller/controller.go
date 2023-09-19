@@ -74,6 +74,10 @@ func (controller *SyncerController) Start(initHeight uint64) {
 func (controller *SyncerController) initController(initHeight uint64) {
 	controller.Task = task.NewTask(controller.config, "controller")
 
+	if !controller.config.Syncer.Enabled {
+		return
+	}
+
 	// FIXME: Add monitor to prometheus
 	monitor := monitor_syncer.NewMonitor().
 		WithMaxHistorySize(30)
