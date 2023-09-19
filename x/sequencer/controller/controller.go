@@ -138,7 +138,7 @@ func (controller *SyncerController) initController(initHeight uint64) {
 }
 
 func (controller *SyncerController) IsRunning() bool {
-	return controller.Controller.Task != nil && !controller.Controller.Task.IsStopping.Load()
+	return controller.config.Syncer.Enabled && controller.Controller.Task != nil && !controller.Controller.Task.IsStopping.Load()
 }
 
 func (controller *SyncerController) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
