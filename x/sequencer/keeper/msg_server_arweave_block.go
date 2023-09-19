@@ -6,8 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
-
-	"github.com/warp-contracts/syncer/src/utils/arweave"
 )
 
 func (k *msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlock) (*types.MsgArweaveBlockResponse, error) {
@@ -32,7 +30,7 @@ func (k *msgServer) setLastArweaveBlockInfo(ctx sdk.Context, msg *types.MsgArwea
 func (k *msgServer) setContractLastSortKeys(ctx sdk.Context, msg *types.MsgArweaveBlock) {
 	for _, tx := range msg.Transactions {
 		lastSortKey := types.LastSortKey {
-			Contract: arweave.Base64String(tx.Contract).Base64(),
+			Contract: tx.Contract,
 			SortKey: tx.SortKey,
 		}
 		k.SetLastSortKey(ctx, lastSortKey)
