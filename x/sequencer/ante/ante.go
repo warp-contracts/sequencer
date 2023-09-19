@@ -13,13 +13,13 @@ import (
 )
 
 type HandlerOptions struct {
-	AccountKeeper           authkeeper.AccountKeeper
-	BankKeeper              authtypes.BankKeeper
-	ExtensionOptionChecker  ante.ExtensionOptionChecker
-	FeegrantKeeper          ante.FeegrantKeeper
-	SignModeHandler         authsigning.SignModeHandler
-	SigGasConsumer          func(meter sdk.GasMeter, sig txsigning.SignatureV2, params authtypes.Params) error
-	TxFeeChecker            ante.TxFeeChecker
+	AccountKeeper          authkeeper.AccountKeeper
+	BankKeeper             authtypes.BankKeeper
+	ExtensionOptionChecker ante.ExtensionOptionChecker
+	FeegrantKeeper         ante.FeegrantKeeper
+	SignModeHandler        authsigning.SignModeHandler
+	SigGasConsumer         func(meter sdk.GasMeter, sig txsigning.SignatureV2, params authtypes.Params) error
+	TxFeeChecker           ante.TxFeeChecker
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence

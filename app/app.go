@@ -721,11 +721,11 @@ func New(
 	// initialize BaseApp
 	anteHandler, err := sequencerante.NewAnteHandler(
 		sequencerante.HandlerOptions{
-			AccountKeeper:           app.AccountKeeper,
-			BankKeeper:              app.BankKeeper,
-			FeegrantKeeper:          app.FeeGrantKeeper,
-			SignModeHandler:         encodingConfig.TxConfig.SignModeHandler(),
-			SigGasConsumer:          sequencerante.SigVerificationGasConsumer,
+			AccountKeeper:   app.AccountKeeper,
+			BankKeeper:      app.BankKeeper,
+			FeegrantKeeper:  app.FeeGrantKeeper,
+			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:  sequencerante.SigVerificationGasConsumer,
 		},
 	)
 	if err != nil {

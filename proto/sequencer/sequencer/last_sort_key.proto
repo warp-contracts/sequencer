@@ -1,0 +1,11 @@
+syntax = "proto3";
+package sequencer.sequencer;
+
+option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
+
+message LastSortKey {
+  string contract = 1; 
+  string sortKey = 2; 
+  
+}
+

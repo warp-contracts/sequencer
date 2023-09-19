@@ -82,7 +82,7 @@ func transactions(payload *listener.Payload) []*types.ArweaveTransaction {
 			txs = append(txs, &types.ArweaveTransaction{
 				Id:       tx.ID,
 				Contract: contract,
-				SortKey: warp.CreateSortKey(tx.ID, payload.BlockHeight, payload.BlockHash),
+				SortKey:  warp.CreateSortKey(tx.ID, payload.BlockHeight, payload.BlockHash),
 			})
 		}
 	}

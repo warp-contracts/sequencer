@@ -110,7 +110,6 @@ func TestProcessProposalValidateDataItemTwoSameSortKeysInBlock(t *testing.T) {
 func TestProcessProposalValidateDataItemTwoBlocks(t *testing.T) {
 	ctx, handler, logger, msg := ctxHandlerLoggerAndMsg(t)
 
-
 	msg.SortKey = "000001431216,0000000000123,00000000"
 	handler.initSortKeyForBlock(ctx)
 	result := handler.processProposalValidateDataItem(ctx, &msg)
@@ -130,10 +129,10 @@ func TestProcessProposalValidateDataItemTwoBlocks(t *testing.T) {
 
 func TestProcessProposalValidateDataItemPanic(t *testing.T) {
 	defer func() {
-        if r := recover(); r == nil {
-            t.Error("The function should panic in case of uninitialized lastSortKey")
-        }
-    }()
+		if r := recover(); r == nil {
+			t.Error("The function should panic in case of uninitialized lastSortKey")
+		}
+	}()
 
 	ctx, handler, _, msg := ctxHandlerLoggerAndMsg(t)
 	msg.SortKey = "000001431216,0000000000123,00000000"

@@ -1,9 +1,8 @@
 package types
 
 import (
-	"testing"
-
 	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func TestGenesisState_Validate(t *testing.T) {
@@ -22,9 +21,31 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &GenesisState{
 
 				LastArweaveBlock: &LastArweaveBlock{},
+				LastSortKeyList: []LastSortKey{
+					{
+						Contract: "0",
+					},
+					{
+						Contract: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
+		},
+		{
+			desc: "duplicated lastSortKey",
+			genState: &GenesisState{
+				LastSortKeyList: []LastSortKey{
+					{
+						Contract: "0",
+					},
+					{
+						Contract: "0",
+					},
+				},
+			},
+			valid: false,
 		},
 		// this line is used by starport scaffolding # types/genesis/testcase
 	} {

@@ -5,12 +5,14 @@ package sequencer.sequencer;
 import "gogoproto/gogo.proto";
 import "sequencer/sequencer/params.proto";
 import "sequencer/sequencer/last_arweave_block.proto";
+import "sequencer/sequencer/last_sort_key.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
 // GenesisState defines the sequencer module's genesis state.
 message GenesisState {
-           Params           params               = 1 [(gogoproto.nullable) = false];
-           LastArweaveBlock lastArweaveBlock     = 2;
+           Params           params           = 1 [(gogoproto.nullable) = false];
+           LastArweaveBlock lastArweaveBlock = 2;
+  repeated LastSortKey      lastSortKeyList  = 3 [(gogoproto.nullable) = false];
 }
 

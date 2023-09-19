@@ -19,8 +19,8 @@ func (k *msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlo
 func (k *msgServer) setLastArweaveBlockInfo(ctx sdk.Context, msg *types.MsgArweaveBlock) {
 	newBlockInfo := *msg.BlockInfo
 
-	lastArweaveBlock := types.LastArweaveBlock {
-		ArweaveBlock: &newBlockInfo,
+	lastArweaveBlock := types.LastArweaveBlock{
+		ArweaveBlock:         &newBlockInfo,
 		SequencerBlockHeight: ctx.BlockHeight(),
 	}
 	k.SetLastArweaveBlock(ctx, lastArweaveBlock)

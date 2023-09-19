@@ -50,8 +50,8 @@ func New(t *testing.T, configs ...Config) *Network {
 // genesis and single validator. All other parameters are inherited from cosmos-sdk/testutil/network.DefaultConfig
 func DefaultConfig() network.Config {
 	var (
-		encoding = app.MakeEncodingConfig()
-		chainID  = "chain-" + tmrand.NewRand().Str(6)
+		encoding   = app.MakeEncodingConfig()
+		chainID    = "chain-" + tmrand.NewRand().Str(6)
 		appOptions = simtestutil.AppOptionsMap{
 			"test": true,
 		}

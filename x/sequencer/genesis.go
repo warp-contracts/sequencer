@@ -14,6 +14,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	} else {
 		panic("LastArweaveBlock cannot be empty in the genesis state")
 	}
+	// Set all the lastSortKey
+	for _, elem := range genState.LastSortKeyList {
+		k.SetLastSortKey(ctx, elem)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -28,6 +32,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	if found {
 		genesis.LastArweaveBlock = &lastArweaveBlock
 	}
+	genesis.LastSortKeyList = k.GetAllLastSortKey(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis
