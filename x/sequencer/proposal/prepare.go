@@ -45,6 +45,7 @@ func NewPrepareProposalHandler(keeper keeper.Keeper, arweaveController controlle
 			result[txCount] = txBytes
 			txCount++
 		}
+		ctx.Logger().With("size", size).With("len", len(result)).With("txCount", txCount).Info("Prepared transactions")
 		return abci.ResponsePrepareProposal{Txs: result[:txCount]}
 	}
 }
