@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "sequencer/sequencer/params.proto";
 import "sequencer/sequencer/last_arweave_block.proto";
+import "sequencer/sequencer/last_sort_key.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
@@ -22,6 +23,16 @@ service Query {
   // Queries a LastArweaveBlock by index.
   rpc LastArweaveBlock (QueryGetLastArweaveBlockRequest) returns (QueryGetLastArweaveBlockResponse) {
     option (google.api.http).get = "/warp-contracts/sequencer/sequencer/last_arweave_block";
+  
+  }
+  
+  // Queries a list of LastSortKey items.
+  rpc LastSortKey    (QueryGetLastSortKeyRequest) returns (QueryGetLastSortKeyResponse) {
+    option (google.api.http).get = "/warp-contracts/sequencer/sequencer/last_sort_key/{contract}";
+  
+  }
+  rpc LastSortKeyAll (QueryAllLastSortKeyRequest) returns (QueryAllLastSortKeyResponse) {
+    option (google.api.http).get = "/warp-contracts/sequencer/sequencer/last_sort_key";
   
   }
 }
@@ -40,3 +51,21 @@ message QueryGetLastArweaveBlockRequest {}
 message QueryGetLastArweaveBlockResponse {
   LastArweaveBlock LastArweaveBlock = 1 [(gogoproto.nullable) = false];
 }
+
+message QueryGetLastSortKeyRequest {
+  string contract = 1;
+}
+
+message QueryGetLastSortKeyResponse {
+  LastSortKey lastSortKey = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllLastSortKeyRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllLastSortKeyResponse {
+  repeated LastSortKey                            lastSortKey = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination  = 2;
+}
+

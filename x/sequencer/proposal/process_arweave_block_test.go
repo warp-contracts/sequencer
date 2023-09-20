@@ -103,7 +103,7 @@ func TestValidateArweaveBlockMsgWithoutHoursDelay(t *testing.T) {
 	}
 
 	result := handler.validateArweaveBlockMsg(ctx, block)
-	
+
 	require.False(t, result)
 	require.Equal(t, logger.Msg, "Rejected proposal: Arweave block should be one hour older than the sequencer block")
 }
@@ -174,7 +174,7 @@ func TestValidateArweaveBlockMsgTimestampMismatchWithNextArweaveBlock(t *testing
 func TestValidateArweaveBlockMsgServerHashMismatchWithNextArweaveBlock(t *testing.T) {
 	block := test.ArweaveBlock()
 	nextBlockInfo := *block.BlockInfo
-	nextBlockInfo.Hash = []byte{1, 2, 3}
+	nextBlockInfo.Hash = "abc"
 	ctx, handler, logger := ctxHandlerAndLogger(t, nil, &nextBlockInfo)
 
 	result := handler.validateArweaveBlockMsg(ctx, &block)

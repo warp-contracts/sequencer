@@ -12,6 +12,7 @@ import (
 
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
 	"github.com/warp-contracts/syncer/src/utils/warp"
+	"github.com/warp-contracts/syncer/src/utils/smartweave"
 )
 
 const TypeMsgDataItem = "data_item"
@@ -60,12 +61,19 @@ func (msg *MsgDataItem) ValidateBasic() (err error) {
 }
 
 func (msg *MsgDataItem) GetNonceFromTags() (uint64, error) {
-	for _, tag := range msg.DataItem.Tags {
-		if tag.Name == warp.TagSequencerNonce {
-			return strconv.ParseUint(tag.Value, 10, 64)
-		}
+	nonce, found := msg.DataItem.GetTag(warp.TagSequencerNonce)
+	if found {
+		return strconv.ParseUint(nonce, 10, 64)
 	}
 	return 0, errors.Wrapf(ErrNoSequencerNonceTag, "data item does not have \"%s\" tag", warp.TagSequencerNonce)
+}
+
+func (msg *MsgDataItem) GetContractFromTags() (string, error) {
+	contract, found := msg.DataItem.GetTag(smartweave.TagContractTxId)
+	if found {
+		return contract, nil
+	}
+	return "", errors.Wrapf(ErrNoContractTag, "data item does not have \"%s\" tag", smartweave.TagContractTxId)
 }
 
 func (msg *MsgDataItem) GetPublicKey() (cryptotypes.PubKey, error) {

@@ -157,7 +157,7 @@ func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.Valid
 	return []abci.ValidatorUpdate{}
 }
 
-// Starts the controller to fetch next Arweave blocks 
+// Starts the controller to fetch next Arweave blocks
 // or remove blocks that have already been added to the blockchain
 func (am AppModule) startOrUpdateArweaveBlocksController(ctx sdk.Context) {
 	if am.arweaveBlocksController == nil {
@@ -169,7 +169,7 @@ func (am AppModule) startOrUpdateArweaveBlocksController(ctx sdk.Context) {
 		if am.arweaveBlocksController.IsRunning() {
 			am.arweaveBlocksController.RemoveNextArweaveBlocksUpToHeight(lastArweaveBlock.ArweaveBlock.Height)
 		} else {
-			am.arweaveBlocksController.Start(lastArweaveBlock.ArweaveBlock.Height + 1)	
+			am.arweaveBlocksController.Start(lastArweaveBlock.ArweaveBlock.Height + 1)
 		}
 	} else {
 		panic("Last Arweave Block is not set when the BeginBlock method is called, and should be set when the blockchain is started")

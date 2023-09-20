@@ -18,7 +18,7 @@ func keeperCtxAndSrv(t *testing.T) (*keeper.Keeper, sdk.Context, types.MsgServer
 	blockHeader := ctx.BlockHeader()
 	blockHeader.Time = time.Unix(1692357017, 0)
 	blockHeader.Height = 123
-	
+
 	srv := keeper.NewMsgServerImpl(*k)
 	return k, ctx.WithBlockHeader(blockHeader), srv
 }

@@ -73,5 +73,14 @@ func verifyTxWithDataItem(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.T
 		return err
 	}
 
+	if err := verifyContract(tx, dataItem); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func verifyContract(tx sdk.Tx, dataItem *types.MsgDataItem) error {
+	_, err := dataItem.GetContractFromTags()
+	return err
 }

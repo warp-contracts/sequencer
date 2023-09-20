@@ -4,9 +4,9 @@ import (
 	"crypto/rand"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -116,10 +116,14 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 	}
 
 	for _, value := range values {
-		tag := bundlr.Tag{}
-		_, err = fmt.Scanf(value, "%s=%s", &tag.Name, &tag.Value)
-		if err != nil {
+		elems := strings.Split(value, "=")
+		if len(elems) != 2 {
+			err = errors.New("Invalid tag argument value: " + value)
 			return
+		}
+		tag := bundlr.Tag{
+			Name:  elems[0],
+			Value: elems[1],
 		}
 		msg.DataItem.Tags = append(msg.DataItem.Tags, tag)
 	}

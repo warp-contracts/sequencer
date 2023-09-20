@@ -12,6 +12,7 @@ func (k *msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlo
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	k.setLastArweaveBlockInfo(ctx, msg)
+	k.setContractLastSortKeys(ctx, msg)
 
 	return &types.MsgArweaveBlockResponse{}, nil
 }
@@ -19,9 +20,19 @@ func (k *msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlo
 func (k *msgServer) setLastArweaveBlockInfo(ctx sdk.Context, msg *types.MsgArweaveBlock) {
 	newBlockInfo := *msg.BlockInfo
 
-	lastArweaveBlock := types.LastArweaveBlock {
-		ArweaveBlock: &newBlockInfo,
+	lastArweaveBlock := types.LastArweaveBlock{
+		ArweaveBlock:         &newBlockInfo,
 		SequencerBlockHeight: ctx.BlockHeight(),
 	}
 	k.SetLastArweaveBlock(ctx, lastArweaveBlock)
+}
+
+func (k *msgServer) setContractLastSortKeys(ctx sdk.Context, msg *types.MsgArweaveBlock) {
+	for _, tx := range msg.Transactions {
+		lastSortKey := types.LastSortKey {
+			Contract: tx.Contract,
+			SortKey: tx.SortKey,
+		}
+		k.SetLastSortKey(ctx, lastSortKey)
+	}
 }

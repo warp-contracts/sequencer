@@ -1,7 +1,6 @@
 package proposal
 
 import (
-	"bytes"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -104,7 +103,7 @@ func (h *processProposalHandler) compareWithNextBlock(ctx sdk.Context, block *ty
 			"expected", nextArweaveBlock.BlockInfo.Timestamp, "actual", block.BlockInfo.Timestamp)
 	}
 
-	if !bytes.Equal(block.BlockInfo.Hash, nextArweaveBlock.BlockInfo.Hash) {
+	if block.BlockInfo.Hash != nextArweaveBlock.BlockInfo.Hash {
 		return h.rejectProposal("hash of the Arweave block does not match the hash of the block downloaded by the Validator",
 			"expected", string(nextArweaveBlock.BlockInfo.Hash), "actual", string(block.BlockInfo.Hash))
 	}
@@ -125,7 +124,7 @@ func transactionsDiffer(transactions1 []*types.ArweaveTransaction, transactions2
 	for i := 0; i < len(transactions1); i++ {
 		tx1 := transactions1[i]
 		tx2 := transactions2[i]
-		if !bytes.Equal(tx1.Id, tx2.Id) || !bytes.Equal(tx1.Contract, tx2.Contract) {
+		if tx1.Id != tx2.Id || tx1.Contract != tx2.Contract {
 			return true
 		}
 	}
