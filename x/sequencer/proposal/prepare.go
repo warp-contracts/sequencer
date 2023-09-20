@@ -39,14 +39,14 @@ func NewPrepareProposalHandler(keeper keeper.Keeper, arweaveController controlle
 		for txCount < len(req.Txs)+i {
 			txBytes := setSortKeyInDataItem(txConfig, req.Txs[txCount-i], sortKey)
 			txSize := int64(len(txBytes))
-			if size + txSize > req.MaxTxBytes {
+			if size+txSize > req.MaxTxBytes {
 				break
 			}
 			result[txCount] = txBytes
 			txCount++
 			size += txSize
 		}
-		ctx.Logger().With("size", size).With("len", len(result)).With("txCount", txCount).Info("Prepared transactions")
+		ctx.Logger().With("height", req.Height).With("size", size).With("len", len(result)).With("txCount", txCount).With("max_tx_bytes", req.MaxTxBytes).Info("Prepared transactions")
 		return abci.ResponsePrepareProposal{Txs: result[:txCount]}
 	}
 }
