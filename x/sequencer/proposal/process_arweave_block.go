@@ -22,7 +22,7 @@ func getArweaveBlockMsg(tx sdk.Tx) *types.MsgArweaveBlock {
 func (h *processProposalHandler) processProposalValidateArweaveBlock(ctx sdk.Context, txIndex int, tx sdk.Tx, msg *types.MsgArweaveBlock) bool {
 	accepted := h.validateIndex(txIndex) && h.validateArweaveBlockTx(tx) && h.validateArweaveBlockMsg(ctx, msg)
 	if accepted {
-		h.lastSortKey.IncreaseArweaveHeight()
+		h.sortKey.IncreaseArweaveHeight()
 	}
 	return accepted
 }
@@ -57,7 +57,7 @@ func (h *processProposalHandler) validateArweaveBlockMsg(ctx sdk.Context, msg *t
 
 	return h.checkBlockIsOldEnough(ctx, newBlockInfo) &&
 		h.compareBlockWithPreviousOne(ctx, newBlockInfo) &&
-		h.compareWithNextBlock(ctx, msg)
+		h.compareWithNextBlock(msg)
 }
 
 func (h *processProposalHandler) checkBlockIsOldEnough(ctx sdk.Context, newBlockInfo *types.ArweaveBlockInfo) bool {
@@ -90,7 +90,7 @@ func (h *processProposalHandler) compareBlockWithPreviousOne(ctx sdk.Context, ne
 	return true
 }
 
-func (h *processProposalHandler) compareWithNextBlock(ctx sdk.Context, block *types.MsgArweaveBlock) bool {
+func (h *processProposalHandler) compareWithNextBlock(block *types.MsgArweaveBlock) bool {
 	nextArweaveBlock := h.controller.GetNextArweaveBlock(block.BlockInfo.Height)
 
 	if nextArweaveBlock == nil {
@@ -108,28 +108,42 @@ func (h *processProposalHandler) compareWithNextBlock(ctx sdk.Context, block *ty
 			"expected", string(nextArweaveBlock.BlockInfo.Hash), "actual", string(block.BlockInfo.Hash))
 	}
 
-	if transactionsDiffer(block.Transactions, nextArweaveBlock.Transactions) {
-		return h.rejectProposal("Arweave block transactions do not match the block downloaded by the Validator transactions",
-			"Arweave block height", block.BlockInfo.Height)
-	}
-
-	return true
+	return h.checkTransactions(block, nextArweaveBlock.Transactions)
 }
 
-func transactionsDiffer(transactions1 []*types.ArweaveTransaction, transactions2 []*types.ArweaveTransaction) bool {
-	if len(transactions1) != len(transactions2) {
-		return true
+func (h *processProposalHandler) checkTransactions(block *types.MsgArweaveBlock, expectedTxs []*types.ArweaveTransaction) bool {
+	if len(block.Transactions) != len(expectedTxs) {
+		return h.rejectProposal("incorrect number of transactions in the Arweave block",
+			"Arweave block height", block.BlockInfo.Height, "expected", len(expectedTxs), "actual", len(block.Transactions))
 	}
 
-	for i := 0; i < len(transactions1); i++ {
-		tx1 := transactions1[i]
-		tx2 := transactions2[i]
-		if tx1.Id != tx2.Id || tx1.Contract != tx2.Contract {
-			return true
+	for i := 0; i < len(expectedTxs); i++ {
+		actualTx := block.Transactions[i]
+		expectedTx := expectedTxs[i]
+
+		if actualTx.Transaction.Id != expectedTx.Id {
+			return h.rejectProposal("transaction id is not as expected",
+			"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedTx.Id, "actual", actualTx.Transaction.Id)
+		}
+		
+		if actualTx.Transaction.Contract != expectedTx.Contract {
+			return h.rejectProposal("the contract of the transaction does not match the expected one",
+			"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedTx.Contract, "actual", actualTx.Transaction.Contract)
+		}
+
+		if actualTx.Transaction.SortKey != expectedTx.SortKey {
+			return h.rejectProposal("transaction sort key is not as expected",
+			"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedTx.SortKey, "actual", actualTx.Transaction.SortKey)
+		}
+
+		expectedLastSortKey := h.lastSortKeys.getAndStoreLastSortKey(actualTx.Transaction.Contract, actualTx.Transaction.SortKey)
+		if actualTx.LastSortKey != expectedLastSortKey {
+			return h.rejectProposal("invalid last sort key",
+			"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedLastSortKey, "actual", actualTx.LastSortKey)
 		}
 	}
 
-	return false
+	return true
 }
 
 func (h *processProposalHandler) checkArweaveBlockIsNotMissing(ctx sdk.Context, txIndex int) bool {

@@ -17,21 +17,45 @@ func getDataItemMsg(tx sdk.Tx) *types.MsgDataItem {
 	return nil
 }
 
-func (h *processProposalHandler) processProposalValidateDataItem(ctx sdk.Context, msg *types.MsgDataItem) bool {
+func (h *processProposalHandler) processProposalValidateDataItem(msg *types.MsgDataItem) bool {
 	if err := msg.ValidateBasic(); err != nil {
 		return h.rejectProposal("invalid data item message", "err", err)
 	}
 
-	if h.lastSortKey == nil {
-		panic("lastSortKey was not initialized")
+	return h.checkSortKey(msg) && h.checkLastSortKey(msg)
+}
+
+func (h *processProposalHandler) checkSortKey(msg *types.MsgDataItem) bool {
+	if h.sortKey == nil {
+		panic("sortKey was not initialized")
 	}
-	expectedSortKey := h.lastSortKey.GetNextValue()
+
+	expectedSortKey := h.sortKey.GetNextValue()
 	if expectedSortKey != msg.SortKey {
 		return h.rejectProposal("invalid sort key", "expected", expectedSortKey, "actual", msg.SortKey)
 	}
+
+	return true
+}
+
+func (h *processProposalHandler) checkLastSortKey(msg *types.MsgDataItem) bool {
+	if h.lastSortKeys == nil {
+		panic("lastSortKeys was not initialized")
+	}
+
+	contract, err := msg.GetContractFromTags()
+	if err != nil {
+		return h.rejectProposal("invalid contract", "error", err)
+	}
+	expectedLastSortKey := h.lastSortKeys.getAndStoreLastSortKey(contract, msg.SortKey)
+	if expectedLastSortKey != msg.LastSortKey {
+		return h.rejectProposal("invalid last sort key", "expected", expectedLastSortKey, "actual", msg.LastSortKey)
+	}
+
 	return true
 }
 
 func (h *processProposalHandler) initSortKeyForBlock(ctx sdk.Context) {
-	h.lastSortKey = types.NewSortKey(h.keeper.MustGetLastArweaveBlock(ctx).ArweaveBlock.Height, ctx.BlockHeight())
+	h.sortKey = newSortKey(h.keeper.MustGetLastArweaveBlock(ctx).ArweaveBlock.Height, ctx.BlockHeight())
+	h.lastSortKeys = newLastSortKeys(h.keeper, ctx)
 }

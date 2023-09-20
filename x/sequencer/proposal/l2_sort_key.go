@@ -1,4 +1,4 @@
-package types
+package proposal
 
 import "fmt"
 
@@ -9,7 +9,7 @@ type SortKey struct {
 	Index           int64
 }
 
-func NewSortKey(arweaveHeight uint64, sequencerHeight int64) *SortKey {
+func newSortKey(arweaveHeight uint64, sequencerHeight int64) *SortKey {
 	return &SortKey{
 		arweaveHeight,
 		sequencerHeight,

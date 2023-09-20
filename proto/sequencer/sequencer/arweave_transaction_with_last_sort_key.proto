@@ -1,0 +1,12 @@
+syntax = "proto3";
+package sequencer.sequencer;
+
+import "sequencer/sequencer/arweave_transaction.proto";
+
+option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
+
+// L1 interaction with a sort key value from the previous interaction with the contract
+message ArweaveTransactionWithLastSortKey {
+  ArweaveTransaction transaction = 1;
+  string last_sort_key = 2;
+}
