@@ -60,6 +60,7 @@ func CmdDataItem() *cobra.Command {
 		},
 	}
 
+	cmd.Flags().String(flags.FlagNode, "tcp://localhost:26657", "<host>:<port> to tendermint rpc interface for this chain")
 	cmd.Flags().String(FlagArweaveWallet, "", "Path to an Arweave wallet. Defaults to ./wallet.json")
 	cmd.Flags().String(FlagEthereumPrivateKey, "", "Hex encoded private key for the Ethereum account. Defaults to ./ethereum.bin")
 	cmd.Flags().StringP(FlagData, "d", "", "File with the binary data")
