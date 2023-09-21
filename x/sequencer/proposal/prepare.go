@@ -2,6 +2,7 @@ package proposal
 
 import (
 	"fmt"
+	math_bits "math/bits"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
@@ -29,7 +30,7 @@ func NewPrepareProposalHandler(keeper *keeper.Keeper, arweaveController controll
 		result := make([][]byte, len(req.Txs)+i)
 		if arweaveBlockTx != nil {
 			result[0] = arweaveBlockTx
-			size += int64(len(arweaveBlockTx))
+			size += protoTxSize(arweaveBlockTx)
 			if size > req.MaxTxBytes {
 				panic(fmt.Sprintf("MaxTxBytes limit (%d) is too small! It is smaller than the size of the Arweave block (%d)",
 					req.MaxTxBytes, size))
@@ -39,7 +40,7 @@ func NewPrepareProposalHandler(keeper *keeper.Keeper, arweaveController controll
 		txCount := i
 		for txCount < len(req.Txs)+i {
 			txBytes := setSortKeysInDataItem(txConfig, req.Txs[txCount-i], sortKey, lastSortKeys)
-			txSize := int64(len(txBytes))
+			txSize := protoTxSize(txBytes)
 			if size+txSize > req.MaxTxBytes {
 				break
 			}
@@ -47,7 +48,14 @@ func NewPrepareProposalHandler(keeper *keeper.Keeper, arweaveController controll
 			txCount++
 			size += txSize
 		}
-		ctx.Logger().With("height", req.Height).With("size", size).With("len", len(result)).With("txCount", txCount).With("max_tx_bytes", req.MaxTxBytes).Info("Prepared transactions")
+
+		ctx.Logger().
+			With("height", req.Height).
+			With("number of txs", txCount).
+			With("size of txs", size).
+			With("max size", req.MaxTxBytes).
+			Info("Prepared transactions")
+
 		return abci.ResponsePrepareProposal{Txs: result[:txCount]}
 	}
 }
@@ -128,4 +136,16 @@ func setSortKeysInDataItem(txConfig client.TxConfig, txBytes []byte, sortKey *So
 		}
 	}
 	return txBytes
+}
+
+// The transaction size after encoding using Protobuf.
+// See: https://pkg.go.dev/github.com/cometbft/cometbft/proto/tendermint/types#Data.Size
+func protoTxSize(tx []byte) int64 {
+	length := len(tx)
+	return 1 + int64(length) + varIntSize(uint64(length))
+}
+
+func varIntSize(x uint64) int64 {
+	return (int64(math_bits.Len64(x|1)) + 6) / 7
+
 }
