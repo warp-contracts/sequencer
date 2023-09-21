@@ -87,9 +87,6 @@ func (controller *SyncerController) initController(initHeight uint64) {
 		client := arweave.NewClient(controller.Ctx, controller.config).
 			WithTagValidator(warp.ValidateTag)
 
-		monitor := monitor_syncer.NewMonitor().
-			WithMaxHistorySize(30)
-
 		networkMonitor := listener.NewNetworkMonitor(controller.config).
 			WithClient(client).
 			WithMonitor(monitor).
