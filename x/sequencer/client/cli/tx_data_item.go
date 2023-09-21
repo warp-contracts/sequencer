@@ -27,6 +27,7 @@ const (
 	FlagArweaveWallet      = "arweave-wallet"
 	FlagData               = "data"
 	FlagTag                = "tag"
+	FlagNonce              = "nonce"
 )
 
 func CmdDataItem() *cobra.Command {
@@ -64,6 +65,7 @@ func CmdDataItem() *cobra.Command {
 	cmd.Flags().StringP(FlagData, "d", "", "File with the binary data")
 	cmd.Flags().StringArrayP(FlagTag, "t", []string{}, "One tag - a pair in the form of key=value. You can specify multiple tags. Example -t someKey=someValue -t someOtherKey=someValue")
 	cmd.Flags().StringP(flags.FlagBroadcastMode, "b", flags.BroadcastSync, "Transaction broadcasting mode (sync|async)")
+	cmd.Flags().Int64P(FlagNonce, "n", -1, "Optional account sequence - if not provided, it is calculated automatically")
 	return cmd
 }
 
@@ -129,7 +131,14 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 	}
 
 	// Add nonce tag
-	sequence, err := getAccountSequence(clientCtx, msg, signer)
+	if err != nil {
+		return
+	}
+	nonceArg, err := cmd.Flags().GetInt64(FlagNonce)
+	if err != nil {
+		return
+	}
+	sequence, err := getAccountSequence(clientCtx, msg, signer, nonceArg)
 	if err != nil {
 		return
 	}
@@ -163,7 +172,10 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 }
 
 // Returns the sequence for the account or 0 if the account does not exist
-func getAccountSequence(clientCtx client.Context, msg *types.MsgDataItem, signer bundlr.Signer) (uint64, error) {
+func getAccountSequence(clientCtx client.Context, msg *types.MsgDataItem, signer bundlr.Signer, nonceArg int64) (uint64, error) {
+	if nonceArg >=0 {
+		return uint64(nonceArg), nil
+	}
 
 	key, err := types.GetPublicKey(msg.DataItem.SignatureType, signer.GetOwner())
 	if err != nil {
