@@ -77,6 +77,8 @@ func (controller *SyncerController) Start(initHeight uint64) {
 }
 
 func (controller *SyncerController) initController(initHeight uint64) {
+	controller.Task = task.NewTask(controller.config, "controller")
+
 	monitor := monitor_syncer.NewMonitor().
 		WithMaxHistorySize(30)
 
@@ -130,7 +132,7 @@ func (controller *SyncerController) initController(initHeight uint64) {
 			return isOK
 		})
 
-	controller.Task = task.NewTask(controller.config, "controller").
+	controller.Task = controller.Task.
 		WithSubtask(server.Task).
 		WithSubtask(monitor.Task).
 		WithSubtask(watchdog.Task)
