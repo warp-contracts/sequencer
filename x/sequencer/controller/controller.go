@@ -14,6 +14,7 @@ import (
 	"github.com/warp-contracts/syncer/src/utils/arweave"
 	"github.com/warp-contracts/syncer/src/utils/config"
 	"github.com/warp-contracts/syncer/src/utils/listener"
+	"github.com/warp-contracts/syncer/src/utils/monitoring"
 	monitor_syncer "github.com/warp-contracts/syncer/src/utils/monitoring/syncer"
 	"github.com/warp-contracts/syncer/src/utils/task"
 	"github.com/warp-contracts/syncer/src/utils/warp"
@@ -76,11 +77,11 @@ func (controller *SyncerController) Start(initHeight uint64) {
 }
 
 func (controller *SyncerController) initController(initHeight uint64) {
-	controller.Task = task.NewTask(controller.config, "controller")
-
-	// FIXME: Add monitor to prometheus
 	monitor := monitor_syncer.NewMonitor().
 		WithMaxHistorySize(30)
+
+	server := monitoring.NewServer(controller.config).
+		WithMonitor(monitor)
 
 	watched := func() *task.Task {
 		client := arweave.NewClient(controller.Ctx, controller.config).
@@ -132,7 +133,8 @@ func (controller *SyncerController) initController(initHeight uint64) {
 			return isOK
 		})
 
-	controller.Task = controller.Task.
+	controller.Task = task.NewTask(controller.config, "controller").
+		WithSubtask(server.Task).
 		WithSubtask(monitor.Task).
 		WithSubtask(watchdog.Task)
 }
