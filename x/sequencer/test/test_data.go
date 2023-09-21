@@ -63,7 +63,7 @@ func createExampleDataItem(t *testing.T, signer bundlr.Signer, tags ...bundlr.Ta
 	dataItem := bundlr.BundleItem{
 		Target: arweave.Base64String(tool.RandomString(32)),
 		Anchor: arweave.Base64String(tool.RandomString(32)),
-		Tags:   bundlr.Tags(tags),
+		Tags:   bundlr.Tags(append(tags, bundlr.Tag{Name: "Contract", Value: "abc"})),
 		Data:   arweave.Base64String(tool.RandomString(100)),
 	}
 	err := dataItem.Sign(signer)
@@ -83,6 +83,6 @@ func ArweaveBlock() types.MsgArweaveBlock {
 			Timestamp: 1692353416,
 			Hash:      ExampleArweaveBlockHash,
 		},
-		Transactions: []*types.ArweaveTransaction{}, // TODO: add some test transactions
+		Transactions: []*types.ArweaveTransactionWithLastSortKey{}, // TODO: add some test transactions
 	}
 }

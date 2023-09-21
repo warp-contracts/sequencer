@@ -24,9 +24,9 @@ func (k *msgServer) setContractLastSortKey(goCtx context.Context, msg *types.Msg
 		return err
 	}
 
-	lastSortKey := types.LastSortKey {
+	lastSortKey := types.LastSortKey{
 		Contract: contract,
-		SortKey: msg.SortKey,
+		SortKey:  msg.SortKey,
 	}
 
 	k.SetLastSortKey(ctx, lastSortKey)

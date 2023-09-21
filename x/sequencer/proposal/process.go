@@ -9,14 +9,14 @@ import (
 
 	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
-	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 type processProposalHandler struct {
-	keeper      *keeper.Keeper
-	controller  controller.ArweaveBlocksController
-	logger      log.Logger
-	lastSortKey *types.SortKey
+	keeper       *keeper.Keeper
+	controller   controller.ArweaveBlocksController
+	logger       log.Logger
+	sortKey      *SortKey
+	lastSortKeys *LastSortKeys
 }
 
 var (
@@ -63,7 +63,7 @@ func (h *processProposalHandler) processProposalValidateTx(ctx sdk.Context, txIn
 
 	dataItem := getDataItemMsg(tx)
 	if dataItem != nil {
-		return h.processProposalValidateDataItem(ctx, dataItem)
+		return h.processProposalValidateDataItem(dataItem)
 	}
 
 	return true

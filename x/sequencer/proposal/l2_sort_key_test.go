@@ -1,13 +1,12 @@
-package types
+package proposal
 
 import (
-	"testing"
-
 	"github.com/stretchr/testify/require"
+	"testing"
 )
 
 func TestSortKeyNextValues(t *testing.T) {
-	sortKey := NewSortKey(100, 200)
+	sortKey := newSortKey(100, 200)
 
 	value1 := sortKey.GetNextValue()
 	value2 := sortKey.GetNextValue()

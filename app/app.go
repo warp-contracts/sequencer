@@ -736,7 +736,7 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(app.SequencerKeeper, arweaveBlocksController, app.txConfig))
+	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(&app.SequencerKeeper, arweaveBlocksController, app.txConfig))
 	app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, arweaveBlocksController, &app.SequencerKeeper, app.Logger()))
 
 	if loadLatest {

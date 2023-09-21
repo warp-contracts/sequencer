@@ -29,9 +29,9 @@ func (k *msgServer) setLastArweaveBlockInfo(ctx sdk.Context, msg *types.MsgArwea
 
 func (k *msgServer) setContractLastSortKeys(ctx sdk.Context, msg *types.MsgArweaveBlock) {
 	for _, tx := range msg.Transactions {
-		lastSortKey := types.LastSortKey {
-			Contract: tx.Contract,
-			SortKey: tx.SortKey,
+		lastSortKey := types.LastSortKey{
+			Contract: tx.Transaction.Contract,
+			SortKey:  tx.Transaction.SortKey,
 		}
 		k.SetLastSortKey(ctx, lastSortKey)
 	}

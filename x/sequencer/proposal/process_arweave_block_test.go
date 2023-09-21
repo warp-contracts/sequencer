@@ -238,3 +238,108 @@ func TestArweaveBlockIsMissing(t *testing.T) {
 	require.False(t, result)
 	require.Equal(t, logger.Msg, "Rejected proposal: first transaction of the block should contain a transaction with the Arweave block")
 }
+
+func TestCheckTransactionsLengthMismatch(t *testing.T) {
+	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", SortKey: "123"}}
+	block := &types.MsgArweaveBlock{
+		BlockInfo: test.ArweaveBlock().BlockInfo,
+	}
+	_, handler, logger := ctxHandlerAndLogger(t, nil, nil)
+
+	result := handler.checkTransactions(block, expectedTxs)
+
+	require.False(t, result)
+	require.Equal(t, logger.Msg, "Rejected proposal: incorrect number of transactions in the Arweave block")
+}
+
+func TestCheckTransactionsIdMismatch(t *testing.T) {
+	actualTxs := []*types.ArweaveTransactionWithLastSortKey{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "1234", SortKey: "1,2,3"}}}
+	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
+	block := &types.MsgArweaveBlock{
+		BlockInfo:    test.ArweaveBlock().BlockInfo,
+		Transactions: actualTxs,
+	}
+	ctx, handler, logger := ctxHandlerAndLogger(t, &types.LastArweaveBlock{
+		ArweaveBlock: block.BlockInfo,
+	}, nil)
+
+	handler.initSortKeyForBlock(ctx)
+	result := handler.checkTransactions(block, expectedTxs)
+
+	require.False(t, result)
+	require.Equal(t, logger.Msg, "Rejected proposal: transaction id is not as expected")
+}
+
+func TestCheckTransactionsContractMismatch(t *testing.T) {
+	actualTxs := []*types.ArweaveTransactionWithLastSortKey{{Transaction: &types.ArweaveTransaction{Contract: "abcd", Id: "123", SortKey: "1,2,3"}}}
+	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
+	block := &types.MsgArweaveBlock{
+		BlockInfo:    test.ArweaveBlock().BlockInfo,
+		Transactions: actualTxs,
+	}
+	ctx, handler, logger := ctxHandlerAndLogger(t, &types.LastArweaveBlock{
+		ArweaveBlock: block.BlockInfo,
+	}, nil)
+
+	handler.initSortKeyForBlock(ctx)
+	result := handler.checkTransactions(block, expectedTxs)
+
+	require.False(t, result)
+	require.Equal(t, logger.Msg, "Rejected proposal: the contract of the transaction does not match the expected one")
+}
+
+func TestCheckTransactionsSortKeyMismatch(t *testing.T) {
+	actualTxs := []*types.ArweaveTransactionWithLastSortKey{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3,4"}}}
+	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
+	block := &types.MsgArweaveBlock{
+		BlockInfo:    test.ArweaveBlock().BlockInfo,
+		Transactions: actualTxs,
+	}
+	ctx, handler, logger := ctxHandlerAndLogger(t, &types.LastArweaveBlock{
+		ArweaveBlock: block.BlockInfo,
+	}, nil)
+
+	handler.initSortKeyForBlock(ctx)
+	result := handler.checkTransactions(block, expectedTxs)
+
+	require.False(t, result)
+	require.Equal(t, logger.Msg, "Rejected proposal: transaction sort key is not as expected")
+}
+
+func TestCheckTransactionsLastSortKeyMismatch(t *testing.T) {
+	actualTxs := []*types.ArweaveTransactionWithLastSortKey{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3"}}}
+	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
+	block := &types.MsgArweaveBlock{
+		BlockInfo:    test.ArweaveBlock().BlockInfo,
+		Transactions: actualTxs,
+	}
+	ctx, handler, logger := ctxHandlerAndLogger(t, &types.LastArweaveBlock{
+		ArweaveBlock: block.BlockInfo,
+	}, nil)
+	handler.keeper.SetLastSortKey(ctx, types.LastSortKey{Contract: "abc", SortKey: "1,1,1"})
+
+	handler.initSortKeyForBlock(ctx)
+	result := handler.checkTransactions(block, expectedTxs)
+
+	require.False(t, result)
+	require.Equal(t, logger.Msg, "Rejected proposal: invalid last sort key")
+}
+
+func TestCheckTransactions(t *testing.T) {
+	actualTxs := []*types.ArweaveTransactionWithLastSortKey{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3"}, LastSortKey: "1,1,1"}}
+	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
+	block := &types.MsgArweaveBlock{
+		BlockInfo:    test.ArweaveBlock().BlockInfo,
+		Transactions: actualTxs,
+	}
+	ctx, handler, logger := ctxHandlerAndLogger(t, &types.LastArweaveBlock{
+		ArweaveBlock: block.BlockInfo,
+	}, nil)
+	handler.keeper.SetLastSortKey(ctx, types.LastSortKey{Contract: "abc", SortKey: "1,1,1"})
+
+	handler.initSortKeyForBlock(ctx)
+	result := handler.checkTransactions(block, expectedTxs)
+
+	require.True(t, result)
+	require.Equal(t, logger.Msg, "")
+}
