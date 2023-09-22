@@ -533,7 +533,7 @@ func New(
 	if appOpts.Get("test") == nil {
 		arweaveBlocksController = controller.NewController(logger, homePath)
 	}
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController)
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController, DefaultNodeHome)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
