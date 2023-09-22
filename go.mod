@@ -24,7 +24,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
-	github.com/warp-contracts/syncer v0.2.34
+	github.com/warp-contracts/syncer v0.2.39
 	google.golang.org/genproto/googleapis/api v0.0.0-20230629202037-9506855d4529
 	google.golang.org/grpc v1.56.2
 	gopkg.in/yaml.v2 v2.4.0
@@ -81,6 +81,7 @@ require (
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
 	github.com/gammazero/workerpool v1.1.3 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
+	github.com/gin-contrib/pprof v1.4.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/gin-gonic/gin v1.8.2 // indirect
 	github.com/go-gorp/gorp/v3 v3.0.5 // indirect
