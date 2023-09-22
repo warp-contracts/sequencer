@@ -1,5 +1,5 @@
 # Build the sequencer binary
-FROM golang:1.20.3-alpine3.17 as sequencer
+FROM golang:1.21-alpine3.18 as sequencer
 LABEL stage=sequencer-builder
 RUN apk add --update make build-base curl git
 
@@ -22,7 +22,7 @@ COPY .git .git
 RUN make build
 
 # Minimal output image
-FROM alpine:3.17
+FROM alpine:3.18
 
 # Cosmovisor setup
 RUN mkdir -p /root/cosmovisor/genesis/bin
