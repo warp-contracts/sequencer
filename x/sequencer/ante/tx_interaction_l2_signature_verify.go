@@ -2,6 +2,7 @@ package ante
 
 import (
 	"bytes"
+
 	"cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -17,7 +18,7 @@ import (
 // Validation of the signature for a transaction with a DataItem.
 // The transaction's signature must match the signature of the DataItem.
 // Additionally, the nonce for the given sender is validated.
-func verifySignatures(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
+func verifySignaturesAndNonce(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	sigTx, ok := tx.(signing.SigVerifiableTx)
 	if !ok {
 		return errors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type SigVerifiableTx")
@@ -34,13 +35,39 @@ func verifySignatures(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, d
 
 	sig := sigs[0]
 	signer := dataItem.GetSigners()[0]
+
+	if err := verifyNonce(ctx, ak, sig, signer, dataItem); err != nil {
+		return err
+	}
+
+	if !ctx.IsReCheckTx() { // the signature does not need to be rechecked
+		if err := verifySingleSignature(sig, signer, dataItem); err != nil {
+			return err
+		}	
+	}
+
+	return nil
+}
+
+func verifyNonce(ctx sdk.Context, ak authkeeper.AccountKeeper, sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
 	acc, err := getOrCreateAccount(ctx, ak, signer, dataItem)
 	if err != nil {
 		return err
 	}
 
-	if err := verifySingleSignature(sig, signer, acc, dataItem); err != nil {
+	if sig.Sequence != acc.GetSequence() {
+		return errors.Wrapf(sdkerrors.ErrWrongSequence,
+			"account sequence mismatch, expected %d, got %d", acc.GetSequence(), sig.Sequence,
+		)
+	}
+
+	tagNonce, err := dataItem.GetNonceFromTags()
+	if err != nil {
 		return err
+	}
+
+	if sig.Sequence != tagNonce {
+		return errors.Wrap(types.ErrSequencerNonceMismatch, "transaction sequence does not match nonce from data item tag")
 	}
 
 	return nil
@@ -69,7 +96,7 @@ func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.A
 	return acc, nil
 }
 
-func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc authtypes.AccountI, dataItem *types.MsgDataItem) error {
+func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
 	switch sigData := sig.Data.(type) {
 	case *txsigning.SingleSignatureData:
 		if sigData.SignMode != txsigning.SignMode_SIGN_MODE_DIRECT {
@@ -92,28 +119,6 @@ func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, acc
 			"transaction public key does not match message public key")
 	}
 
-	if err := verifyNonce(acc, sig, signer, dataItem); err != nil {
-		return err
-	}
-
 	return nil
 }
 
-func verifyNonce(acc authtypes.AccountI, sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
-	if sig.Sequence != acc.GetSequence() {
-		return errors.Wrapf(sdkerrors.ErrWrongSequence,
-			"account sequence mismatch, expected %d, got %d", acc.GetSequence(), sig.Sequence,
-		)
-	}
-
-	tagNonce, err := dataItem.GetNonceFromTags()
-	if err != nil {
-		return err
-	}
-
-	if sig.Sequence != tagNonce {
-		return errors.Wrap(types.ErrSequencerNonceMismatch, "transaction sequence does not match nonce from data item tag")
-	}
-
-	return nil
-}

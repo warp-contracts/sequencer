@@ -61,11 +61,16 @@ func isL2Interaction(tx sdk.Tx) bool {
 }
 
 func verifyTxWithDataItem(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
-	if err := verifyTxBody(tx); err != nil {
+	if err := verifySignaturesAndNonce(ctx, ak, tx, dataItem); err != nil {
 		return err
 	}
 
-	if err := verifySignatures(ctx, ak, tx, dataItem); err != nil {
+	if ctx.IsReCheckTx() {
+		// the following do not need to be rechecked
+		return nil
+	}
+
+	if err := verifyTxBody(tx); err != nil {
 		return err
 	}
 

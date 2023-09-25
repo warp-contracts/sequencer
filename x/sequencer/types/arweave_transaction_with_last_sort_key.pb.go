@@ -22,6 +22,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// L1 interaction with a sort key value from the previous interaction with the contract
 type ArweaveTransactionWithLastSortKey struct {
 	Transaction *ArweaveTransaction `protobuf:"bytes,1,opt,name=transaction,proto3" json:"transaction,omitempty"`
 	LastSortKey string              `protobuf:"bytes,2,opt,name=last_sort_key,json=lastSortKey,proto3" json:"last_sort_key,omitempty"`
