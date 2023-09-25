@@ -75469,6 +75469,9 @@ definitions:
           sort_key and last_sort_key.
       last_sort_key:
         type: string
+    title: >-
+      L1 interaction with a sort key value from the previous interaction with
+      the contract
   sequencer.sequencer.LastArweaveBlock:
     type: object
     properties:

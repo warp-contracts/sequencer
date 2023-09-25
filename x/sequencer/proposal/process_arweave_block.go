@@ -45,10 +45,6 @@ func (h *processProposalHandler) validateArweaveBlockTx(tx sdk.Tx) bool {
 }
 
 func (h *processProposalHandler) validateArweaveBlockMsg(ctx sdk.Context, msg *types.MsgArweaveBlock) bool {
-	if err := msg.ValidateBasic(); err != nil {
-		return h.rejectProposal("invalid Arweave block message", "err", err)
-	}
-
 	newBlockInfo := &types.ArweaveBlockInfo{
 		Height:    msg.BlockInfo.Height,
 		Timestamp: msg.BlockInfo.Timestamp,

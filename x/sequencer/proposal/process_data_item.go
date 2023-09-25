@@ -18,10 +18,6 @@ func getDataItemMsg(tx sdk.Tx) *types.MsgDataItem {
 }
 
 func (h *processProposalHandler) processProposalValidateDataItem(msg *types.MsgDataItem) bool {
-	if err := msg.ValidateBasic(); err != nil {
-		return h.rejectProposal("invalid data item message", "err", err)
-	}
-
 	return h.checkSortKey(msg) && h.checkLastSortKey(msg)
 }
 
