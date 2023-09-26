@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/gorilla/mux"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
@@ -26,6 +27,15 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		BadRequestError(w, err, "parse data item error")
 		return
+	}
+
+	// Get broadcast mode from request header
+	mode := r.Header.Get("X-Broadcast-Mode")
+	switch mode {
+	case flags.BroadcastSync, flags.BroadcastAsync:
+		h.ctx.BroadcastMode = mode
+	default:
+		h.ctx.BroadcastMode = flags.BroadcastSync
 	}
 
 	// Wrap message with Cosmos transaction, validate and broadcast transaction
