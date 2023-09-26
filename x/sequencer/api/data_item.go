@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/gorilla/mux"
+	"github.com/warp-contracts/sequencer/tools"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
@@ -20,6 +21,8 @@ func RegisterDataItemAPIRoute(clientCtx client.Context, router *mux.Router) {
 }
 
 func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	defer tools.Timer("dataItemHandler.ServeHTTP")()
+
 	var msg types.MsgDataItem
 
 	// Parse DataItem from request body

@@ -3,14 +3,16 @@ package api
 import (
 	"encoding/base64"
 	"encoding/json"
+	"net/http"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
-	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/warp-contracts/sequencer/tools"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
@@ -38,6 +40,8 @@ func RegisterNonceAPIRoute(clientCtx client.Context, router *mux.Router) {
 }
 
 func (h nonceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	defer tools.Timer("nonceHandler.ServeHTTP")()
+
 	var request NonceRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
