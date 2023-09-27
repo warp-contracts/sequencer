@@ -431,14 +431,7 @@
     },
     "params": null,
     "sequencer": {
-      "params": {},
-      "lastArweaveBlock": {
-        "arweaveBlock": {
-          "height": 1266400,
-          "timestamp": 1695348480  
-        },
-        "sequencerBlockHeight": 0
-      }
+      "params": {}
     },
     "slashing": {
       "params": {
