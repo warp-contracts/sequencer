@@ -13,16 +13,26 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-const LAST_SORT_KEYS_FILE = "last_sort_keys.json"
+const (
+	CONFIG_DIR              = "config"
+	LAST_ARWEAVE_BLOCK_FILE = "last_arweave_block.json"
+	LAST_SORT_KEYS_FILE     = "last_sort_keys.json"
+)
 
 // InitGenesis initializes the module's state from a provided genesis state.
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, homeDir string) {
 	// Set LastArweaveBlock
+	var lastArweaveBlock *types.LastArweaveBlock
+	var err error
 	if genState.LastArweaveBlock != nil {
-		k.SetLastArweaveBlock(ctx, *genState.LastArweaveBlock)
+		lastArweaveBlock = genState.LastArweaveBlock
 	} else {
-		panic("LastArweaveBlock cannot be empty in the genesis state")
+		lastArweaveBlock, err = readLastArweaveBlockFromFile(ctx.Logger(), homeDir)
+		if err != nil {
+			panic(err)
+		}
 	}
+	k.SetLastArweaveBlock(ctx, *lastArweaveBlock)
 
 	// Set all the lastSortKey
 	var lastSortKeys []types.LastSortKey
@@ -39,8 +49,27 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, 
 	k.SetParams(ctx, genState.Params)
 }
 
+func readLastArweaveBlockFromFile(logger log.Logger, homeDir string) (*types.LastArweaveBlock, error) {
+	filePath := filepath.Join(homeDir, CONFIG_DIR, LAST_ARWEAVE_BLOCK_FILE)
+	jsonFile, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	var blockInfo types.ArweaveBlockInfo
+	err = json.Unmarshal(jsonFile, &blockInfo)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.LastArweaveBlock{
+		ArweaveBlock:         &blockInfo,
+		SequencerBlockHeight: 0,
+	}, nil
+}
+
 func readLastSortKeysFromFile(logger log.Logger, homeDir string) []types.LastSortKey {
-	filePath := filepath.Join(homeDir, "config", LAST_SORT_KEYS_FILE)
+	filePath := filepath.Join(homeDir, CONFIG_DIR, LAST_SORT_KEYS_FILE)
 	var keys []types.LastSortKey
 
 	jsonFile, err := os.ReadFile(filePath)
