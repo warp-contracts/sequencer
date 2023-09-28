@@ -216,6 +216,7 @@ func TestVerifySignaturesArweaveSignature(t *testing.T) {
 	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
 
 	require.NoError(t, err)
+	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetCreator()).GetSequence(), uint64(6))
 }
 
 func TestVerifySignaturesEthereumSignature(t *testing.T) {
@@ -228,6 +229,7 @@ func TestVerifySignaturesEthereumSignature(t *testing.T) {
 	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
 
 	require.NoError(t, err)
+	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetCreator()).GetSequence(), uint64(6))
 }
 
 func TestVerifySignaturesNoSignerAccount(t *testing.T) {
@@ -239,4 +241,5 @@ func TestVerifySignaturesNoSignerAccount(t *testing.T) {
 	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
 
 	require.NoError(t, err)
+	require.True(t, app.AccountKeeper.HasAccount(ctx, dataItem.GetCreator()))
 }
