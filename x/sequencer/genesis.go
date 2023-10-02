@@ -1,33 +1,22 @@
 package sequencer
 
 import (
-	"encoding/json"
-	"os"
-	"path/filepath"
-
-	"github.com/cometbft/cometbft/libs/log"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/warp-contracts/sequencer/x/sequencer/config"
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-const (
-	CONFIG_DIR              = "config"
-	LAST_ARWEAVE_BLOCK_FILE = "last_arweave_block.json"
-	LAST_SORT_KEYS_FILE     = "last_sort_keys.json"
-)
-
 // InitGenesis initializes the module's state from a provided genesis state.
-func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, homeDir string) {
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, configProvider *config.ConfigProvider) {
 	// Set LastArweaveBlock
 	var lastArweaveBlock *types.LastArweaveBlock
 	var err error
 	if genState.LastArweaveBlock != nil {
 		lastArweaveBlock = genState.LastArweaveBlock
 	} else {
-		lastArweaveBlock, err = readLastArweaveBlockFromFile(ctx.Logger(), homeDir)
+		lastArweaveBlock, err = configProvider.LastArweaveBlock()
 		if err != nil {
 			panic(err)
 		}
@@ -37,7 +26,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, 
 	// Set all the lastSortKey
 	var lastSortKeys []types.LastSortKey
 	if len(genState.LastSortKeyList) == 0 {
-		lastSortKeys = readLastSortKeysFromFile(ctx.Logger(), homeDir)
+		lastSortKeys = configProvider.LastSortKeys()
 	} else {
 		lastSortKeys = genState.GetLastSortKeyList()
 	}
@@ -47,54 +36,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, 
 
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
-}
-
-func readLastArweaveBlockFromFile(logger log.Logger, homeDir string) (*types.LastArweaveBlock, error) {
-	filePath := filepath.Join(homeDir, CONFIG_DIR, LAST_ARWEAVE_BLOCK_FILE)
-	jsonFile, err := os.ReadFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	var blockInfo types.ArweaveBlockInfo
-	err = json.Unmarshal(jsonFile, &blockInfo)
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.LastArweaveBlock{
-		ArweaveBlock:         &blockInfo,
-		SequencerBlockHeight: 0,
-	}, nil
-}
-
-func readLastSortKeysFromFile(logger log.Logger, homeDir string) []types.LastSortKey {
-	filePath := filepath.Join(homeDir, CONFIG_DIR, LAST_SORT_KEYS_FILE)
-	var keys []types.LastSortKey
-
-	jsonFile, err := os.ReadFile(filePath)
-	if err != nil {
-		logger.
-			With("err", err).
-			With("file", filePath).
-			Info("Unable to retrieve last sort keys from the file")
-		return keys
-	}
-
-	err = json.Unmarshal(jsonFile, &keys)
-	if err != nil {
-		logger.
-			With("err", err).
-			With("file", filePath).
-			Info("Unable to unmarshal last sort keys from the file")
-		return keys
-	}
-
-	logger.
-		With("number of keys", len(keys)).
-		With("file", filePath).
-		Info("Last sort keys loaded from the file")
-	return keys
 }
 
 // ExportGenesis returns the module's exported genesis

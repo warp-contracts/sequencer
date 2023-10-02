@@ -18,6 +18,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/warp-contracts/sequencer/x/sequencer/client/cli"
+	"github.com/warp-contracts/sequencer/x/sequencer/config"
 	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -100,7 +101,7 @@ type AppModule struct {
 	accountKeeper           types.AccountKeeper
 	bankKeeper              types.BankKeeper
 	arweaveBlocksController controller.ArweaveBlocksController
-	homeDir                 string
+	configProvider          *config.ConfigProvider
 }
 
 func NewAppModule(
@@ -109,7 +110,7 @@ func NewAppModule(
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	arweaveBlocksController controller.ArweaveBlocksController,
-	homeDir string,
+	configProvider *config.ConfigProvider,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic:          NewAppModuleBasic(cdc),
@@ -117,7 +118,7 @@ func NewAppModule(
 		accountKeeper:           accountKeeper,
 		bankKeeper:              bankKeeper,
 		arweaveBlocksController: arweaveBlocksController,
-		homeDir: homeDir,
+		configProvider:          configProvider,
 	}
 }
 
@@ -136,7 +137,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 	// Initialize global index to index in genesis state
 	cdc.MustUnmarshalJSON(gs, &genState)
 
-	InitGenesis(ctx, am.keeper, genState, am.homeDir)
+	InitGenesis(ctx, am.keeper, genState, am.configProvider)
 
 	return []abci.ValidatorUpdate{}
 }

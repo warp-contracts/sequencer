@@ -112,6 +112,7 @@ import (
 	sequencermodule "github.com/warp-contracts/sequencer/x/sequencer"
 	sequencerante "github.com/warp-contracts/sequencer/x/sequencer/ante"
 	sequencerapi "github.com/warp-contracts/sequencer/x/sequencer/api"
+	sequencerconfig "github.com/warp-contracts/sequencer/x/sequencer/config"
 	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	sequencermodulekeeper "github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	sequencerproposal "github.com/warp-contracts/sequencer/x/sequencer/proposal"
@@ -533,7 +534,8 @@ func New(
 	if appOpts.Get("test") == nil {
 		arweaveBlocksController = controller.NewController(logger, homePath)
 	}
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController, DefaultNodeHome)
+	configProvider := sequencerconfig.NewConfigProvider(DefaultNodeHome, logger)
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController, configProvider)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -736,7 +738,7 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(&app.SequencerKeeper, arweaveBlocksController, app.txConfig))
+	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(&app.SequencerKeeper, arweaveBlocksController, app.txConfig, configProvider))
 	app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, arweaveBlocksController, &app.SequencerKeeper, app.Logger()))
 
 	if loadLatest {
