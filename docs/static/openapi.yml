@@ -75582,3 +75582,15 @@ definitions:
         description: params holds all the parameters of this module.
         type: object
     description: QueryParamsResponse is response type for the Query/Params RPC method.
+  sequencer.sequencer.VrfData:
+    type: object
+    properties:
+      hash:
+        type: string
+      proof:
+        type: string
+      number:
+        type: string
+      public_key:
+        type: string
+    title: 'TODO: comment'

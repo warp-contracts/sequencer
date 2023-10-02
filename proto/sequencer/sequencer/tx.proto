@@ -6,6 +6,7 @@ import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 import "sequencer/sequencer/arweave_block_info.proto";
 import "sequencer/sequencer/arweave_transaction_with_last_sort_key.proto";
+import "sequencer/sequencer/vrf.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
@@ -20,6 +21,7 @@ message MsgDataItem {
   bytes data_item = 1 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem", (gogoproto.nullable) = false];
   string sort_key = 2;
   string last_sort_key = 3;
+  VrfData vrf_data = 4;
 }
 
 message MsgDataItemResponse {}
