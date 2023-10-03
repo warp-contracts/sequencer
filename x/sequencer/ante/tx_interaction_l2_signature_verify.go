@@ -10,7 +10,6 @@ import (
 	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
@@ -39,7 +38,7 @@ func verifySignaturesAndNonce(ctx sdk.Context, ak authkeeper.AccountKeeper, tx s
 	if !ctx.IsReCheckTx() { // the signature does not need to be rechecked
 		if err := verifySingleSignature(sig, signer, dataItem); err != nil {
 			return err
-		}	
+		}
 	}
 
 	if err = verifyNonceAndIncreaseSequence(ctx, ak, sig, signer, dataItem); err != nil {
