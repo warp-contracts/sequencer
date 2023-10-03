@@ -32,6 +32,8 @@ func (ditd DataItemTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate 
 		if err := verifyTxWithDataItem(ctx, ditd.ak, tx, dataItem); err != nil {
 			return ctx, err
 		}
+		// a valid transaction with a data item does not require further validation by the AnteHandler.
+		return ctx, nil
 	}
 
 	return next(ctx, tx, simulate)
@@ -60,25 +62,26 @@ func isL2Interaction(tx sdk.Tx) bool {
 	return dataItem != nil && err == nil
 }
 
-func verifyTxWithDataItem(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
+func verifyTxWithDataItem(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) (err error) {
+	if !ctx.IsReCheckTx() {
+		if err = verifyTxBody(tx); err != nil {
+			return
+		}
+	
+		if err = verifyFee(tx, dataItem); err != nil {
+			return
+		}
+	
+		if err = verifyContract(tx, dataItem); err != nil {
+			return
+		}
+
+		if err = dataItem.ValidateBasic(); err != nil {
+			return 
+		}
+	}
+
 	if err := verifySignaturesAndNonce(ctx, ak, tx, dataItem); err != nil {
-		return err
-	}
-
-	if ctx.IsReCheckTx() {
-		// the following do not need to be rechecked
-		return nil
-	}
-
-	if err := verifyTxBody(tx); err != nil {
-		return err
-	}
-
-	if err := verifyFee(tx, dataItem); err != nil {
-		return err
-	}
-
-	if err := verifyContract(tx, dataItem); err != nil {
 		return err
 	}
 
