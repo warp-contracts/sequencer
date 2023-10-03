@@ -5,7 +5,7 @@ package sequencer.sequencer;
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 import "sequencer/sequencer/arweave_block_info.proto";
-import "sequencer/sequencer/arweave_transaction_with_last_sort_key.proto";
+import "sequencer/sequencer/arweave_transaction_with_info.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
@@ -20,6 +20,7 @@ message MsgDataItem {
   bytes data_item = 1 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem", (gogoproto.nullable) = false];
   string sort_key = 2;
   string last_sort_key = 3;
+  bytes random = 4;
 }
 
 message MsgDataItemResponse {}
@@ -27,7 +28,7 @@ message MsgDataItemResponse {}
 // message with an Arweave block
 message MsgArweaveBlock {
   ArweaveBlockInfo block_info = 1;
-  repeated ArweaveTransactionWithLastSortKey transactions = 2;
+  repeated ArweaveTransactionWithInfo transactions = 2;
 }
 
 message MsgArweaveBlockResponse {}

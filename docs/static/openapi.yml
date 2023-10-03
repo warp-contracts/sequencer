@@ -75452,7 +75452,7 @@ definitions:
     description: >-
       Store basic information about L1 interaction needed for calculating
       sort_key and last_sort_key.
-  sequencer.sequencer.ArweaveTransactionWithLastSortKey:
+  sequencer.sequencer.ArweaveTransactionWithInfo:
     type: object
     properties:
       transaction:
@@ -75469,6 +75469,9 @@ definitions:
           sort_key and last_sort_key.
       last_sort_key:
         type: string
+      random:
+        type: string
+        format: byte
     title: >-
       L1 interaction with a sort key value from the previous interaction with
       the contract
