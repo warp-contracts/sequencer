@@ -48,52 +48,52 @@ func verifySignaturesAndNonce(ctx sdk.Context, ak authkeeper.AccountKeeper, tx s
 	return nil
 }
 
-// func verifyNonce(ctx sdk.Context, ak authkeeper.AccountKeeper, sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
-// acc, err := getOrCreateAccount(ctx, ak, signer, dataItem)
-// if err != nil {
-// 	return err
-// }
+func verifyNonce(ctx sdk.Context, ak authkeeper.AccountKeeper, sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
+	acc, err := getOrCreateAccount(ctx, ak, signer, dataItem)
+	if err != nil {
+		return err
+	}
 
-// if sig.Sequence != acc.GetSequence() {
-// 	return errors.Wrapf(sdkerrors.ErrWrongSequence,
-// 		"account sequence mismatch, expected %d, got %d", acc.GetSequence(), sig.Sequence,
-// 	)
-// }
+	if sig.Sequence != acc.GetSequence() {
+		return errors.Wrapf(sdkerrors.ErrWrongSequence,
+			"account sequence mismatch, expected %d, got %d", acc.GetSequence(), sig.Sequence,
+		)
+	}
 
-// tagNonce, err := dataItem.GetNonceFromTags()
-// if err != nil {
-// 	return err
-// }
+	tagNonce, err := dataItem.GetNonceFromTags()
+	if err != nil {
+		return err
+	}
 
-// if sig.Sequence != tagNonce {
-// 	return errors.Wrap(types.ErrSequencerNonceMismatch, "transaction sequence does not match nonce from data item tag")
-// }
+	if sig.Sequence != tagNonce {
+		return errors.Wrap(types.ErrSequencerNonceMismatch, "transaction sequence does not match nonce from data item tag")
+	}
 
-// return nil
-// }
+	return nil
+}
 
-// func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.AccAddress, dataItem *types.MsgDataItem) (authtypes.AccountI, error) {
-// 	acc := ak.GetAccount(ctx, addr)
+func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.AccAddress, dataItem *types.MsgDataItem) (authtypes.AccountI, error) {
+	acc := ak.GetAccount(ctx, addr)
 
-// 	if acc != nil {
-// 		return acc, nil
-// 	}
+	if acc != nil {
+		return acc, nil
+	}
 
-// 	pubKey, err := dataItem.GetPublicKey()
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	pubKey, err := dataItem.GetPublicKey()
+	if err != nil {
+		return nil, err
+	}
 
-// 	acc = ak.NewAccountWithAddress(ctx, addr)
+	acc = ak.NewAccountWithAddress(ctx, addr)
 
-// 	err = acc.SetPubKey(pubKey)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	err = acc.SetPubKey(pubKey)
+	if err != nil {
+		return nil, err
+	}
 
-// 	ak.SetAccount(ctx, acc)
-// 	return acc, nil
-// }
+	ak.SetAccount(ctx, acc)
+	return acc, nil
+}
 
 func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
 	switch sigData := sig.Data.(type) {
