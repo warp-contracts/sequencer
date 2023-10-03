@@ -10,6 +10,7 @@ import (
 	txsigning "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
@@ -47,7 +48,6 @@ func verifySignaturesAndNonce(ctx sdk.Context, ak authkeeper.AccountKeeper, tx s
 
 	return nil
 }
-
 
 func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
 	switch sigData := sig.Data.(type) {
