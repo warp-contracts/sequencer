@@ -143,7 +143,7 @@ func (h *processProposalHandler) checkTransactions(block *types.MsgArweaveBlock,
 }
 
 func (h *processProposalHandler) checkArweaveBlockIsNotMissing(ctx sdk.Context, txIndex int) bool {
-	if ctx.BlockHeader().Height == 0 || txIndex > 0 {
+	if ctx.BlockHeight() == 0 || txIndex > 0 {
 		return true
 	}
 

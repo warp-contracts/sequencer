@@ -91,7 +91,7 @@ func TestVerifySignaturesNoSignatures(t *testing.T) {
 	addCreatorAccount(t, app, ctx, dataItem)
 	tx := createTxWithSignatures(t, dataItem)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.ErrorIs(t, err, types.ErrNotSingleSignature)
 }
@@ -103,7 +103,7 @@ func TestVerifySignaturesTooManySignatures(t *testing.T) {
 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.ErrorIs(t, err, types.ErrNotSingleSignature)
 }
@@ -119,7 +119,7 @@ func TestVerifySignaturesInvalidSignMode(t *testing.T) {
 	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
 	tx := createTxWithSignatures(t, dataItem, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.ErrorIs(t, err, types.ErrInvalidSignMode)
 }
@@ -135,7 +135,7 @@ func TestVerifySignaturesNotEmptySignature(t *testing.T) {
 	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
 	tx := createTxWithSignatures(t, dataItem, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.ErrorIs(t, err, types.ErrNotEmptySignature)
 }
@@ -148,7 +148,7 @@ func TestVerifySignaturesMultiSignature(t *testing.T) {
 	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
 	tx := createTxWithSignatures(t, dataItem, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.ErrorIs(t, err, types.ErrTooManySigners)
 }
@@ -165,7 +165,7 @@ func TestVerifySignaturesPublicKeyMismatch(t *testing.T) {
 	}
 	tx := createTxWithSignatures(t, dataItem, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.ErrorIs(t, err, types.ErrPublicKeyMismatch)
 }
@@ -177,7 +177,7 @@ func TestVerifySignaturesWrongSequence(t *testing.T) {
 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence()+1)
 	tx := createTxWithSignatures(t, dataItem, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.ErrorIs(t, err, sdkerrors.ErrWrongSequence)
 }
@@ -189,7 +189,7 @@ func TestVerifySignaturesNoSequencerNonceTag(t *testing.T) {
 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.ErrorIs(t, err, types.ErrNoSequencerNonceTag)
 }
@@ -201,7 +201,7 @@ func TestVerifySignaturesSequencerNonceMismatch(t *testing.T) {
 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.ErrorIs(t, err, types.ErrSequencerNonceMismatch)
 }
@@ -213,7 +213,7 @@ func TestVerifySignaturesArweaveSignature(t *testing.T) {
 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.NoError(t, err)
 	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetCreator()).GetSequence(), uint64(6))
@@ -226,7 +226,7 @@ func TestVerifySignaturesEthereumSignature(t *testing.T) {
 	sig := createEmptyEthereumSignature(t, dataItem, acc.GetSequence())
 	tx := createTxWithSignatures(t, dataItem, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.NoError(t, err)
 	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetCreator()).GetSequence(), uint64(6))
@@ -238,7 +238,7 @@ func TestVerifySignaturesNoSignerAccount(t *testing.T) {
 	sig := createEmptyArweaveSignature(dataItem, 0)
 	tx := createTxWithSignatures(t, dataItem, sig)
 
-	err := verifySignaturesAndNonce(ctx, app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.NoError(t, err)
 	require.True(t, app.AccountKeeper.HasAccount(ctx, dataItem.GetCreator()))
