@@ -29,4 +29,5 @@ var (
 	ErrBadArweaveTimestamp         = errors.Register(ModuleName, 1118, "invalid arweave block timestamp")
 	ErrBadArweaveHashLength        = errors.Register(ModuleName, 1119, "invalid arweave block hash length")
 	ErrArweaveBlockNotFromProposer = errors.Register(ModuleName, 1120, "arweave block not from proposer")
+	ErrDataItemAlreadyInBlock      = errors.Register(ModuleName, 1121, "data item already in block")
 )

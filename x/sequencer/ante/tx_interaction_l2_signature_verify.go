@@ -18,7 +18,7 @@ import (
 // Validation of the signature for a transaction with a DataItem.
 // The transaction's signature must match the signature of the DataItem.
 // Additionally, the nonce for the given sender is validated.
-func verifySignaturesAndNonce(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
+func verifySignaturesAndNonce(ctx sdk.Context, ak *authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	sigTx, ok := tx.(signing.SigVerifiableTx)
 	if !ok {
 		return errors.Wrap(sdkerrors.ErrTxDecode, "transaction is not of type SigVerifiableTx")
@@ -75,7 +75,7 @@ func verifySingleSignature(sig txsigning.SignatureV2, signer sdk.AccAddress, dat
 	return nil
 }
 
-func verifyNonceAndIncreaseSequence(ctx sdk.Context, ak authkeeper.AccountKeeper, sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
+func verifyNonceAndIncreaseSequence(ctx sdk.Context, ak *authkeeper.AccountKeeper, sig txsigning.SignatureV2, signer sdk.AccAddress, dataItem *types.MsgDataItem) error {
 	acc, err := getOrCreateAccount(ctx, ak, signer, dataItem)
 	if err != nil {
 		return err
@@ -105,7 +105,7 @@ func verifyNonceAndIncreaseSequence(ctx sdk.Context, ak authkeeper.AccountKeeper
 	return nil
 }
 
-func getOrCreateAccount(ctx sdk.Context, ak authkeeper.AccountKeeper, addr sdk.AccAddress, dataItem *types.MsgDataItem) (authtypes.AccountI, error) {
+func getOrCreateAccount(ctx sdk.Context, ak *authkeeper.AccountKeeper, addr sdk.AccAddress, dataItem *types.MsgDataItem) (authtypes.AccountI, error) {
 	acc := ak.GetAccount(ctx, addr)
 
 	if acc != nil {

@@ -13,23 +13,22 @@ import (
 // Such a transaction can have exactly one message, and all the values in this transaction are predetermined or derived from the DataItem.
 // See: https://github.com/warp-contracts/sequencer/issues/8
 type DataItemTxDecorator struct {
-	ak authkeeper.AccountKeeper
+	ak *authkeeper.AccountKeeper
+	bi *BlockInteractions
 }
 
-func NewDataItemTxDecorator(ak authkeeper.AccountKeeper) DataItemTxDecorator {
-	return DataItemTxDecorator{
-		ak: ak,
-	}
+func NewDataItemTxDecorator(ak *authkeeper.AccountKeeper, bi *BlockInteractions) *DataItemTxDecorator {
+	return &DataItemTxDecorator{ak, bi}
 }
 
-func (ditd DataItemTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
+func (ditd *DataItemTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	dataItem, err := GetL2Interaction(tx)
 	if err != nil {
 		return ctx, err
 	}
 
 	if dataItem != nil {
-		if err := verifyTxWithDataItem(ctx, ditd.ak, tx, dataItem); err != nil {
+		if err := ditd.verifyTxWithDataItem(ctx, tx, dataItem); err != nil {
 			return ctx, err
 		}
 		// a valid transaction with a data item does not require further validation by the AnteHandler.
@@ -62,33 +61,57 @@ func isL2Interaction(tx sdk.Tx) bool {
 	return dataItem != nil && err == nil
 }
 
-func verifyTxWithDataItem(ctx sdk.Context, ak authkeeper.AccountKeeper, tx sdk.Tx, dataItem *types.MsgDataItem) (err error) {
-	if !ctx.IsReCheckTx() {
+func (ditd *DataItemTxDecorator) verifyTxWithDataItem(ctx sdk.Context, tx sdk.Tx, dataItem *types.MsgDataItem) (err error) {
+	if ctx.IsReCheckTx() {
+		if err = ditd.verifyAlreadyInBlock(ctx, dataItem); err != nil {
+			return
+		}
+	} else {
 		if err = verifyTxBody(tx); err != nil {
 			return
 		}
-	
+
 		if err = verifyFee(tx, dataItem); err != nil {
 			return
 		}
-	
+
 		if err = verifyContract(tx, dataItem); err != nil {
 			return
 		}
 
-		if err = dataItem.ValidateBasic(); err != nil {
-			return 
+		if err = verifyDataItem(dataItem); err != nil {
+			return
 		}
 	}
 
-	if err := verifySignaturesAndNonce(ctx, ak, tx, dataItem); err != nil {
+	if err := verifySignaturesAndNonce(ctx, ditd.ak, tx, dataItem); err != nil {
 		return err
 	}
 
 	return nil
 }
 
+func (ditd *DataItemTxDecorator) verifyAlreadyInBlock(ctx sdk.Context, dataItem *types.MsgDataItem) (err error) {
+	if ditd.bi.Contains(ctx.BlockHeight(), dataItem) {
+		err = errors.Wrapf(types.ErrDataItemAlreadyInBlock, 
+			"The data item has already been added to the block at height %d",
+			ctx.BlockHeight(),
+		)
+	}
+	return
+}
+
 func verifyContract(tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	_, err := dataItem.GetContractFromTags()
 	return err
+}
+
+func verifyDataItem(dataItem *types.MsgDataItem) error {
+	// Verifies DataItem acording to the ANS-104 standard. Verifies signature.
+	// https://github.com/ArweaveTeam/arweave-standards/blob/master/ans/ANS-104.md#21-verifying-a-dataitem
+	err := dataItem.DataItem.Verify()
+	if err != nil {
+		return err
+	}
+	return dataItem.DataItem.VerifySignature()
 }

@@ -17,6 +17,7 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/warp-contracts/sequencer/x/sequencer/ante"
 	"github.com/warp-contracts/sequencer/x/sequencer/client/cli"
 	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
@@ -101,6 +102,7 @@ type AppModule struct {
 	bankKeeper              types.BankKeeper
 	arweaveBlocksController controller.ArweaveBlocksController
 	homeDir                 string
+	blockInteractions       *ante.BlockInteractions
 }
 
 func NewAppModule(
@@ -110,6 +112,7 @@ func NewAppModule(
 	bankKeeper types.BankKeeper,
 	arweaveBlocksController controller.ArweaveBlocksController,
 	homeDir string,
+	blockInteractions *ante.BlockInteractions,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic:          NewAppModuleBasic(cdc),
@@ -117,13 +120,14 @@ func NewAppModule(
 		accountKeeper:           accountKeeper,
 		bankKeeper:              bankKeeper,
 		arweaveBlocksController: arweaveBlocksController,
-		homeDir: homeDir,
+		homeDir:                 homeDir,
+		blockInteractions:       blockInteractions,
 	}
 }
 
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper, am.blockInteractions))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
@@ -153,6 +157,7 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 	am.startOrUpdateArweaveBlocksController(ctx)
+	am.blockInteractions.NewBlock(ctx.BlockHeight())
 }
 
 // EndBlock contains the logic that is automatically triggered at the end of each block

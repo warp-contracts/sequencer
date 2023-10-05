@@ -9,16 +9,17 @@ import (
 )
 
 func (k *msgServer) DataItem(goCtx context.Context, msg *types.MsgDataItem) (*types.MsgDataItemResponse, error) {
-	if err := k.setContractLastSortKey(goCtx, msg); err != nil {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := k.setContractLastSortKey(ctx, msg); err != nil {
 		return nil, err
 	}
+	
+	k.blockInteractions.Add(ctx.BlockHeight(), msg)
 
 	return &types.MsgDataItemResponse{}, nil
 }
 
-func (k *msgServer) setContractLastSortKey(goCtx context.Context, msg *types.MsgDataItem) error {
-	ctx := sdk.UnwrapSDKContext(goCtx)
-
+func (k *msgServer) setContractLastSortKey(ctx sdk.Context, msg *types.MsgDataItem) error {
 	contract, err := msg.GetContractFromTags()
 	if err != nil {
 		return err

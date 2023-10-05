@@ -533,7 +533,8 @@ func New(
 	if appOpts.Get("test") == nil {
 		arweaveBlocksController = controller.NewController(logger, homePath)
 	}
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController, DefaultNodeHome)
+	blockInteractions := sequencerante.NewBlockInteractions()
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController, DefaultNodeHome, blockInteractions)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -721,11 +722,12 @@ func New(
 	// initialize BaseApp
 	anteHandler, err := sequencerante.NewAnteHandler(
 		sequencerante.HandlerOptions{
-			AccountKeeper:   app.AccountKeeper,
-			BankKeeper:      app.BankKeeper,
-			FeegrantKeeper:  app.FeeGrantKeeper,
-			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-			SigGasConsumer:  sequencerante.SigVerificationGasConsumer,
+			AccountKeeper:     app.AccountKeeper,
+			BankKeeper:        app.BankKeeper,
+			FeegrantKeeper:    app.FeeGrantKeeper,
+			SignModeHandler:   encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:    sequencerante.SigVerificationGasConsumer,
+			BlockInteractions: blockInteractions,
 		},
 	)
 	if err != nil {

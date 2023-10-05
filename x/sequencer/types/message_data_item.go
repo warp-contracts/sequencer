@@ -45,18 +45,8 @@ func (msg *MsgDataItem) GetSignBytes() []byte {
 }
 
 func (msg *MsgDataItem) ValidateBasic() (err error) {
-	// Verifies DataItem acording to the ANS-104 standard. Verifies signature.
-	// https://github.com/ArweaveTeam/arweave-standards/blob/master/ans/ANS-104.md#21-verifying-a-dataitem
-	err = msg.DataItem.Verify()
-	if err != nil {
-		return
-	}
-
-	err = msg.DataItem.VerifySignature()
-	if err != nil {
-		return
-	}
-
+	// Data item validation is done in the AnteHandler 
+	// to have greater control over it and avoid executing it during recheckTx.
 	return nil
 }
 

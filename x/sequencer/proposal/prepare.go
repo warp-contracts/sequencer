@@ -30,7 +30,7 @@ func NewPrepareProposalHandler(keeper *keeper.Keeper, arweaveController controll
 func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepareProposal) abci.ResponsePrepareProposal {
 	lastBlock := h.keeper.MustGetLastArweaveBlock(ctx)
 	arweaveHeight := lastBlock.ArweaveBlock.Height
-	sequencerHeight := ctx.BlockHeader().Height
+	sequencerHeight := ctx.BlockHeight()
 	sequencerBlockHash := ctx.BlockHeader().LastBlockId.Hash
 	nextBlock := h.arweaveController.GetNextArweaveBlock(arweaveHeight + 1)
 	lastSortKeys := newLastSortKeys(h.keeper, ctx)

@@ -8,6 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	keepertest "github.com/warp-contracts/sequencer/testutil/keeper"
+	"github.com/warp-contracts/sequencer/x/sequencer/ante"
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -19,7 +20,10 @@ func keeperCtxAndSrv(t *testing.T) (*keeper.Keeper, sdk.Context, types.MsgServer
 	blockHeader.Time = time.Unix(1692357017, 0)
 	blockHeader.Height = 123
 
-	srv := keeper.NewMsgServerImpl(*k)
+	bi := ante.NewBlockInteractions()
+	bi.NewBlock(123)
+
+	srv := keeper.NewMsgServerImpl(*k, bi)
 	return k, ctx.WithBlockHeader(blockHeader), srv
 }
 
