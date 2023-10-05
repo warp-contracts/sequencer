@@ -253,7 +253,7 @@ func TestCheckTransactionsLengthMismatch(t *testing.T) {
 }
 
 func TestCheckTransactionsIdMismatch(t *testing.T) {
-	actualTxs := []*types.ArweaveTransactionWithLastSortKey{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "1234", SortKey: "1,2,3"}}}
+	actualTxs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "1234", SortKey: "1,2,3"}}}
 	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
 	block := &types.MsgArweaveBlock{
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
@@ -271,7 +271,7 @@ func TestCheckTransactionsIdMismatch(t *testing.T) {
 }
 
 func TestCheckTransactionsContractMismatch(t *testing.T) {
-	actualTxs := []*types.ArweaveTransactionWithLastSortKey{{Transaction: &types.ArweaveTransaction{Contract: "abcd", Id: "123", SortKey: "1,2,3"}}}
+	actualTxs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{Contract: "abcd", Id: "123", SortKey: "1,2,3"}}}
 	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
 	block := &types.MsgArweaveBlock{
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
@@ -289,7 +289,7 @@ func TestCheckTransactionsContractMismatch(t *testing.T) {
 }
 
 func TestCheckTransactionsSortKeyMismatch(t *testing.T) {
-	actualTxs := []*types.ArweaveTransactionWithLastSortKey{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3,4"}}}
+	actualTxs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3,4"}}}
 	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
 	block := &types.MsgArweaveBlock{
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
@@ -307,7 +307,7 @@ func TestCheckTransactionsSortKeyMismatch(t *testing.T) {
 }
 
 func TestCheckTransactionsLastSortKeyMismatch(t *testing.T) {
-	actualTxs := []*types.ArweaveTransactionWithLastSortKey{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3"}}}
+	actualTxs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3"}}}
 	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
 	block := &types.MsgArweaveBlock{
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
@@ -325,8 +325,29 @@ func TestCheckTransactionsLastSortKeyMismatch(t *testing.T) {
 	require.Equal(t, logger.Msg, "Rejected proposal: invalid last sort key")
 }
 
+func TestCheckTransactionsInvalidRandom(t *testing.T) {
+	actualTxs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3"}, LastSortKey: "1,1,1"}}
+	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
+	block := &types.MsgArweaveBlock{
+		BlockInfo:    test.ArweaveBlock().BlockInfo,
+		Transactions: actualTxs,
+	}
+	ctx, handler, logger := ctxHandlerAndLogger(t, &types.LastArweaveBlock{
+		ArweaveBlock: block.BlockInfo,
+	}, nil)
+	handler.keeper.SetLastSortKey(ctx, types.LastSortKey{Contract: "abc", SortKey: "1,1,1"})
+
+	handler.initSortKeyForBlock(ctx)
+	result := handler.checkTransactions(block, expectedTxs)
+
+	require.False(t, result)
+	require.Equal(t, logger.Msg, "Rejected proposal: transaction random value is not as expected")
+}
+
 func TestCheckTransactions(t *testing.T) {
-	actualTxs := []*types.ArweaveTransactionWithLastSortKey{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3"}, LastSortKey: "1,1,1"}}
+	actualTxs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{
+		Contract: "abc", Id: "123", SortKey: "1,2,3"}, LastSortKey: "1,1,1",
+		Random: []byte{190, 96, 22, 62, 107, 198, 68, 216, 15, 189, 0, 227, 101, 238, 190, 27, 213, 120, 74, 38, 183, 173, 90, 197, 69, 66, 142, 157, 121, 160, 9, 117}}}
 	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
 	block := &types.MsgArweaveBlock{
 		BlockInfo:    test.ArweaveBlock().BlockInfo,

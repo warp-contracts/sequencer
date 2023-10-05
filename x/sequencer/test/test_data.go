@@ -83,6 +83,6 @@ func ArweaveBlock() types.MsgArweaveBlock {
 			Timestamp: 1692353416,
 			Hash:      ExampleArweaveBlockHash,
 		},
-		Transactions: []*types.ArweaveTransactionWithLastSortKey{}, // TODO: add some test transactions
+		Transactions: []*types.ArweaveTransactionWithInfo{}, // TODO: add some test transactions
 	}
 }
