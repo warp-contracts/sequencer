@@ -12,6 +12,7 @@ import (
 )
 
 type processProposalHandler struct {
+	txConfig     client.TxConfig
 	keeper       *keeper.Keeper
 	controller   controller.ArweaveBlocksController
 	logger       log.Logger
@@ -24,26 +25,27 @@ var (
 	rejectResponse = abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}
 )
 
-// Validates the block proposal for the presence and correctness of transactions with the Arweave block,
-// as well as the correctness of data items
 func NewProcessProposalHandler(txConfig client.TxConfig, controller controller.ArweaveBlocksController, keeper *keeper.Keeper,
 	logger log.Logger) sdk.ProcessProposalHandler {
-	handler := &processProposalHandler{controller: controller, keeper: keeper, logger: logger}
+	handler := &processProposalHandler{txConfig: txConfig, controller: controller, keeper: keeper, logger: logger}
+	return handler.process
+}
 
-	return func(ctx sdk.Context, req abci.RequestProcessProposal) abci.ResponseProcessProposal {
-		handler.initSortKeyForBlock(ctx)
-		for txIndex, txBytes := range req.Txs {
-			tx, err := txConfig.TxDecoder()(txBytes)
-			if err != nil {
-				handler.rejectProposal("unable to decode the transaction", "err", err)
-				return rejectResponse
-			}
-			if !handler.processProposalValidateTx(ctx, txIndex, tx) {
-				return rejectResponse
-			}
+// Validates the block proposal for the presence and correctness of transactions with the Arweave block,
+// as well as the correctness of data items
+func (h *processProposalHandler) process(ctx sdk.Context, req abci.RequestProcessProposal) abci.ResponseProcessProposal {
+	h.initSortKeyForBlock(ctx)
+	for txIndex, txBytes := range req.Txs {
+		tx, err := h.txConfig.TxDecoder()(txBytes)
+		if err != nil {
+			h.rejectProposal("unable to decode the transaction", "err", err)
+			return rejectResponse
 		}
-		return acceptResponse
+		if !h.processProposalValidateTx(ctx, txIndex, tx) {
+			return rejectResponse
+		}
 	}
+	return acceptResponse
 }
 
 func (h *processProposalHandler) rejectProposal(msg string, keyvals ...interface{}) bool {
@@ -63,7 +65,7 @@ func (h *processProposalHandler) processProposalValidateTx(ctx sdk.Context, txIn
 
 	dataItem := getDataItemMsg(tx)
 	if dataItem != nil {
-		return h.processProposalValidateDataItem(dataItem)
+		return h.processProposalValidateDataItem(ctx, dataItem)
 	}
 
 	return true

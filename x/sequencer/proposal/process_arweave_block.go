@@ -1,6 +1,7 @@
 package proposal
 
 import (
+	"bytes"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -136,6 +137,12 @@ func (h *processProposalHandler) checkTransactions(block *types.MsgArweaveBlock,
 		if actualTx.LastSortKey != expectedLastSortKey {
 			return h.rejectProposal("invalid last sort key",
 			"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedLastSortKey, "actual", actualTx.LastSortKey)
+		}
+
+		expectedRandom := generateRandomL1(actualTx.Transaction.SortKey)
+		if !bytes.Equal(actualTx.Random, expectedRandom) {
+			return h.rejectProposal("transaction random value is not as expected",
+			"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedRandom, "actual", actualTx.Random)
 		}
 	}
 
