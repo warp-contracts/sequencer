@@ -1,6 +1,8 @@
 package proposal
 
 import (
+	"time"
+
 	"github.com/cometbft/cometbft/libs/log"
 
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -34,6 +36,7 @@ func NewProcessProposalHandler(txConfig client.TxConfig, controller controller.A
 // Validates the block proposal for the presence and correctness of transactions with the Arweave block,
 // as well as the correctness of data items
 func (h *processProposalHandler) process(ctx sdk.Context, req abci.RequestProcessProposal) abci.ResponseProcessProposal {
+	now := time.Now()
 	h.initSortKeyForBlock(ctx)
 	for txIndex, txBytes := range req.Txs {
 		tx, err := h.txConfig.TxDecoder()(txBytes)
@@ -45,6 +48,13 @@ func (h *processProposalHandler) process(ctx sdk.Context, req abci.RequestProces
 			return rejectResponse
 		}
 	}
+
+	ctx.Logger().
+		With("height", req.Height).
+		With("number of txs", len(req.Txs)).
+		With("proposer", req.ProposerAddress).
+		With("time", time.Since(now).Milliseconds()).
+		Info("Block accepted")
 	return acceptResponse
 }
 

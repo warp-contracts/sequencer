@@ -3,6 +3,7 @@ package proposal
 import (
 	"fmt"
 	math_bits "math/bits"
+	"time"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 
@@ -28,6 +29,7 @@ func NewPrepareProposalHandler(keeper *keeper.Keeper, arweaveController controll
 
 // Sets sort keys and random value for all L2 interactions and adds an Arweave block transaction to the beginning of the block if needed.
 func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepareProposal) abci.ResponsePrepareProposal {
+	now := time.Now()
 	lastBlock := h.keeper.MustGetLastArweaveBlock(ctx)
 	arweaveHeight := lastBlock.ArweaveBlock.Height
 	sequencerHeight := ctx.BlockHeight()
@@ -65,6 +67,7 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 		With("number of txs", txCount).
 		With("size of txs", size).
 		With("max size", req.MaxTxBytes).
+		With("time", time.Since(now).Milliseconds()).
 		Info("Prepared transactions")
 
 	return abci.ResponsePrepareProposal{Txs: result[:txCount]}
