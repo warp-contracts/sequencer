@@ -52,8 +52,8 @@ func (h *processProposalHandler) process(ctx sdk.Context, req abci.RequestProces
 	ctx.Logger().
 		With("height", req.Height).
 		With("number of txs", len(req.Txs)).
-		With("proposer", req.ProposerAddress).
-		With("time", time.Since(now).Milliseconds()).
+		With("proposer", sdk.ConsAddress(req.ProposerAddress).String()).
+		With("execution time", time.Since(now).Milliseconds()).
 		Info("Block accepted")
 	return acceptResponse
 }
