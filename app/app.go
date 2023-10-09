@@ -254,6 +254,10 @@ type App struct {
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
 	SequencerKeeper sequencermodulekeeper.Keeper
+
+	// Tasks
+	ArweaveBlocksController controller.ArweaveBlocksController
+
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -529,12 +533,12 @@ func New(
 		keys[sequencermoduletypes.MemStoreKey],
 		app.GetSubspace(sequencermoduletypes.ModuleName),
 	)
-	var arweaveBlocksController controller.ArweaveBlocksController
+
 	if appOpts.Get("test") == nil {
-		arweaveBlocksController = controller.NewController(logger, homePath)
+		app.ArweaveBlocksController = controller.NewController(logger, homePath)
 	}
 	blockInteractions := sequencerante.NewBlockInteractions()
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, arweaveBlocksController, DefaultNodeHome, blockInteractions)
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, DefaultNodeHome, blockInteractions)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -738,8 +742,8 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(&app.SequencerKeeper, arweaveBlocksController, app.txConfig))
-	app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, arweaveBlocksController, &app.SequencerKeeper, app.Logger()))
+	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(&app.SequencerKeeper, app.ArweaveBlocksController, app.txConfig))
+	app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, app.ArweaveBlocksController, &app.SequencerKeeper, app.Logger()))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -936,4 +940,10 @@ func (app *App) SimulationManager() *module.SimulationManager {
 // ModuleManager returns the app ModuleManager
 func (app *App) ModuleManager() *module.Manager {
 	return app.mm
+}
+
+// ModuleManager returns the app ModuleManager
+func (app *App) Close() (err error) {
+	app.ArweaveBlocksController.StopWait()
+	return nil
 }
