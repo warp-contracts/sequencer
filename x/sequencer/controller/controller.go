@@ -159,7 +159,7 @@ func (controller *SyncerController) RemoveNextArweaveBlocksUpToHeight(height uin
 }
 
 func (controller *SyncerController) StopWait() {
-	if controller != nil || !controller.IsRunning() {
+	if controller == nil || !controller.IsRunning() {
 		return
 	}
 	controller.Controller.StopWait()
