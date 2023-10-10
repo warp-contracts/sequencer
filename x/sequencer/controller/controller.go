@@ -25,6 +25,9 @@ type ArweaveBlocksController interface {
 	// Starts the fetching of Arweave blocks beginning from the given height
 	Start(initHeight uint64)
 
+	// Gracefully stops the controller, waits for all tasks to finish
+	StopWait()
+
 	// Has the controller been started?
 	IsRunning() bool
 
@@ -153,4 +156,11 @@ func (controller *SyncerController) RemoveNextArweaveBlocksUpToHeight(height uin
 	if controller.IsRunning() {
 		controller.store.removeNextArweaveBlocksUpToHeight(height)
 	}
+}
+
+func (controller *SyncerController) StopWait() {
+	if controller != nil || !controller.IsRunning() {
+		return
+	}
+	controller.Controller.StopWait()
 }
