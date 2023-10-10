@@ -45,9 +45,19 @@ func (msg *MsgDataItem) GetSignBytes() []byte {
 }
 
 func (msg *MsgDataItem) ValidateBasic() (err error) {
-	// Data item validation is done in the AnteHandler 
+	// Data item validation is done in the `AnteHandler` and `processProposalHandler` using the `Verify` method
 	// to have greater control over it and avoid executing it during recheckTx.
 	return nil
+}
+
+func (msg *MsgDataItem) Verify() (err error) {
+	// Verifies DataItem acording to the ANS-104 standard. Verifies signature.
+	// https://github.com/ArweaveTeam/arweave-standards/blob/master/ans/ANS-104.md#21-verifying-a-dataitem
+	err = msg.DataItem.Verify()
+	if err != nil {
+		return
+	}
+	return msg.DataItem.VerifySignature()
 }
 
 func (msg *MsgDataItem) GetNonceFromTags() (uint64, error) {

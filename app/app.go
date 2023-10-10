@@ -253,6 +253,7 @@ func New(
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 	txConfig := encodingConfig.TxConfig
+	configPath := filepath.Join(homePath, "config")
 
 	bApp := baseapp.NewBaseApp(
 		Name,
@@ -453,10 +454,10 @@ func New(
 	)
 
 	if appOpts.Get("test") == nil {
-		app.ArweaveBlocksController = controller.NewController(logger, homePath)
+		app.ArweaveBlocksController = controller.NewController(logger, configPath)
 	}
 	blockInteractions := sequencerante.NewBlockInteractions()
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, DefaultNodeHome, blockInteractions)
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, configPath, blockInteractions)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -642,7 +643,9 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(&app.SequencerKeeper, app.ArweaveBlocksController, app.txConfig))
-	app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, app.ArweaveBlocksController, &app.SequencerKeeper, app.Logger()))
+	if appOpts.Get("test") == nil {
+		app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, app.ArweaveBlocksController, &app.SequencerKeeper, app.Logger()))
+	}
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {

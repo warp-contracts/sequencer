@@ -2,6 +2,8 @@ package controller
 
 import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
+
+	"github.com/warp-contracts/syncer/src/utils/config"
 )
 
 type ArweaveBlocksControllerMock struct {
@@ -13,6 +15,10 @@ func (mock ArweaveBlocksControllerMock) Start(height uint64) {
 
 func (mock ArweaveBlocksControllerMock) IsRunning() bool {
 	return true
+}
+
+func (mock ArweaveBlocksControllerMock) GetConfig() *config.Config {
+	return nil
 }
 
 func (mock ArweaveBlocksControllerMock) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {

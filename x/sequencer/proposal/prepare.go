@@ -76,7 +76,7 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 // Returns the transaction with an Arweave block if it is older than an hour and has not been added to the blockchain yet.
 // Additionally, it returns 1 if such a block exists and 0 otherwise.
 func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlock *types.NextArweaveBlock, lastSortKeys *LastSortKeys) ([]byte, int) {
-	if nextArweaveBlock == nil || !types.IsArweaveBlockOldEnough(ctx, nextArweaveBlock.BlockInfo) {
+	if nextArweaveBlock == nil || !types.IsArweaveBlockOldEnough(ctx.BlockHeader(), nextArweaveBlock.BlockInfo) {
 		return nil, 0
 	}
 

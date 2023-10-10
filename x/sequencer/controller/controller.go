@@ -31,6 +31,8 @@ type ArweaveBlocksController interface {
 	// Has the controller been started?
 	IsRunning() bool
 
+	GetConfig() *config.Config
+
 	// Returns the fetched Arweave block with the given height
 	GetNextArweaveBlock(height uint64) *types.NextArweaveBlock
 
@@ -45,12 +47,12 @@ type SyncerController struct {
 	config *config.Config
 }
 
-func NewController(log log.Logger, homeDir string) (out ArweaveBlocksController) {
+func NewController(log log.Logger, configPath string) (out ArweaveBlocksController) {
 	controller := new(SyncerController)
 	InitLogger(log, logrus.InfoLevel.String())
 
 	var err error
-	filepath := path.Join(homeDir, "syncer.json")
+	filepath := path.Join(configPath, "syncer.json")
 	if _, err := os.Stat(filepath); err != nil {
 		// Empty file path loads default config
 		filepath = ""
@@ -143,6 +145,10 @@ func (controller *SyncerController) initController(initHeight uint64) {
 
 func (controller *SyncerController) IsRunning() bool {
 	return controller.config.Syncer.Enabled && controller.Controller.Task != nil && !controller.Controller.Task.IsStopping.Load()
+}
+
+func (controller *SyncerController) GetConfig() *config.Config {
+	return controller.config
 }
 
 func (controller *SyncerController) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
