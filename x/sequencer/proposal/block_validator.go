@@ -4,8 +4,6 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/cometbft/cometbft/libs/log"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/controller"
@@ -27,40 +25,42 @@ type BlockValidator struct {
 
 	keeper     *keeper.Keeper
 	controller controller.ArweaveBlocksController
-	logger     log.Logger
-	Input      chan *Block
-	Output     chan bool
+	input      chan *Block
+	output     chan error
 }
 
-func newBlockValidator(keeper *keeper.Keeper, controller controller.ArweaveBlocksController, logger log.Logger) *BlockValidator {
+func NewBlockValidator(keeper *keeper.Keeper, controller controller.ArweaveBlocksController) *BlockValidator {
 	validator := new(BlockValidator)
 	validator.keeper = keeper
 	validator.controller = controller
-	validator.logger = logger
-	validator.Input = make(chan *Block)
-	validator.Output = make(chan bool)
+	validator.input = make(chan *Block)
+	validator.output = make(chan error)
 
-	validator.Task = task.NewTask(controller.GetConfig(), "block-validator").
+	validator.Task = task.NewTask(nil, "block-validator").
 		WithSubtaskFunc(validator.run).
-		WithWorkerPool(runtime.NumCPU(), 1)
+		WithWorkerPool(runtime.NumCPU(), 1).
+		WithOnAfterStop(func() {
+			close(validator.input)
+			close(validator.output)
+		})
 
 	return validator
 }
 
 func (v *BlockValidator) run() error {
-	for block := range v.Input {
+	for block := range v.input {
 		if len(block.txs) == 0 {
-			v.Output <- true
+			v.output <- nil
 			continue
 		}
 
-		txValidator := newTxValidator(block.ctx, v.keeper, v.controller, v.logger)
-		result := newValidationResult(v.Output)
+		txValidator := newTxValidator(block.ctx, v.keeper, v.controller)
+		result := newValidationResult(v.output)
 		wg := &sync.WaitGroup{}
-		wg.Add(len(block.txs))
+		wg.Add(1 + len(block.txs)) // one sequential and for each transaction
 
+		v.validateSequentially(txValidator, block.txs, result, wg)
 		v.validateInParallel(txValidator, block.txs, result, wg)
-		v.validateSequentially(txValidator, block.txs, result)
 
 		wg.Wait()
 		result.sendIfValid()
@@ -69,22 +69,52 @@ func (v *BlockValidator) run() error {
 	return nil
 }
 
+func (v *BlockValidator) validateSequentially(txValidator *TxValidator, txs []sdk.Tx, result *validationResult, wg *sync.WaitGroup) {
+	v.SubmitToWorker(func() {
+		for txIndex, tx := range txs {
+			if result.isValid() {
+				err := txValidator.validateSequentially(txIndex, tx)
+				if err != nil {
+					result.sendFirstError(err)
+					break
+				}
+			}
+		}
+		wg.Done()
+	})
+}
+
 func (v *BlockValidator) validateInParallel(txValidator *TxValidator, txs []sdk.Tx, result *validationResult, wg *sync.WaitGroup) {
 	for txIndex, tx := range txs {
 		v.SubmitToWorker(func() {
-			txResult := result.isValid() && txValidator.validateInParallel(txIndex, tx)
-			result.sendFirstInvalid(txResult)
+			if result.isValid() {
+				err := txValidator.validateInParallel(txIndex, tx)
+				result.sendFirstError(err)
+			}
 			wg.Done()
 		})
 	}
 }
 
-func (v *BlockValidator) validateSequentially(txValidator *TxValidator, txs []sdk.Tx, result *validationResult) {
-	for txIndex, tx := range txs {
-		txResult := result.isValid() && txValidator.validateSequentially(txIndex, tx)
-		result.sendFirstInvalid(txResult)
-		if !txResult {
-			return
-		}
+func (v *BlockValidator) validateBlock(block *Block) error {
+	if v == nil || v.IsStopping.Load() {
+		return nil
+	}
+
+	v.input <- block
+
+	select {
+	case <-v.Ctx.Done():
+		return nil
+	case <-block.ctx.Done():
+		return nil
+	case err := <-v.output:
+		return err
+	}
+}
+
+func (v *BlockValidator) StopWait() {
+	if v != nil && !v.IsStopping.Load() {
+		v.Task.StopWait()
 	}
 }

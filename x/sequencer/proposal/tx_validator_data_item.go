@@ -3,6 +3,7 @@ package proposal
 import (
 	"bytes"
 
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -19,57 +20,60 @@ func getDataItemMsg(tx sdk.Tx) *types.MsgDataItem {
 	return nil
 }
 
-func (tv *TxValidator) validateSequentiallyDataItem(txIndex int, tx sdk.Tx) bool {
+func (tv *TxValidator) validateSequentiallyDataItem(txIndex int, tx sdk.Tx) error {
 	dataItem := getDataItemMsg(tx)
+
 	if dataItem != nil {
-		return tv.checkSortKey(dataItem) && tv.checkLastSortKey(dataItem)
+		if err := tv.checkSortKey(dataItem); err != nil {
+			return err
+		}
+		return tv.checkLastSortKey(dataItem)
 	}
-	return true
+
+	return nil
 }
 
-func (tv *TxValidator) checkSortKey(msg *types.MsgDataItem) bool {
+func (tv *TxValidator) checkSortKey(dataItem *types.MsgDataItem) error {
 	expectedSortKey := tv.sortKey.GetNextValue()
-	if expectedSortKey != msg.SortKey {
-		return tv.rejectProposal("invalid sort key", "expected", expectedSortKey, "actual", msg.SortKey)
+	if expectedSortKey != dataItem.SortKey {
+		return errors.Wrapf(types.ErrInvalidSortKey, "expected: %s, actual: %s", expectedSortKey, dataItem.SortKey)
 	}
 
-	return true
+	return nil
 }
 
-func (tv *TxValidator) checkLastSortKey(msg *types.MsgDataItem) bool {
-	contract, err := msg.GetContractFromTags()
+func (tv *TxValidator) checkLastSortKey(dataItem *types.MsgDataItem) error {
+	contract, err := dataItem.GetContractFromTags()
 	if err != nil {
-		return tv.rejectProposal("invalid contract", "error", err)
-	}
-	expectedLastSortKey := tv.lastSortKeys.getAndStoreLastSortKey(contract, msg.SortKey)
-	if expectedLastSortKey != msg.LastSortKey {
-		return tv.rejectProposal("invalid last sort key", "expected", expectedLastSortKey, "actual", msg.LastSortKey)
+		return err
 	}
 
-	return true
+	expectedLastSortKey := tv.lastSortKeys.getAndStoreLastSortKey(contract, dataItem.SortKey)
+	if expectedLastSortKey != dataItem.LastSortKey {
+		return errors.Wrapf(types.ErrInvalidLastSortKey, "expected: %s, actual: %s", expectedLastSortKey, dataItem.LastSortKey)
+	}
+
+	return nil
 }
 
-func (tv *TxValidator) validateInParallelDataItem(txIndex int, tx sdk.Tx) bool {
+func (tv *TxValidator) validateInParallelDataItem(txIndex int, tx sdk.Tx) error {
 	dataItem := getDataItemMsg(tx)
+
 	if dataItem != nil {
-		return tv.checkDataItem(dataItem) && tv.checkRandom(dataItem)
+		if err := dataItem.Verify(); err != nil {
+			return err
+		}
+		return tv.checkRandom(dataItem)
 	}
-	return true
+
+	return nil
 }
 
-func (tv *TxValidator) checkDataItem(dataItem *types.MsgDataItem) bool {
-	err := dataItem.Verify()
-	if err != nil {
-		return tv.rejectProposal("invalid data item message", "err", err)
-	}
-	return true
-}
-
-func (tv *TxValidator) checkRandom(dataItem *types.MsgDataItem) bool {
+func (tv *TxValidator) checkRandom(dataItem *types.MsgDataItem) error {
 	expectedRandom := generateRandomL2(tv.sequencerBlockHeader.LastBlockId.Hash, dataItem.SortKey)
 	if !bytes.Equal(dataItem.Random, expectedRandom) {
-		return tv.rejectProposal("invalid random value", "expected", expectedRandom, "actual", dataItem.Random)
+		return errors.Wrapf(types.ErrInvalidRandomValue, "expected: %s, actual: %s", expectedRandom, dataItem.Random)
 	}
 
-	return true
+	return nil
 }

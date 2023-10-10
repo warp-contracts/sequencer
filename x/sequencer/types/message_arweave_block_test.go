@@ -41,7 +41,7 @@ func TestMsgArweaveBlock_ValidateBasic(t *testing.T) {
 					Hash:      "",
 				},
 			},
-			err: ErrBadArweaveHashLength,
+			err: ErrBadArweaveHash,
 		}, {
 			name: "valid",
 			msg: MsgArweaveBlock{

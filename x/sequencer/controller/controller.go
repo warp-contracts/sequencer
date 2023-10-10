@@ -31,8 +31,6 @@ type ArweaveBlocksController interface {
 	// Has the controller been started?
 	IsRunning() bool
 
-	GetConfig() *config.Config
-
 	// Returns the fetched Arweave block with the given height
 	GetNextArweaveBlock(height uint64) *types.NextArweaveBlock
 
@@ -145,10 +143,6 @@ func (controller *SyncerController) initController(initHeight uint64) {
 
 func (controller *SyncerController) IsRunning() bool {
 	return controller.config.Syncer.Enabled && controller.Controller.Task != nil && !controller.Controller.Task.IsStopping.Load()
-}
-
-func (controller *SyncerController) GetConfig() *config.Config {
-	return controller.config
 }
 
 func (controller *SyncerController) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {

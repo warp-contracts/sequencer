@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"time"
 
+	"cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -20,111 +21,132 @@ func getArweaveBlockMsg(tx sdk.Tx) *types.MsgArweaveBlock {
 	return nil
 }
 
-func (tv *TxValidator) validateSequentiallyArweaveBlock(txIndex int, tx sdk.Tx) bool {
+func (tv *TxValidator) validateSequentiallyArweaveBlock(txIndex int, tx sdk.Tx) error {
 	arweaveBlock := getArweaveBlockMsg(tx)
 	if arweaveBlock != nil {
 		tv.sortKey.IncreaseArweaveHeight()
 		return tv.validateLastSortKeys(arweaveBlock)
 	}
-	return true
+	return nil
 }
 
-func (tv *TxValidator) validateLastSortKeys(block *types.MsgArweaveBlock) bool {
+func (tv *TxValidator) validateLastSortKeys(block *types.MsgArweaveBlock) error {
 	for i, tx := range block.Transactions {
 		expectedLastSortKey := tv.lastSortKeys.getAndStoreLastSortKey(tx.Transaction.Contract, tx.Transaction.SortKey)
 		if tx.LastSortKey != expectedLastSortKey {
-			return tv.rejectProposal("invalid last sort key",
-				"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedLastSortKey, "actual", tx.LastSortKey)
+			return errors.Wrapf(types.ErrInvalidLastSortKey, "Arweave block height: %d, transaction index: %d, expected: %s, actual: %s",
+				block.BlockInfo.Height, i, expectedLastSortKey, tx.LastSortKey)
 		}
 	}
-	return true
+	return nil
 }
 
-func (tv *TxValidator) validateInParallelArweaveBlock(txIndex int, tx sdk.Tx) bool {
+func (tv *TxValidator) validateInParallelArweaveBlock(txIndex int, tx sdk.Tx) error {
 	arweaveBlock := getArweaveBlockMsg(tx)
+
 	if arweaveBlock != nil {
-		return tv.validateIndex(txIndex) && tv.validateArweaveBlockTx(tx) && tv.validateArweaveBlockMsg(arweaveBlock)
-	} else {
-		return tv.checkArweaveBlockIsNotMissing(txIndex)
+		if err := tv.validateIndex(txIndex); err != nil {
+			return err
+		}
+
+		if err := tv.validateArweaveBlockTx(tx); err != nil {
+			return err
+		}
+
+		return tv.validateArweaveBlockMsg(arweaveBlock)
 	}
+
+	return tv.checkArweaveBlockIsNotMissing(txIndex)
 }
 
-func (tv *TxValidator) validateIndex(txIndex int) bool {
+func (tv *TxValidator) validateIndex(txIndex int) error {
 	if txIndex > 0 {
-		return tv.rejectProposal("Arweave block must be in the first transaction in the sequencer block",
-			"transaction index", txIndex)
+		return errors.Wrapf(types.ErrInvalidTxIndex, "Arweave block must be in the first transaction in the sequencer block, transaction index: %d", txIndex)
 	}
-	return true
+
+	return nil
 }
 
-func (tv *TxValidator) validateArweaveBlockTx(tx sdk.Tx) bool {
-	msgs := tx.GetMsgs()
-	if len(msgs) != 1 {
-		return tv.rejectProposal("transaction with Arweave block must have exactly one message",
-			"number of messages", len(msgs))
+func (tv *TxValidator) validateArweaveBlockTx(tx sdk.Tx) error {
+	numberOfMessages := len(tx.GetMsgs())
+	if numberOfMessages != 1 {
+		return errors.Wrapf(types.ErrInvalidMessagesNumber, "transaction with Arweave block must have exactly one message, number of messages: %d", numberOfMessages)
 	}
-	return true
+
+	return nil
 }
 
-func (tv *TxValidator) validateArweaveBlockMsg(msg *types.MsgArweaveBlock) bool {
+func (tv *TxValidator) validateArweaveBlockMsg(msg *types.MsgArweaveBlock) error {
 	newBlockInfo := &types.ArweaveBlockInfo{
 		Height:    msg.BlockInfo.Height,
 		Timestamp: msg.BlockInfo.Timestamp,
 		Hash:      msg.BlockInfo.Hash,
 	}
 
-	return tv.checkBlockIsOldEnough(newBlockInfo) &&
-		tv.compareBlockWithPreviousOne(newBlockInfo) &&
-		tv.compareWithNextBlock(msg)
+	if err := tv.checkBlockIsOldEnough(newBlockInfo); err != nil {
+		return err
+	}
+
+	if err := tv.compareBlockWithPreviousOne(newBlockInfo); err != nil {
+		return err
+	}
+
+	return tv.compareWithNextBlock(msg)
 }
 
-func (tv *TxValidator) checkBlockIsOldEnough(newBlockInfo *types.ArweaveBlockInfo) bool {
+func (tv *TxValidator) checkBlockIsOldEnough(newBlockInfo *types.ArweaveBlockInfo) error {
 	arweaveBlockTimestamp := time.Unix(int64(newBlockInfo.Timestamp), 0)
 	sequencerBlockTimestamp := tv.sequencerBlockHeader.Time
 
 	if !types.IsArweaveBlockOldEnough(tv.sequencerBlockHeader, newBlockInfo) {
-		return tv.rejectProposal("Arweave block should be one hour older than the sequencer block",
-			"Arweave block timestamp", arweaveBlockTimestamp.UTC(),
-			"Sequencer block timestamp", sequencerBlockTimestamp.UTC())
+		return errors.Wrapf(types.ErrArweaveBlockNotOldEnough,
+			"Arweave block should be one hour older than the sequencer block, Arweave block timestamp: %s, sequencer block timestamp: %s",
+			arweaveBlockTimestamp.UTC().Format(time.DateTime), sequencerBlockTimestamp.UTC().Format(time.DateTime))
 	}
-	return true
+	return nil
 }
 
-func (tv *TxValidator) compareBlockWithPreviousOne(newValue *types.ArweaveBlockInfo) bool {
+func (tv *TxValidator) compareBlockWithPreviousOne(newValue *types.ArweaveBlockInfo) error {
 	if newValue.Height-tv.lastArweaveBlock.ArweaveBlock.Height != 1 {
-		return tv.rejectProposal("new height of the Arweave block is not the next value compared to the previous height")
+		return errors.Wrapf(types.ErrBadArweaveHeight,
+			"new height (%d) of the Arweave block is not the next value compared to the previous height (%d)",
+			newValue.Height, tv.lastArweaveBlock.ArweaveBlock.Height)
 	}
 
 	if newValue.Timestamp <= tv.lastArweaveBlock.ArweaveBlock.Timestamp {
-		return tv.rejectProposal("timestamp of the Arweave block is not later than the previous one")
+		return errors.Wrapf(types.ErrBadArweaveTimestamp,
+			"timestamp of the Arweave block (%d) is not later than the previous one (%d)",
+			newValue.Timestamp, tv.lastArweaveBlock.ArweaveBlock.Timestamp)
 	}
 
-	return true
+	return nil
 }
 
-func (tv *TxValidator) compareWithNextBlock(block *types.MsgArweaveBlock) bool {
+func (tv *TxValidator) compareWithNextBlock(block *types.MsgArweaveBlock) error {
 	if tv.nextArweaveBlock == nil {
-		return tv.rejectProposal("the Validator did not fetch the Arweave block with given height",
-			"Arweave block height", block.BlockInfo.Height)
+		return errors.Wrapf(types.ErrUnknownArweaveBlock, "the Validator did not fetch the Arweave block with height: %d", block.BlockInfo.Height)
 	}
 
 	if block.BlockInfo.Timestamp != tv.nextArweaveBlock.BlockInfo.Timestamp {
-		return tv.rejectProposal("timestamp of the Arweave block does not match the timestamp of the block downloaded by the Validator",
-			"expected", tv.nextArweaveBlock.BlockInfo.Timestamp, "actual", block.BlockInfo.Timestamp)
+		return errors.Wrapf(types.ErrBadArweaveTimestamp,
+			"timestamp of the Arweave block does not match the timestamp of the block downloaded by the Validator, expected: %d, actual: %d",
+			tv.nextArweaveBlock.BlockInfo.Timestamp, block.BlockInfo.Timestamp)
 	}
 
 	if block.BlockInfo.Hash != tv.nextArweaveBlock.BlockInfo.Hash {
-		return tv.rejectProposal("hash of the Arweave block does not match the hash of the block downloaded by the Validator",
-			"expected", string(tv.nextArweaveBlock.BlockInfo.Hash), "actual", string(block.BlockInfo.Hash))
+		return errors.Wrapf(types.ErrBadArweaveHash,
+			"hash of the Arweave block does not match the hash of the block downloaded by the Validator, expected: %d, actual: %d",
+			tv.nextArweaveBlock.BlockInfo.Timestamp, block.BlockInfo.Timestamp)
 	}
 
 	return tv.checkTransactions(block, tv.nextArweaveBlock.Transactions)
 }
 
-func (tv *TxValidator) checkTransactions(block *types.MsgArweaveBlock, expectedTxs []*types.ArweaveTransaction) bool {
+func (tv *TxValidator) checkTransactions(block *types.MsgArweaveBlock, expectedTxs []*types.ArweaveTransaction) error {
 	if len(block.Transactions) != len(expectedTxs) {
-		return tv.rejectProposal("incorrect number of transactions in the Arweave block",
-			"Arweave block height", block.BlockInfo.Height, "expected", len(expectedTxs), "actual", len(block.Transactions))
+		return errors.Wrapf(types.ErrInvalidTxNumber,
+			"incorrect number of transactions in the Arweave block with height: %d, expected: %d, actual: %d",
+			block.BlockInfo.Height, len(expectedTxs), len(block.Transactions))
 	}
 
 	for i := 0; i < len(expectedTxs); i++ {
@@ -132,38 +154,43 @@ func (tv *TxValidator) checkTransactions(block *types.MsgArweaveBlock, expectedT
 		expectedTx := expectedTxs[i]
 
 		if actualTx.Transaction.Id != expectedTx.Id {
-			return tv.rejectProposal("transaction id is not as expected",
-				"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedTx.Id, "actual", actualTx.Transaction.Id)
+			return errors.Wrapf(types.ErrTxIdMismatch,
+				"transaction id (%s) is not as expected (%s), Arweave block height: %d, transaction index: %d",
+				actualTx.Transaction.Id, expectedTx.Id, block.BlockInfo.Height, i)
 		}
 
 		if actualTx.Transaction.Contract != expectedTx.Contract {
-			return tv.rejectProposal("the contract of the transaction does not match the expected one",
-				"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedTx.Contract, "actual", actualTx.Transaction.Contract)
+			return errors.Wrapf(types.ErrTxContractMismatch,
+				"the contract of the transaction (%s) does not match the expected one (%s), Arweave block height: %d, transaction index: %d",
+				actualTx.Transaction.Contract, expectedTx.Contract, block.BlockInfo.Height, i)
 		}
 
 		if actualTx.Transaction.SortKey != expectedTx.SortKey {
-			return tv.rejectProposal("transaction sort key is not as expected",
-				"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedTx.SortKey, "actual", actualTx.Transaction.SortKey)
+			return errors.Wrapf(types.ErrInvalidSortKey,
+				"transaction sort key (%s) is not as expected (%s), Arweave block height: %d, transaction index: %d",
+				actualTx.Transaction.SortKey, expectedTx.SortKey, block.BlockInfo.Height, i)
 		}
 
 		expectedRandom := generateRandomL1(actualTx.Transaction.SortKey)
 		if !bytes.Equal(actualTx.Random, expectedRandom) {
-			return tv.rejectProposal("transaction random value is not as expected",
-				"Arweave block height", block.BlockInfo.Height, "transaction index", i, "expected", expectedRandom, "actual", actualTx.Random)
+			return errors.Wrapf(types.ErrInvalidRandomValue,
+				"transaction random value (%s) is not as expected (%s), Arweave block height: %d, transaction index: %d",
+				actualTx.Random, expectedRandom, block.BlockInfo.Height, i)
 		}
 	}
 
-	return true
+	return nil
 }
 
-func (tv *TxValidator) checkArweaveBlockIsNotMissing(txIndex int) bool {
+func (tv *TxValidator) checkArweaveBlockIsNotMissing(txIndex int) error {
 	if txIndex > 0 || tv.sequencerBlockHeader.Height == 0 {
-		return true
+		return nil
 	}
 
 	if tv.nextArweaveBlock != nil && types.IsArweaveBlockOldEnough(tv.sequencerBlockHeader, tv.nextArweaveBlock.BlockInfo) {
-		return tv.rejectProposal("first transaction of the block should contain a transaction with the Arweave block",
-			"expected Arweave block height", tv.nextArweaveBlock.BlockInfo.Height)
+		return errors.Wrapf(types.ErrArweaveBlockMissing,
+			"first transaction of the block should contain a transaction with the Arweave block with height: %d",
+			tv.nextArweaveBlock.BlockInfo.Height)
 	}
-	return true
+	return nil
 }

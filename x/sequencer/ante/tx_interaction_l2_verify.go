@@ -45,7 +45,7 @@ func GetL2Interaction(tx sdk.Tx) (*types.MsgDataItem, error) {
 		dataItem, isDataItem := msg.(*types.MsgDataItem)
 		if isDataItem {
 			if len(msgs) > 1 {
-				err := errors.Wrapf(types.ErrTooManyMessages,
+				err := errors.Wrapf(types.ErrInvalidMessagesNumber,
 					"transaction with L2 interaction can have only one message, and it has: %d", len(msgs))
 				return nil, err
 			}

@@ -30,7 +30,7 @@ func (msg *MsgArweaveBlock) GetSignBytes() []byte {
 
 func (msg *MsgArweaveBlock) ValidateBasic() error {
 	if len(msg.BlockInfo.Hash) <= 0 {
-		return errors.Wrapf(ErrBadArweaveHashLength, "hash length should be greater than zero")
+		return errors.Wrapf(ErrBadArweaveHash, "hash length should be greater than zero")
 	}
 
 	if msg.BlockInfo.Height <= 0 {

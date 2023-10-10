@@ -8,7 +8,7 @@ import (
 
 // x/sequencer module sentinel errors
 var (
-	ErrTooManyMessages             = errors.Register(ModuleName, 1100, "too many messages")
+	ErrInvalidMessagesNumber       = errors.Register(ModuleName, 1100, "invalid number of messages")
 	ErrNotEmptyMemo                = errors.Register(ModuleName, 1101, "not empty memo")
 	ErrNonZeroTimeoutHeight        = errors.Register(ModuleName, 1102, "non-zero timeout height")
 	ErrHasExtensionOptions         = errors.Register(ModuleName, 1103, "has extension options")
@@ -27,7 +27,17 @@ var (
 	ErrNotEmptyTip                 = errors.Register(ModuleName, 1116, "not empty tip")
 	ErrBadArweaveHeight            = errors.Register(ModuleName, 1117, "invalid arweave block height")
 	ErrBadArweaveTimestamp         = errors.Register(ModuleName, 1118, "invalid arweave block timestamp")
-	ErrBadArweaveHashLength        = errors.Register(ModuleName, 1119, "invalid arweave block hash length")
+	ErrBadArweaveHash              = errors.Register(ModuleName, 1119, "invalid arweave block hash")
 	ErrArweaveBlockNotFromProposer = errors.Register(ModuleName, 1120, "arweave block not from proposer")
-	ErrDataItemAlreadyInBlock      = errors.Register(ModuleName, 1121, "data item already in block")
+	ErrArweaveBlockNotOldEnough    = errors.Register(ModuleName, 1121, "arweave block not old enough")
+	ErrUnknownArweaveBlock         = errors.Register(ModuleName, 1122, "unknown arweave block")
+	ErrArweaveBlockMissing         = errors.Register(ModuleName, 1123, "arweave block is missing")
+	ErrDataItemAlreadyInBlock      = errors.Register(ModuleName, 1124, "data item already in block")
+	ErrInvalidSortKey              = errors.Register(ModuleName, 1125, "invalid sort key")
+	ErrInvalidLastSortKey          = errors.Register(ModuleName, 1126, "invalid last sort key")
+	ErrInvalidRandomValue          = errors.Register(ModuleName, 1127, "invalid random value")
+	ErrInvalidTxIndex              = errors.Register(ModuleName, 1128, "invalid transaction index")
+	ErrInvalidTxNumber             = errors.Register(ModuleName, 1129, "invalid number of transactions")
+	ErrTxIdMismatch                = errors.Register(ModuleName, 1130, "transaction id mismatch")
+	ErrTxContractMismatch          = errors.Register(ModuleName, 1131, "transaction contract mismatch")
 )

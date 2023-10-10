@@ -12,7 +12,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func validatorAndLogger(t *testing.T, lastBlock *types.LastArweaveBlock, nextBlock *types.ArweaveBlockInfo, lastSortKey *types.LastSortKey) (*TxValidator, *LoggerMock) {
+func mockValidator(t *testing.T, lastBlock *types.LastArweaveBlock, nextBlock *types.ArweaveBlockInfo, lastSortKey *types.LastSortKey) *TxValidator {
 	keeper, ctx := keepertest.SequencerKeeper(t)
 
 	if lastBlock == nil {
@@ -30,10 +30,8 @@ func validatorAndLogger(t *testing.T, lastBlock *types.LastArweaveBlock, nextBlo
 	blockHeader.Height = 123
 
 	controller := controller.MockArweaveBlocksController(nextBlock)
-	logger := &LoggerMock{}
 
-	validator := newTxValidator(ctx.WithBlockHeader(blockHeader), keeper, controller, logger)
-	return validator, logger
+	return newTxValidator(ctx.WithBlockHeader(blockHeader), keeper, controller)
 }
 
 func TestValidateLastSortKeysMismatch(t *testing.T) {
@@ -42,78 +40,72 @@ func TestValidateLastSortKeysMismatch(t *testing.T) {
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
 		Transactions: txs,
 	}
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: block.BlockInfo,
 	}, nil, &types.LastSortKey{Contract: "abc", SortKey: "1,2,1"})
 
-	result := validator.validateLastSortKeys(block)
+	err := validator.validateLastSortKeys(block)
 
-	require.Equal(t, "Rejected proposal: invalid last sort key", logger.Msg)
-	require.False(t, result)
+	require.ErrorIs(t, err, types.ErrInvalidLastSortKey)
 }
 
 func TestValidateIndex(t *testing.T) {
-	validator, logger := validatorAndLogger(t, nil, nil, nil)
+	validator := mockValidator(t, nil, nil, nil)
 
-	result := validator.validateIndex(0)
+	err := validator.validateIndex(0)
 
-	require.True(t, result)
-	require.Equal(t, "", logger.Msg)
+	require.NoError(t, err)
+
 }
 
 func TestValidateIndexNotFirst(t *testing.T) {
-	validator, logger := validatorAndLogger(t, nil, nil, nil)
+	validator := mockValidator(t, nil, nil, nil)
 
-	result := validator.validateIndex(1)
+	err := validator.validateIndex(1)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: Arweave block must be in the first transaction in the sequencer block", logger.Msg)
+	require.ErrorIs(t, err, types.ErrInvalidTxIndex)
 }
 
 func TestValidateArweaveBlockTx(t *testing.T) {
 	block := test.ArweaveBlock()
 	tx := test.CreateTxWithMsgs(t, &block)
-	validator, logger := validatorAndLogger(t, nil, nil, nil)
+	validator := mockValidator(t, nil, nil, nil)
 
-	result := validator.validateArweaveBlockTx(tx)
+	err := validator.validateArweaveBlockTx(tx)
 
-	require.True(t, result)
-	require.Equal(t, "", logger.Msg)
+	require.NoError(t, err)
 }
 
 func TestValidateArweaveBlockTxNoMsgs(t *testing.T) {
 	tx := test.CreateTxWithMsgs(t)
-	validator, logger := validatorAndLogger(t, nil, nil, nil)
+	validator := mockValidator(t, nil, nil, nil)
 
-	result := validator.validateArweaveBlockTx(tx)
+	err := validator.validateArweaveBlockTx(tx)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: transaction with Arweave block must have exactly one message", logger.Msg)
+	require.ErrorIs(t, err, types.ErrInvalidMessagesNumber)
 }
 
 func TestValidateArweaveBlockTxToManyMsgs(t *testing.T) {
 	block := test.ArweaveBlock()
 	tx := test.CreateTxWithMsgs(t, &block, &block)
-	validator, logger := validatorAndLogger(t, nil, nil, nil)
+	validator := mockValidator(t, nil, nil, nil)
 
-	result := validator.validateArweaveBlockTx(tx)
+	err := validator.validateArweaveBlockTx(tx)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: transaction with Arweave block must have exactly one message", logger.Msg)
+	require.ErrorIs(t, err, types.ErrInvalidMessagesNumber)
 }
 
 func TestValidateArweaveBlockMsg(t *testing.T) {
 	block := test.ArweaveBlock()
-	validator, logger := validatorAndLogger(t, nil, block.BlockInfo, nil)
+	validator := mockValidator(t, nil, block.BlockInfo, nil)
 
-	result := validator.validateArweaveBlockMsg(&block)
+	err := validator.validateArweaveBlockMsg(&block)
 
-	require.True(t, result)
-	require.Equal(t, "", logger.Msg)
+	require.NoError(t, err)
 }
 
 func TestValidateArweaveBlockMsgWithoutHoursDelay(t *testing.T) {
-	validator, logger := validatorAndLogger(t, nil, nil, nil)
+	validator := mockValidator(t, nil, nil, nil)
 
 	block := &types.MsgArweaveBlock{
 		BlockInfo: &types.ArweaveBlockInfo{
@@ -123,10 +115,9 @@ func TestValidateArweaveBlockMsgWithoutHoursDelay(t *testing.T) {
 		},
 	}
 
-	result := validator.validateArweaveBlockMsg(block)
+	err := validator.validateArweaveBlockMsg(block)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: Arweave block should be one hour older than the sequencer block", logger.Msg)
+	require.ErrorIs(t, err, types.ErrArweaveBlockNotOldEnough)
 }
 
 func TestValidateArweaveBlockMsgWithoutNextHeight(t *testing.T) {
@@ -137,14 +128,13 @@ func TestValidateArweaveBlockMsgWithoutNextHeight(t *testing.T) {
 			Hash:      test.ExampleArweaveBlockHash,
 		},
 	}
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: block.BlockInfo,
 	}, nil, nil)
 
-	result := validator.validateArweaveBlockMsg(block)
+	err := validator.validateArweaveBlockMsg(block)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: new height of the Arweave block is not the next value compared to the previous height", logger.Msg)
+	require.ErrorIs(t, err, types.ErrBadArweaveHeight)
 }
 
 func TestValidateArweaveBlockMsgWithoutLaterTimestamp(t *testing.T) {
@@ -158,106 +148,97 @@ func TestValidateArweaveBlockMsgWithoutLaterTimestamp(t *testing.T) {
 		Timestamp: 1692353410,
 		Hash:      test.ExampleArweaveBlockHash,
 	}
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: oldBlock,
 	}, nil, nil)
 
-	result := validator.validateArweaveBlockMsg(&types.MsgArweaveBlock{
+	err := validator.validateArweaveBlockMsg(&types.MsgArweaveBlock{
 		BlockInfo: newBlock,
 	})
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: timestamp of the Arweave block is not later than the previous one", logger.Msg)
+	require.ErrorIs(t, err, types.ErrBadArweaveTimestamp)
 }
 
 func TestValidateArweaveBlockMsgWithoutNextArweaveBlock(t *testing.T) {
 	block := test.ArweaveBlock()
-	validator, logger := validatorAndLogger(t, nil, nil, nil)
+	validator := mockValidator(t, nil, nil, nil)
 
-	result := validator.validateArweaveBlockMsg(&block)
+	err := validator.validateArweaveBlockMsg(&block)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: the Validator did not fetch the Arweave block with given height", logger.Msg)
+	require.ErrorIs(t, err, types.ErrUnknownArweaveBlock)
 }
 
 func TestValidateArweaveBlockMsgTimestampMismatchWithNextArweaveBlock(t *testing.T) {
 	block := test.ArweaveBlock()
 	nextBlockInfo := *block.BlockInfo
 	nextBlockInfo.Timestamp += 1
-	validator, logger := validatorAndLogger(t, nil, &nextBlockInfo, nil)
+	validator := mockValidator(t, nil, &nextBlockInfo, nil)
 
-	result := validator.validateArweaveBlockMsg(&block)
+	err := validator.validateArweaveBlockMsg(&block)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: timestamp of the Arweave block does not match the timestamp of the block downloaded by the Validator", logger.Msg)
+	require.ErrorIs(t, err, types.ErrBadArweaveTimestamp)
 }
 
 func TestValidateArweaveBlockMsgServerHashMismatchWithNextArweaveBlock(t *testing.T) {
 	block := test.ArweaveBlock()
 	nextBlockInfo := *block.BlockInfo
 	nextBlockInfo.Hash = "abc"
-	validator, logger := validatorAndLogger(t, nil, &nextBlockInfo, nil)
+	validator := mockValidator(t, nil, &nextBlockInfo, nil)
 
-	result := validator.validateArweaveBlockMsg(&block)
+	err := validator.validateArweaveBlockMsg(&block)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: hash of the Arweave block does not match the hash of the block downloaded by the Validator", logger.Msg)
+	require.ErrorIs(t, err, types.ErrBadArweaveHash)
 }
 
 func TestArweaveBlockIsNotMissingGenesis(t *testing.T) {
-	validator, logger := validatorAndLogger(t, nil, test.ArweaveBlock().BlockInfo, nil)
+	validator := mockValidator(t, nil, test.ArweaveBlock().BlockInfo, nil)
 	validator.sequencerBlockHeader.Height = 0
 
-	result := validator.checkArweaveBlockIsNotMissing(0)
+	err := validator.checkArweaveBlockIsNotMissing(0)
 
-	require.True(t, result)
-	require.Equal(t, "", logger.Msg)
+	require.NoError(t, err)
 }
 
 func TestArweaveBlockIsNotMissingNotFirst(t *testing.T) {
-	validator, logger := validatorAndLogger(t, nil, nil, nil)
+	validator := mockValidator(t, nil, nil, nil)
 
-	result := validator.checkArweaveBlockIsNotMissing(1)
+	err := validator.checkArweaveBlockIsNotMissing(1)
 
-	require.True(t, result)
-	require.Equal(t, "", logger.Msg)
+	require.NoError(t, err)
 }
 
-func TestArweaveBlockIsNotMissingNotNext(t *testing.T) {
+func TestArweaveBlockIsNotMissingNoNext(t *testing.T) {
 	block := test.ArweaveBlock()
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: block.BlockInfo,
 	}, nil, nil)
 
-	result := validator.checkArweaveBlockIsNotMissing(0)
+	err := validator.checkArweaveBlockIsNotMissing(0)
 
-	require.True(t, result)
-	require.Equal(t, "", logger.Msg)
+	require.NoError(t, err)
 }
 
 func TestArweaveBlockIsNotMissing(t *testing.T) {
 	blockInfo := test.ArweaveBlock().BlockInfo
 	blockInfo.Timestamp += 1692356017
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: blockInfo,
 	}, blockInfo, nil)
 
-	result := validator.checkArweaveBlockIsNotMissing(0)
+	err := validator.checkArweaveBlockIsNotMissing(0)
 
-	require.True(t, result)
-	require.Equal(t, "", logger.Msg)
+	require.NoError(t, err)
 }
 
 func TestArweaveBlockIsMissing(t *testing.T) {
 	blockInfo := test.ArweaveBlock().BlockInfo
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: blockInfo,
 	}, blockInfo, nil)
 
-	result := validator.checkArweaveBlockIsNotMissing(0)
+	err := validator.checkArweaveBlockIsNotMissing(0)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: first transaction of the block should contain a transaction with the Arweave block", logger.Msg)
+	require.ErrorIs(t, err, types.ErrArweaveBlockMissing)
 }
 
 func TestCheckTransactionsLengthMismatch(t *testing.T) {
@@ -265,12 +246,11 @@ func TestCheckTransactionsLengthMismatch(t *testing.T) {
 	block := &types.MsgArweaveBlock{
 		BlockInfo: test.ArweaveBlock().BlockInfo,
 	}
-	validator, logger := validatorAndLogger(t, nil, nil, nil)
+	validator := mockValidator(t, nil, nil, nil)
 
-	result := validator.checkTransactions(block, expectedTxs)
+	err := validator.checkTransactions(block, expectedTxs)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: incorrect number of transactions in the Arweave block", logger.Msg)
+	require.ErrorIs(t, err, types.ErrInvalidTxNumber)
 }
 
 func TestCheckTransactionsIdMismatch(t *testing.T) {
@@ -280,14 +260,13 @@ func TestCheckTransactionsIdMismatch(t *testing.T) {
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
 		Transactions: actualTxs,
 	}
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: block.BlockInfo,
 	}, nil, nil)
 
-	result := validator.checkTransactions(block, expectedTxs)
+	err := validator.checkTransactions(block, expectedTxs)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: transaction id is not as expected", logger.Msg)
+	require.ErrorIs(t, err, types.ErrTxIdMismatch)
 }
 
 func TestCheckTransactionsContractMismatch(t *testing.T) {
@@ -297,14 +276,13 @@ func TestCheckTransactionsContractMismatch(t *testing.T) {
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
 		Transactions: actualTxs,
 	}
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: block.BlockInfo,
 	}, nil, nil)
 
-	result := validator.checkTransactions(block, expectedTxs)
+	err := validator.checkTransactions(block, expectedTxs)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: the contract of the transaction does not match the expected one", logger.Msg)
+	require.ErrorIs(t, err, types.ErrTxContractMismatch)
 }
 
 func TestCheckTransactionsSortKeyMismatch(t *testing.T) {
@@ -314,14 +292,13 @@ func TestCheckTransactionsSortKeyMismatch(t *testing.T) {
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
 		Transactions: actualTxs,
 	}
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: block.BlockInfo,
 	}, nil, nil)
 
-	result := validator.checkTransactions(block, expectedTxs)
+	err := validator.checkTransactions(block, expectedTxs)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: transaction sort key is not as expected", logger.Msg)
+	require.ErrorIs(t, err, types.ErrInvalidSortKey)
 }
 
 func TestCheckTransactionsInvalidRandom(t *testing.T) {
@@ -331,14 +308,13 @@ func TestCheckTransactionsInvalidRandom(t *testing.T) {
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
 		Transactions: actualTxs,
 	}
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: block.BlockInfo,
 	}, nil, nil)
 
-	result := validator.checkTransactions(block, expectedTxs)
+	err := validator.checkTransactions(block, expectedTxs)
 
-	require.False(t, result)
-	require.Equal(t, "Rejected proposal: transaction random value is not as expected", logger.Msg)
+	require.ErrorIs(t, err, types.ErrInvalidRandomValue)
 }
 
 func TestCheckTransactions(t *testing.T) {
@@ -350,12 +326,11 @@ func TestCheckTransactions(t *testing.T) {
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
 		Transactions: actualTxs,
 	}
-	validator, logger := validatorAndLogger(t, &types.LastArweaveBlock{
+	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: block.BlockInfo,
 	}, nil, nil)
 
-	result := validator.checkTransactions(block, expectedTxs)
+	err := validator.checkTransactions(block, expectedTxs)
 
-	require.True(t, result)
-	require.Equal(t, "", logger.Msg)
+	require.NoError(t, err)
 }

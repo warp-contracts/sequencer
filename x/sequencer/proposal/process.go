@@ -8,9 +8,6 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/warp-contracts/sequencer/x/sequencer/controller"
-	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 )
 
 type processProposalHandler struct {
@@ -24,14 +21,7 @@ var (
 	rejectResponse = abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}
 )
 
-func NewProcessProposalHandler(txConfig client.TxConfig, controller controller.ArweaveBlocksController, keeper *keeper.Keeper,
-	logger log.Logger) sdk.ProcessProposalHandler {
-	blockValidator := newBlockValidator(keeper, controller, logger)
-	err := blockValidator.Start()
-	if err != nil {
-		panic(err)
-	}
-
+func NewProcessProposalHandler(txConfig client.TxConfig, blockValidator *BlockValidator, logger log.Logger) sdk.ProcessProposalHandler {
 	handler := &processProposalHandler{txConfig, logger, blockValidator}
 	return handler.process
 }
@@ -45,9 +35,8 @@ func (h *processProposalHandler) process(ctx sdk.Context, req abci.RequestProces
 		return rejectResponse
 	}
 
-	h.blockValidator.Input <- block
-	valid := <-h.blockValidator.Output
-	if !valid {
+	if err := h.blockValidator.validateBlock(block); err != nil {
+		h.logger.Info("Rejected proposal: invalid block", "err", err)
 		return rejectResponse
 	}
 
