@@ -65,7 +65,6 @@ func NewController(log log.Logger, configPath string) (out ArweaveBlocksControll
 	return
 }
 
-// TODO add controller stop
 func (controller *SyncerController) Start(initHeight uint64) {
 	if !controller.config.Syncer.Enabled {
 		return
