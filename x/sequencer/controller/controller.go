@@ -66,10 +66,6 @@ func NewController(log log.Logger, configPath string) (out ArweaveBlocksControll
 }
 
 func (controller *SyncerController) Start(initHeight uint64) {
-	if !controller.config.Syncer.Enabled {
-		return
-	}
-
 	controller.initController(initHeight)
 
 	err := controller.Controller.Start()
@@ -137,7 +133,7 @@ func (controller *SyncerController) initController(initHeight uint64) {
 	controller.Task = controller.Task.
 		WithSubtask(server.Task).
 		WithSubtask(monitor.Task).
-		WithSubtask(watchdog.Task)
+		WithConditionalSubtask(controller.config.Syncer.Enabled, watchdog.Task)
 }
 
 func (controller *SyncerController) IsRunning() bool {
