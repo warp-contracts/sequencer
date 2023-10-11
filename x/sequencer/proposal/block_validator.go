@@ -40,7 +40,7 @@ func NewBlockValidator(keeper *keeper.Keeper, controller controller.ArweaveBlock
 		WithSubtaskFunc(validator.run).
 		WithWorkerPool(runtime.NumCPU(), 1).
 		WithOnAfterStop(func() {
-			close(validator.input)
+			// We are closing only the `output` channel to avoid panicking when sending to the `input` channel in the `ValidateBlock` method.
 			close(validator.output)
 		})
 
@@ -48,31 +48,34 @@ func NewBlockValidator(keeper *keeper.Keeper, controller controller.ArweaveBlock
 }
 
 func (v *BlockValidator) run() error {
-	for block := range v.input {
-		if len(block.txs) == 0 {
-			v.output <- nil
-			continue
+	for {
+		select {
+		case <-v.Ctx.Done():
+			return nil
+		case block := <-v.input:
+			if len(block.txs) == 0 {
+				v.output <- nil
+				continue
+			}
+
+			txValidator := newTxValidator(block.ctx, v.keeper, v.controller)
+			result := newValidationResult(v.output)
+			wg := &sync.WaitGroup{}
+			wg.Add(1 + len(block.txs)) // one sequential and for each transaction
+
+			v.validateSequentially(txValidator, block.txs, result, wg)
+			v.validateInParallel(txValidator, block.txs, result, wg)
+
+			wg.Wait()
+			result.sendIfNoError()
 		}
-
-		txValidator := newTxValidator(block.ctx, v.keeper, v.controller)
-		result := newValidationResult(v.output)
-		wg := &sync.WaitGroup{}
-		wg.Add(1 + len(block.txs)) // one sequential and for each transaction
-
-		v.validateSequentially(txValidator, block.txs, result, wg)
-		v.validateInParallel(txValidator, block.txs, result, wg)
-
-		wg.Wait()
-		result.sendIfValid()
 	}
-
-	return nil
 }
 
 func (v *BlockValidator) validateSequentially(txValidator *TxValidator, txs []sdk.Tx, result *validationResult, wg *sync.WaitGroup) {
 	v.SubmitToWorker(func() {
 		for txIndex, tx := range txs {
-			if result.isValid() {
+			if result.isNotSent() {
 				err := txValidator.validateSequentially(txIndex, tx)
 				if err != nil {
 					result.sendFirstError(err)
@@ -87,7 +90,7 @@ func (v *BlockValidator) validateSequentially(txValidator *TxValidator, txs []sd
 func (v *BlockValidator) validateInParallel(txValidator *TxValidator, txs []sdk.Tx, result *validationResult, wg *sync.WaitGroup) {
 	for txIndex, tx := range txs {
 		v.SubmitToWorker(func() {
-			if result.isValid() {
+			if result.isNotSent() {
 				err := txValidator.validateInParallel(txIndex, tx)
 				result.sendFirstError(err)
 			}
@@ -96,12 +99,18 @@ func (v *BlockValidator) validateInParallel(txValidator *TxValidator, txs []sdk.
 	}
 }
 
-func (v *BlockValidator) validateBlock(block *Block) error {
-	if v == nil || v.IsStopping.Load() {
+func (v *BlockValidator) ValidateBlock(block *Block) error {
+	if v == nil {
 		return nil
 	}
 
-	v.input <- block
+	select {
+	case <-v.Ctx.Done():
+		return nil
+	case <-block.ctx.Done():
+		return nil
+	case v.input <- block:
+	}
 
 	select {
 	case <-v.Ctx.Done():
@@ -109,12 +118,13 @@ func (v *BlockValidator) validateBlock(block *Block) error {
 	case <-block.ctx.Done():
 		return nil
 	case err := <-v.output:
+		// in case of a closed channel, err will be nil
 		return err
 	}
 }
 
 func (v *BlockValidator) StopWait() {
-	if v != nil && !v.IsStopping.Load() {
+	if v != nil {
 		v.Task.StopWait()
 	}
 }
