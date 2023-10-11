@@ -115,7 +115,7 @@ func (store *Store) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
 	return nil
 }
 
-func (store *Store) removeNextArweaveBlocksUpToHeight(height uint64) {
+func (store *Store) RemoveNextArweaveBlocksUpToHeight(height uint64) {
 	store.mtx.Lock()
 	defer store.mtx.Unlock()
 

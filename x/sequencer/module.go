@@ -173,13 +173,9 @@ func (am AppModule) startOrUpdateArweaveBlocksController(ctx sdk.Context) {
 	}
 	lastArweaveBlock, found := am.keeper.GetLastArweaveBlock(ctx)
 
-	if found {
-		if am.arweaveBlocksController.IsRunning() {
-			am.arweaveBlocksController.RemoveNextArweaveBlocksUpToHeight(lastArweaveBlock.ArweaveBlock.Height)
-		} else {
-			am.arweaveBlocksController.Start(lastArweaveBlock.ArweaveBlock.Height + 1)
-		}
-	} else {
+	if !found {
 		panic("Last Arweave Block is not set when the BeginBlock method is called, and should be set when the blockchain is started")
 	}
+
+	am.arweaveBlocksController.SetLastAcceptedBlockHeight(lastArweaveBlock.ArweaveBlock.Height)
 }

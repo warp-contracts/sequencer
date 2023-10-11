@@ -250,6 +250,7 @@ func New(
 	appOpts servertypes.AppOptions,
 	baseAppOptions ...func(*baseapp.BaseApp),
 ) *App {
+	var err error
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
@@ -455,7 +456,11 @@ func New(
 	)
 
 	if appOpts.Get("test") == nil {
-		app.ArweaveBlocksController = controller.NewController(logger, configPath)
+		app.ArweaveBlocksController, err = controller.NewController(logger, configPath)
+		if err != nil {
+			panic(err)
+		}
+
 		app.BlockValidator = sequencerproposal.NewBlockValidator(&app.SequencerKeeper, app.ArweaveBlocksController)
 		err := app.BlockValidator.Start()
 		if err != nil {
