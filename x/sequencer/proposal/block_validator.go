@@ -104,6 +104,7 @@ func (v *BlockValidator) ValidateBlock(block *Block) error {
 		return nil
 	}
 
+	// sending the block to the input channel (with checking whether the task is not stopped)
 	select {
 	case <-v.Ctx.Done():
 		return nil
@@ -112,6 +113,7 @@ func (v *BlockValidator) ValidateBlock(block *Block) error {
 	case v.input <- block:
 	}
 
+	// receiving the validation result from the output channel (with checking whether the task is not stopped)
 	select {
 	case <-v.Ctx.Done():
 		return nil
