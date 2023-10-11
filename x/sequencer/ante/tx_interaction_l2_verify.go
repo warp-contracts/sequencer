@@ -45,7 +45,7 @@ func GetL2Interaction(tx sdk.Tx) (*types.MsgDataItem, error) {
 		dataItem, isDataItem := msg.(*types.MsgDataItem)
 		if isDataItem {
 			if len(msgs) > 1 {
-				err := errors.Wrapf(types.ErrTooManyMessages,
+				err := errors.Wrapf(types.ErrInvalidMessagesNumber,
 					"transaction with L2 interaction can have only one message, and it has: %d", len(msgs))
 				return nil, err
 			}
@@ -79,8 +79,12 @@ func (ditd *DataItemTxDecorator) verifyTxWithDataItem(ctx sdk.Context, tx sdk.Tx
 			return
 		}
 
-		if err = verifyDataItem(dataItem); err != nil {
-			return
+		if ctx.IsCheckTx() {
+			// The data item is only validated before being inserted into the mempool 
+			// and during the block validation in the `processProposalHandler`.
+			if err = dataItem.Verify(); err != nil {
+				return
+			}
 		}
 	}
 
@@ -104,14 +108,4 @@ func (ditd *DataItemTxDecorator) verifyAlreadyInBlock(ctx sdk.Context, dataItem 
 func verifyContract(tx sdk.Tx, dataItem *types.MsgDataItem) error {
 	_, err := dataItem.GetContractFromTags()
 	return err
-}
-
-func verifyDataItem(dataItem *types.MsgDataItem) error {
-	// Verifies DataItem acording to the ANS-104 standard. Verifies signature.
-	// https://github.com/ArweaveTeam/arweave-standards/blob/master/ans/ANS-104.md#21-verifying-a-dataitem
-	err := dataItem.DataItem.Verify()
-	if err != nil {
-		return err
-	}
-	return dataItem.DataItem.VerifySignature()
 }

@@ -101,7 +101,7 @@ type AppModule struct {
 	accountKeeper           types.AccountKeeper
 	bankKeeper              types.BankKeeper
 	arweaveBlocksController controller.ArweaveBlocksController
-	homeDir                 string
+	configPath              string
 	blockInteractions       *ante.BlockInteractions
 }
 
@@ -111,7 +111,7 @@ func NewAppModule(
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	arweaveBlocksController controller.ArweaveBlocksController,
-	homeDir string,
+	configPath string,
 	blockInteractions *ante.BlockInteractions,
 ) AppModule {
 	return AppModule{
@@ -120,7 +120,7 @@ func NewAppModule(
 		accountKeeper:           accountKeeper,
 		bankKeeper:              bankKeeper,
 		arweaveBlocksController: arweaveBlocksController,
-		homeDir:                 homeDir,
+		configPath:              configPath,
 		blockInteractions:       blockInteractions,
 	}
 }
@@ -140,7 +140,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 	// Initialize global index to index in genesis state
 	cdc.MustUnmarshalJSON(gs, &genState)
 
-	InitGenesis(ctx, am.keeper, genState, am.homeDir)
+	InitGenesis(ctx, am.keeper, genState, am.configPath)
 
 	return []abci.ValidatorUpdate{}
 }

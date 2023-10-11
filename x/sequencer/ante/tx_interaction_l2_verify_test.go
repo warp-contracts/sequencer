@@ -37,7 +37,7 @@ func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
 	result, err := GetL2Interaction(tx)
 
 	require.Nil(t, result)
-	require.ErrorIs(t, err, types.ErrTooManyMessages)
+	require.ErrorIs(t, err, types.ErrInvalidMessagesNumber)
 }
 
 func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
@@ -48,7 +48,7 @@ func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
 	result, err := GetL2Interaction(tx)
 
 	require.Nil(t, result)
-	require.ErrorIs(t, err, types.ErrTooManyMessages)
+	require.ErrorIs(t, err, types.ErrInvalidMessagesNumber)
 }
 
 func TestGetDataItemMsgDataItemAfterMsg(t *testing.T) {
@@ -59,5 +59,5 @@ func TestGetDataItemMsgDataItemAfterMsg(t *testing.T) {
 	result, err := GetL2Interaction(tx)
 
 	require.Nil(t, result)
-	require.ErrorIs(t, err, types.ErrTooManyMessages)
+	require.ErrorIs(t, err, types.ErrInvalidMessagesNumber)
 }

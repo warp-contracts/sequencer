@@ -45,12 +45,12 @@ type SyncerController struct {
 	config *config.Config
 }
 
-func NewController(log log.Logger, homeDir string) (out ArweaveBlocksController) {
+func NewController(log log.Logger, configPath string) (out ArweaveBlocksController) {
 	controller := new(SyncerController)
 	InitLogger(log, logrus.InfoLevel.String())
 
 	var err error
-	filepath := path.Join(homeDir, "syncer.json")
+	filepath := path.Join(configPath, "syncer.json")
 	if _, err := os.Stat(filepath); err != nil {
 		// Empty file path loads default config
 		filepath = ""

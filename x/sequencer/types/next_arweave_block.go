@@ -3,12 +3,12 @@ package types
 import (
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 )
 
-func IsArweaveBlockOldEnough(ctx sdk.Context, newBlockInfo *ArweaveBlockInfo) bool {
+func IsArweaveBlockOldEnough(sequencerBlockHeader tmproto.Header, newBlockInfo *ArweaveBlockInfo) bool {
 	arweaveBlockTimestamp := time.Unix(int64(newBlockInfo.Timestamp), 0)
-	cosmosBlockTimestamp := ctx.BlockHeader().Time
+	sequencerBlockTimestamp := sequencerBlockHeader.Time
 
-	return cosmosBlockTimestamp.After(arweaveBlockTimestamp.Add(time.Hour))
+	return sequencerBlockTimestamp.After(arweaveBlockTimestamp.Add(time.Hour))
 }

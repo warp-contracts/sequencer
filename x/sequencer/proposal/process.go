@@ -8,18 +8,12 @@ import (
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/warp-contracts/sequencer/x/sequencer/controller"
-	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 )
 
 type processProposalHandler struct {
-	txConfig     client.TxConfig
-	keeper       *keeper.Keeper
-	controller   controller.ArweaveBlocksController
-	logger       log.Logger
-	sortKey      *SortKey
-	lastSortKeys *LastSortKeys
+	txConfig       client.TxConfig
+	logger         log.Logger
+	blockValidator *BlockValidator
 }
 
 var (
@@ -27,9 +21,8 @@ var (
 	rejectResponse = abci.ResponseProcessProposal{Status: abci.ResponseProcessProposal_REJECT}
 )
 
-func NewProcessProposalHandler(txConfig client.TxConfig, controller controller.ArweaveBlocksController, keeper *keeper.Keeper,
-	logger log.Logger) sdk.ProcessProposalHandler {
-	handler := &processProposalHandler{txConfig: txConfig, controller: controller, keeper: keeper, logger: logger}
+func NewProcessProposalHandler(txConfig client.TxConfig, blockValidator *BlockValidator, logger log.Logger) sdk.ProcessProposalHandler {
+	handler := &processProposalHandler{txConfig, logger, blockValidator}
 	return handler.process
 }
 
@@ -37,16 +30,14 @@ func NewProcessProposalHandler(txConfig client.TxConfig, controller controller.A
 // as well as the correctness of data items
 func (h *processProposalHandler) process(ctx sdk.Context, req abci.RequestProcessProposal) abci.ResponseProcessProposal {
 	now := time.Now()
-	h.initSortKeyForBlock(ctx)
-	for txIndex, txBytes := range req.Txs {
-		tx, err := h.txConfig.TxDecoder()(txBytes)
-		if err != nil {
-			h.rejectProposal("unable to decode the transaction", "err", err)
-			return rejectResponse
-		}
-		if !h.processProposalValidateTx(ctx, txIndex, tx) {
-			return rejectResponse
-		}
+	block := h.createBlock(ctx, req)
+	if block == nil {
+		return rejectResponse
+	}
+
+	if err := h.blockValidator.ValidateBlock(block); err != nil {
+		h.logger.Info("Rejected proposal: invalid block", "err", err)
+		return rejectResponse
 	}
 
 	ctx.Logger().
@@ -58,25 +49,15 @@ func (h *processProposalHandler) process(ctx sdk.Context, req abci.RequestProces
 	return acceptResponse
 }
 
-func (h *processProposalHandler) rejectProposal(msg string, keyvals ...interface{}) bool {
-	h.logger.Info("Rejected proposal: "+msg, keyvals...)
-	return false
-}
-
-func (h *processProposalHandler) processProposalValidateTx(ctx sdk.Context, txIndex int, tx sdk.Tx) bool {
-	arweaveBlock := getArweaveBlockMsg(tx)
-	if arweaveBlock != nil {
-		return h.processProposalValidateArweaveBlock(ctx, txIndex, tx, arweaveBlock)
+func (h *processProposalHandler) createBlock(ctx sdk.Context, req abci.RequestProcessProposal) *Block {
+	var txs []sdk.Tx
+	for txIndex, txBytes := range req.Txs {
+		tx, err := h.txConfig.TxDecoder()(txBytes)
+		if err != nil {
+			h.logger.Info("Rejected proposal: unable to decode the transaction", "err", err, "txIndex", txIndex)
+			return nil
+		}
+		txs = append(txs, tx)
 	}
-
-	if !h.checkArweaveBlockIsNotMissing(ctx, txIndex) {
-		return false
-	}
-
-	dataItem := getDataItemMsg(tx)
-	if dataItem != nil {
-		return h.processProposalValidateDataItem(ctx, dataItem)
-	}
-
-	return true
+	return &Block{ctx, txs}
 }

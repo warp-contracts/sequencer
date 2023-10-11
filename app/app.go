@@ -225,6 +225,7 @@ type App struct {
 
 	// Tasks
 	ArweaveBlocksController controller.ArweaveBlocksController
+	BlockValidator *sequencerproposal.BlockValidator
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
@@ -253,6 +254,7 @@ func New(
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 	txConfig := encodingConfig.TxConfig
+	configPath := filepath.Join(homePath, "config")
 
 	bApp := baseapp.NewBaseApp(
 		Name,
@@ -453,10 +455,15 @@ func New(
 	)
 
 	if appOpts.Get("test") == nil {
-		app.ArweaveBlocksController = controller.NewController(logger, homePath)
+		app.ArweaveBlocksController = controller.NewController(logger, configPath)
+		app.BlockValidator = sequencerproposal.NewBlockValidator(&app.SequencerKeeper, app.ArweaveBlocksController)
+		err := app.BlockValidator.Start()
+		if err != nil {
+			panic(err)
+		}
 	}
 	blockInteractions := sequencerante.NewBlockInteractions()
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, DefaultNodeHome, blockInteractions)
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, configPath, blockInteractions)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -642,7 +649,7 @@ func New(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(&app.SequencerKeeper, app.ArweaveBlocksController, app.txConfig))
-	app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, app.ArweaveBlocksController, &app.SequencerKeeper, app.Logger()))
+	app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, app.BlockValidator, app.Logger()))
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -838,5 +845,6 @@ func (app *App) ModuleManager() *module.Manager {
 // ModuleManager returns the app ModuleManager
 func (app *App) Close() (err error) {
 	app.ArweaveBlocksController.StopWait()
+	app.BlockValidator.StopWait()
 	return nil
 }
