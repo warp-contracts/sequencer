@@ -225,7 +225,7 @@ type App struct {
 
 	// Tasks
 	ArweaveBlocksController controller.ArweaveBlocksController
-	BlockValidator *sequencerproposal.BlockValidator
+	BlockValidator          *sequencerproposal.BlockValidator
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
@@ -272,7 +272,7 @@ func New(
 		authtypes.StoreKey, authz.ModuleName, banktypes.StoreKey, stakingtypes.StoreKey,
 		crisistypes.StoreKey, minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, upgradetypes.StoreKey,
-		feegrant.StoreKey, evidencetypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey, 
+		feegrant.StoreKey, evidencetypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
 		consensusparamtypes.StoreKey, sequencermoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
@@ -791,7 +791,9 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register the route for retrieving nonce
 	sequencerapi.RegisterNonceAPIRoute(clientCtx, apiSvr.Router)
 	// Register the route for retrieving tx by sender and nonce
-	sequencerapi.RegisterTxAPIRoute(clientCtx, apiSvr.Router)
+	sequencerapi.RegisterTxBySenderNonceAPIRoute(clientCtx, apiSvr.Router)
+	// Register the route for retrieving tx by data item id
+	sequencerapi.RegisterTxByDataItemIdAPIRoute(clientCtx, apiSvr.Router)
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.

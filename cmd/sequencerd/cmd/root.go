@@ -40,6 +40,7 @@ import (
 
 	"github.com/warp-contracts/sequencer/app"
 	appparams "github.com/warp-contracts/sequencer/app/params"
+	sequencercli "github.com/warp-contracts/sequencer/x/sequencer/client/cli"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application
@@ -163,7 +164,7 @@ func queryCommand() *cobra.Command {
 		rpc.ValidatorCommand(),
 		rpc.BlockCommand(),
 		authcmd.QueryTxsByEventsCmd(),
-		authcmd.QueryTxCmd(),
+		sequencercli.QueryTxCmd(),
 	)
 
 	app.ModuleBasics.AddQueryCommands(cmd)
