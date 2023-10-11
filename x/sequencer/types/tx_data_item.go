@@ -7,6 +7,10 @@ import (
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 )
 
+const (
+	AttributeKeyDataItemId = "data_item_id"
+)
+
 type BroadcastResponse struct {
 	Code   uint32
 	RawLog string
