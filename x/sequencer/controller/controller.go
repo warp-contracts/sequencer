@@ -4,13 +4,13 @@ import (
 	"math"
 	"os"
 	"path"
+	"sync"
 	"time"
 
 	"github.com/cometbft/cometbft/libs/log"
 	"github.com/sirupsen/logrus"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
-	"github.com/warp-contracts/syncer/src/sync"
 	"github.com/warp-contracts/syncer/src/utils/arweave"
 	"github.com/warp-contracts/syncer/src/utils/config"
 	"github.com/warp-contracts/syncer/src/utils/listener"
@@ -22,104 +22,101 @@ import (
 
 // Controller for fetching Arweave blocks to add them to the sequencer blockchain or validate blocks added by the Proposer.
 type ArweaveBlocksController interface {
-	// Starts the fetching of Arweave blocks beginning from the given height
-	Start(initHeight uint64)
+	// Sets the last block height accepted by the sequencer network
+	SetLastAcceptedBlockHeight(uint64)
 
 	// Gracefully stops the controller, waits for all tasks to finish
 	StopWait()
 
-	// Has the controller been started?
-	IsRunning() bool
-
 	// Returns the fetched Arweave block with the given height
 	GetNextArweaveBlock(height uint64) *types.NextArweaveBlock
-
-	// Deletes all fetched Arweave blocks with height not greater than the given one
-	RemoveNextArweaveBlocksUpToHeight(height uint64)
 }
 
 type SyncerController struct {
-	sync.Controller
+	*task.Task
 
 	store  *Store
 	config *config.Config
+
+	// Runtime state
+	mtx                       sync.Mutex
+	lastAcceptedArweaveHeight uint64
+	blockDownloader           *listener.BlockDownloader
 }
 
-func NewController(log log.Logger, configPath string) (out ArweaveBlocksController) {
-	controller := new(SyncerController)
+func NewController(log log.Logger, configPath string) (out ArweaveBlocksController, err error) {
+	self := new(SyncerController)
 	InitLogger(log, logrus.InfoLevel.String())
 
-	var err error
+	// Load configuration from path, env or defaults
 	filepath := path.Join(configPath, "syncer.json")
 	if _, err := os.Stat(filepath); err != nil {
 		// Empty file path loads default config
 		filepath = ""
 	}
 
-	controller.config, err = config.Load(filepath)
+	self.config, err = config.Load(filepath)
 	if err != nil {
-		panic(err)
+		return
 	}
 
-	out = controller
-	return
-}
+	// Setup the tasks
+	self.Task = task.NewTask(self.config, "controller")
 
-func (controller *SyncerController) Start(initHeight uint64) {
-	controller.initController(initHeight)
-
-	err := controller.Controller.Start()
-	if err != nil {
-		panic(err)
-	}
-}
-
-func (controller *SyncerController) initController(initHeight uint64) {
-	controller.Task = task.NewTask(controller.config, "controller")
-
+	// Monitoring and performance metrics
 	monitor := monitor_syncer.NewMonitor().
 		WithMaxHistorySize(30)
 
-	server := monitoring.NewServer(controller.config).
+	server := monitoring.NewServer(self.config).
 		WithMonitor(monitor)
 
+	// Function that creates the watched task
+	// This can be called multiple times to setup syncing when something got stuck
 	watched := func() *task.Task {
-		client := arweave.NewClient(controller.Ctx, controller.config).
+		self.mtx.Lock()
+		defer self.mtx.Unlock()
+
+		client := arweave.NewClient(self.Ctx, self.config).
 			WithTagValidator(warp.ValidateTag)
 
-		networkMonitor := listener.NewNetworkMonitor(controller.config).
+		networkMonitor := listener.NewNetworkMonitor(self.config).
 			WithClient(client).
 			WithMonitor(monitor).
-			WithInterval(controller.config.NetworkMonitor.Period).
-			WithRequiredConfirmationBlocks(controller.config.NetworkMonitor.RequiredConfirmationBlocks)
+			WithInterval(self.config.NetworkMonitor.Period).
+			WithRequiredConfirmationBlocks(self.config.NetworkMonitor.RequiredConfirmationBlocks)
 
-		blockDownloader := listener.NewBlockDownloader(controller.config).
+		self.blockDownloader = listener.NewBlockDownloader(self.config).
 			WithClient(client).
 			WithInputChannel(networkMonitor.Output).
 			WithMonitor(monitor).
-			WithBackoff(0, controller.config.Syncer.TransactionMaxInterval).
-			WithHeightRange(initHeight, math.MaxUint64)
+			WithBackoff(0, self.config.Syncer.TransactionMaxInterval)
 
-		transactionDownloader := listener.NewTransactionDownloader(controller.config).
+		if self.lastAcceptedArweaveHeight > 0 {
+			// This is a restart from the watchdog so set the start height
+			// Otherwise it will be set later
+			self.blockDownloader.WithHeightRange(self.lastAcceptedArweaveHeight+1, math.MaxUint64)
+		}
+
+		transactionDownloader := listener.NewTransactionDownloader(self.config).
 			WithClient(client).
-			WithInputChannel(blockDownloader.Output).
+			WithInputChannel(self.blockDownloader.Output).
 			WithMonitor(monitor).
-			WithBackoff(0, controller.config.Syncer.TransactionMaxInterval).
+			WithBackoff(0, self.config.Syncer.TransactionMaxInterval).
 			WithFilterInteractions()
 
-		store := NewStore(controller.config).
+		store := NewStore(self.config).
 			WithInputChannel(transactionDownloader.Output).
 			WithMonitor(monitor)
-		controller.store = store
+		self.store = store
 
-		return task.NewTask(controller.config, "watched").
+		return task.NewTask(self.config, "watched").
 			WithSubtask(networkMonitor.Task).
-			WithSubtask(blockDownloader.Task).
+			WithSubtask(self.blockDownloader.Task).
 			WithSubtask(transactionDownloader.Task).
 			WithSubtask(store.Task)
 	}
 
-	watchdog := task.NewWatchdog(controller.config).
+	watchdog := task.NewWatchdog(self.config).
 		WithTask(watched).
 		WithIsOK(30*time.Second, func() bool {
 			isOK := monitor.IsOK()
@@ -130,32 +127,52 @@ func (controller *SyncerController) initController(initHeight uint64) {
 			return isOK
 		})
 
-	controller.Task = controller.Task.
+	self.Task = self.Task.
 		WithSubtask(server.Task).
 		WithSubtask(monitor.Task).
-		WithConditionalSubtask(controller.config.Syncer.Enabled, watchdog.Task)
-}
+		WithConditionalSubtask(self.config.Syncer.Enabled, watchdog.Task)
 
-func (controller *SyncerController) IsRunning() bool {
-	return controller.config.Syncer.Enabled && controller.Controller.Task != nil && !controller.Controller.Task.IsStopping.Load()
-}
-
-func (controller *SyncerController) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
-	if controller.IsRunning() {
-		return controller.store.GetNextArweaveBlock(height)
-	}
-	return nil
-}
-
-func (controller *SyncerController) RemoveNextArweaveBlocksUpToHeight(height uint64) {
-	if controller.IsRunning() {
-		controller.store.removeNextArweaveBlocksUpToHeight(height)
-	}
-}
-
-func (controller *SyncerController) StopWait() {
-	if controller == nil || !controller.IsRunning() {
+	// Starts all the tasks, but downloading new block will be blocked until lastAcceptedArweaveHeight is set
+	err = self.Start()
+	if err != nil {
 		return
 	}
-	controller.Controller.StopWait()
+
+	return
+}
+
+func (self *SyncerController) isRunning() bool {
+	return self != nil && self.config.Syncer.Enabled && self.Task != nil && !self.Task.IsStopping.Load()
+}
+
+func (self *SyncerController) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
+	if !self.isRunning() {
+		return nil
+	}
+	return self.store.GetNextArweaveBlock(height)
+}
+
+func (self *SyncerController) StopWait() {
+	if self == nil {
+		return
+	}
+
+	self.StopWait()
+}
+
+func (self *SyncerController) SetLastAcceptedBlockHeight(height uint64) {
+	if !self.isRunning() {
+		return
+	}
+	self.mtx.Lock()
+	defer self.mtx.Unlock()
+
+	if self.lastAcceptedArweaveHeight == 0 {
+		// This is the first time we set the height
+		self.blockDownloader.SetStartHeight(self.lastAcceptedArweaveHeight + 1)
+	} else {
+		// Called after the initialization
+		self.store.RemoveNextArweaveBlocksUpToHeight(height)
+
+	}
 }

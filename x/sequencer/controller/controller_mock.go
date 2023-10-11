@@ -8,18 +8,11 @@ type ArweaveBlocksControllerMock struct {
 	block *types.NextArweaveBlock
 }
 
-func (mock ArweaveBlocksControllerMock) Start(height uint64) {
-}
-
-func (mock ArweaveBlocksControllerMock) IsRunning() bool {
-	return true
+func (mock ArweaveBlocksControllerMock) SetLastAcceptedBlockHeight(height uint64) {
 }
 
 func (mock ArweaveBlocksControllerMock) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
 	return mock.block
-}
-
-func (mock ArweaveBlocksControllerMock) RemoveNextArweaveBlocksUpToHeight(height uint64) {
 }
 
 func (mock ArweaveBlocksControllerMock) StopWait() {
