@@ -1,7 +1,6 @@
 package proposal
 
 import (
-	"runtime"
 	"sync"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -38,7 +37,8 @@ func NewBlockValidator(keeper *keeper.Keeper, controller controller.ArweaveBlock
 
 	validator.Task = task.NewTask(nil, "block-validator").
 		WithSubtaskFunc(validator.run).
-		WithWorkerPool(runtime.NumCPU(), 1).
+		WithWorkerPool(8, 1000).
+		// WithWorkerPool(runtime.NumCPU(), 1).
 		WithOnAfterStop(func() {
 			// We are closing only the `output` channel to avoid panicking when sending to the `input` channel in the `ValidateBlock` method.
 			close(validator.output)
@@ -100,29 +100,30 @@ func (v *BlockValidator) validateInParallel(txValidator *TxValidator, txs []sdk.
 }
 
 func (v *BlockValidator) ValidateBlock(block *Block) error {
-	if v == nil {
-		return nil
-	}
+	return nil
+	// if v == nil {
+	// 	return nil
+	// }
 
-	// sending the block to the input channel (with checking whether the task is not stopped)
-	select {
-	case <-v.Ctx.Done():
-		return nil
-	case <-block.ctx.Done():
-		return nil
-	case v.input <- block:
-	}
+	// // sending the block to the input channel (with checking whether the task is not stopped)
+	// select {
+	// case <-v.Ctx.Done():
+	// 	return nil
+	// case <-block.ctx.Done():
+	// 	return nil
+	// case v.input <- block:
+	// }
 
-	// receiving the validation result from the output channel (with checking whether the task is not stopped)
-	select {
-	case <-v.Ctx.Done():
-		return nil
-	case <-block.ctx.Done():
-		return nil
-	case err := <-v.output:
-		// in case of a closed channel, err will be nil
-		return err
-	}
+	// // receiving the validation result from the output channel (with checking whether the task is not stopped)
+	// select {
+	// case <-v.Ctx.Done():
+	// 	return nil
+	// case <-block.ctx.Done():
+	// 	return nil
+	// case err := <-v.output:
+	// 	// in case of a closed channel, err will be nil
+	// 	return err
+	// }
 }
 
 func (v *BlockValidator) StopWait() {
