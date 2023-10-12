@@ -35,13 +35,14 @@ type ArweaveBlocksController interface {
 type SyncerController struct {
 	*task.Task
 
-	store  *Store
 	config *config.Config
 
 	// Runtime state
 	mtx                       sync.Mutex
 	lastAcceptedArweaveHeight uint64
-	blockDownloader           *listener.BlockDownloader
+
+	blockDownloader *listener.BlockDownloader
+	store           *Store
 }
 
 func NewController(log log.Logger, configPath string) (out ArweaveBlocksController, err error) {
@@ -104,16 +105,15 @@ func NewController(log log.Logger, configPath string) (out ArweaveBlocksControll
 			WithBackoff(0, self.config.Syncer.TransactionMaxInterval).
 			WithFilterInteractions()
 
-		store := NewStore(self.config).
+		self.store = NewStore(self.config).
 			WithInputChannel(transactionDownloader.Output).
 			WithMonitor(monitor)
-		self.store = store
 
 		return task.NewTask(self.config, "watched").
 			WithSubtask(networkMonitor.Task).
 			WithSubtask(self.blockDownloader.Task).
 			WithSubtask(transactionDownloader.Task).
-			WithSubtask(store.Task)
+			WithSubtask(self.store.Task)
 	}
 
 	watchdog := task.NewWatchdog(self.config).
@@ -137,6 +137,8 @@ func NewController(log log.Logger, configPath string) (out ArweaveBlocksControll
 	if err != nil {
 		return
 	}
+
+	out = self
 
 	return
 }
