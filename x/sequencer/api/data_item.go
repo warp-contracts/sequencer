@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -46,12 +45,7 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if response.Code != 0 {
-		jsonResponse, err := json.Marshal(response)
-		if err != nil {
-			InternalServerError(w, err, "response encoding error")
-		} else {
-			InternalServerErrorString(w, string(jsonResponse), "broadcast response with non-zero code")
-		}
+		BadRequestErrorString(w, response.RawLog, &response.Code, "broadcast response with non-zero code")
 		return
 	}
 
