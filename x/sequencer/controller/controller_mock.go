@@ -8,7 +8,7 @@ type ArweaveBlocksControllerMock struct {
 	block *types.NextArweaveBlock
 }
 
-func (mock ArweaveBlocksControllerMock) SetLastAcceptedBlockHeight(height uint64) {
+func (mock ArweaveBlocksControllerMock) SetLastAcceptedBlock(*types.ArweaveBlockInfo) {
 }
 
 func (mock ArweaveBlocksControllerMock) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {

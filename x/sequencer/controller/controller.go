@@ -23,7 +23,7 @@ import (
 // Controller for fetching Arweave blocks to add them to the sequencer blockchain or validate blocks added by the Proposer.
 type ArweaveBlocksController interface {
 	// Sets the last block height accepted by the sequencer network
-	SetLastAcceptedBlockHeight(uint64)
+	SetLastAcceptedBlock(*types.ArweaveBlockInfo)
 
 	// Gracefully stops the controller, waits for all tasks to finish
 	StopWait()
@@ -40,6 +40,7 @@ type SyncerController struct {
 	// Runtime state
 	mtx                       sync.Mutex
 	lastAcceptedArweaveHeight uint64
+	lastAcceptedArweaveHash   arweave.Base64String
 
 	blockDownloader *listener.BlockDownloader
 	store           *Store
@@ -95,7 +96,7 @@ func NewController(log log.Logger, configPath string) (out ArweaveBlocksControll
 		if self.lastAcceptedArweaveHeight > 0 {
 			// This is a restart from the watchdog so set the start height
 			// Otherwise it will be set later
-			self.blockDownloader.WithHeightRange(self.lastAcceptedArweaveHeight+1, math.MaxUint64)
+			self.blockDownloader.WithHeightRange(self.lastAcceptedArweaveHeight, math.MaxUint64)
 		}
 
 		transactionDownloader := listener.NewTransactionDownloader(self.config).
@@ -162,19 +163,27 @@ func (self *SyncerController) StopWait() {
 	self.StopWait()
 }
 
-func (self *SyncerController) SetLastAcceptedBlockHeight(height uint64) {
+func (self *SyncerController) SetLastAcceptedBlock(block *types.ArweaveBlockInfo) {
 	if !self.isRunning() {
 		return
 	}
 	self.mtx.Lock()
 	defer self.mtx.Unlock()
 
-	if self.lastAcceptedArweaveHeight == 0 {
-		// This is the first time we set the height
-		self.blockDownloader.SetStartHeight(self.lastAcceptedArweaveHeight + 1)
-	} else {
+	if self.lastAcceptedArweaveHeight != 0 {
 		// Called after the initialization
-		self.store.RemoveNextArweaveBlocksUpToHeight(height)
-
+		self.store.RemoveNextArweaveBlocksUpToHeight(block.Height)
+		return
 	}
+
+	// This is the first time we see the last accepted block
+	// Start downloading blocks from the next one
+	self.lastAcceptedArweaveHeight = block.Height
+	var hash arweave.Base64String
+	err := hash.Decode(block.Hash)
+	if err != nil {
+		panic(err)
+	}
+	self.lastAcceptedArweaveHash = hash
+	self.blockDownloader.SetPreviousBlock(self.lastAcceptedArweaveHeight, self.lastAcceptedArweaveHash)
 }
