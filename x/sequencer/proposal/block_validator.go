@@ -100,30 +100,29 @@ func (v *BlockValidator) validateInParallel(txValidator *TxValidator, txs []sdk.
 }
 
 func (v *BlockValidator) ValidateBlock(block *Block) error {
-	return nil
-	// if v == nil {
-	// 	return nil
-	// }
+	if v == nil {
+		return nil
+	}
 
-	// // sending the block to the input channel (with checking whether the task is not stopped)
-	// select {
-	// case <-v.Ctx.Done():
-	// 	return nil
-	// case <-block.ctx.Done():
-	// 	return nil
-	// case v.input <- block:
-	// }
+	// sending the block to the input channel (with checking whether the task is not stopped)
+	select {
+	case <-v.Ctx.Done():
+		return nil
+	case <-block.ctx.Done():
+		return nil
+	case v.input <- block:
+	}
 
-	// // receiving the validation result from the output channel (with checking whether the task is not stopped)
-	// select {
-	// case <-v.Ctx.Done():
-	// 	return nil
-	// case <-block.ctx.Done():
-	// 	return nil
-	// case err := <-v.output:
-	// 	// in case of a closed channel, err will be nil
-	// 	return err
-	// }
+	// receiving the validation result from the output channel (with checking whether the task is not stopped)
+	select {
+	case <-v.Ctx.Done():
+		return nil
+	case <-block.ctx.Done():
+		return nil
+	case err := <-v.output:
+		// in case of a closed channel, err will be nil
+		return err
+	}
 }
 
 func (v *BlockValidator) StopWait() {

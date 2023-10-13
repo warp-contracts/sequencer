@@ -177,5 +177,5 @@ func (am AppModule) startOrUpdateArweaveBlocksController(ctx sdk.Context) {
 		panic("Last Arweave Block is not set when the BeginBlock method is called, and should be set when the blockchain is started")
 	}
 
-	am.arweaveBlocksController.SetLastAcceptedBlockHeight(lastArweaveBlock.ArweaveBlock.Height)
+	am.arweaveBlocksController.SetLastAcceptedBlock(lastArweaveBlock.ArweaveBlock)
 }

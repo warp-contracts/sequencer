@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -634,25 +635,25 @@ func New(
 	app.MountMemoryStores(memKeys)
 
 	// initialize BaseApp
-	// anteHandler, err := sequencerante.NewAnteHandler(
-	// 	sequencerante.HandlerOptions{
-	// 		AccountKeeper:     app.AccountKeeper,
-	// 		BankKeeper:        app.BankKeeper,
-	// 		FeegrantKeeper:    app.FeeGrantKeeper,
-	// 		SignModeHandler:   encodingConfig.TxConfig.SignModeHandler(),
-	// 		SigGasConsumer:    sequencerante.SigVerificationGasConsumer,
-	// 		BlockInteractions: blockInteractions,
-	// 	},
-	// )
-	// if err != nil {
-	// 	panic(fmt.Errorf("failed to create AnteHandler: %w", err))
-	// }
+	anteHandler, err := sequencerante.NewAnteHandler(
+		sequencerante.HandlerOptions{
+			AccountKeeper:     app.AccountKeeper,
+			BankKeeper:        app.BankKeeper,
+			FeegrantKeeper:    app.FeeGrantKeeper,
+			SignModeHandler:   encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:    sequencerante.SigVerificationGasConsumer,
+			BlockInteractions: blockInteractions,
+		},
+	)
+	if err != nil {
+		panic(fmt.Errorf("failed to create AnteHandler: %w", err))
+	}
 
-	// app.SetAnteHandler(anteHandler)
+	app.SetAnteHandler(anteHandler)
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	// app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(&app.SequencerKeeper, app.ArweaveBlocksController, app.txConfig))
+	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(&app.SequencerKeeper, app.ArweaveBlocksController, app.txConfig))
 	app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, app.BlockValidator, app.Logger()))
 
 	if loadLatest {
