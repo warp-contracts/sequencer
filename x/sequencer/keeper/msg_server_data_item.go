@@ -14,7 +14,7 @@ func (k *msgServer) DataItem(goCtx context.Context, msg *types.MsgDataItem) (*ty
 		return nil, err
 	}
 	
-	k.blockInteractions.Add(ctx.BlockHeight(), msg)
+	k.blockInteractions.Add(msg)
 
 	return &types.MsgDataItemResponse{}, nil
 }

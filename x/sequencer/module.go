@@ -157,7 +157,7 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 	am.startOrUpdateArweaveBlocksController(ctx)
-	am.blockInteractions.NewBlock(ctx.BlockHeight())
+	am.blockInteractions.NewBlock()
 }
 
 // EndBlock contains the logic that is automatically triggered at the end of each block
