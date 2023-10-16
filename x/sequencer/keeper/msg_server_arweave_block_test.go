@@ -21,7 +21,7 @@ func keeperCtxAndSrv(t *testing.T) (*keeper.Keeper, sdk.Context, types.MsgServer
 	blockHeader.Height = 123
 
 	bi := ante.NewBlockInteractions()
-	bi.NewBlock(123)
+	bi.NewBlock()
 
 	srv := keeper.NewMsgServerImpl(*k, bi)
 	return k, ctx.WithBlockHeader(blockHeader), srv

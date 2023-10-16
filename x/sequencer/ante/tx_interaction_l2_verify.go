@@ -14,11 +14,10 @@ import (
 // See: https://github.com/warp-contracts/sequencer/issues/8
 type DataItemTxDecorator struct {
 	ak *authkeeper.AccountKeeper
-	bi *BlockInteractions
 }
 
-func NewDataItemTxDecorator(ak *authkeeper.AccountKeeper, bi *BlockInteractions) *DataItemTxDecorator {
-	return &DataItemTxDecorator{ak, bi}
+func NewDataItemTxDecorator(ak *authkeeper.AccountKeeper) *DataItemTxDecorator {
+	return &DataItemTxDecorator{ak}
 }
 
 func (ditd *DataItemTxDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
@@ -62,11 +61,7 @@ func isL2Interaction(tx sdk.Tx) bool {
 }
 
 func (ditd *DataItemTxDecorator) verifyTxWithDataItem(ctx sdk.Context, tx sdk.Tx, dataItem *types.MsgDataItem) (err error) {
-	if ctx.IsReCheckTx() {
-		if err = ditd.verifyAlreadyInBlock(ctx, dataItem); err != nil {
-			return
-		}
-	} else {
+	if !ctx.IsReCheckTx() {
 		if err = verifyTxBody(tx); err != nil {
 			return
 		}
@@ -93,16 +88,6 @@ func (ditd *DataItemTxDecorator) verifyTxWithDataItem(ctx sdk.Context, tx sdk.Tx
 	}
 
 	return nil
-}
-
-func (ditd *DataItemTxDecorator) verifyAlreadyInBlock(ctx sdk.Context, dataItem *types.MsgDataItem) (err error) {
-	if ditd.bi.Contains(ctx.BlockHeight(), dataItem) {
-		err = errors.Wrapf(types.ErrDataItemAlreadyInBlock, 
-			"The data item has already been added to the block at height %d",
-			ctx.BlockHeight(),
-		)
-	}
-	return
 }
 
 func verifyContract(tx sdk.Tx, dataItem *types.MsgDataItem) error {

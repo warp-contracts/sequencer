@@ -26,6 +26,8 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -220,8 +222,7 @@ type App struct {
 	FeeGrantKeeper        feegrantkeeper.Keeper
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
-
-	SequencerKeeper sequencermodulekeeper.Keeper
+	SequencerKeeper       sequencermodulekeeper.Keeper
 
 	// Tasks
 	ArweaveBlocksController controller.ArweaveBlocksController
@@ -235,6 +236,8 @@ type App struct {
 	// sm is the simulation manager
 	sm           *module.SimulationManager
 	configurator module.Configurator
+
+	BlockInteractions *sequencerante.BlockInteractions
 }
 
 // New returns a reference to an initialized blockchain app
@@ -467,8 +470,8 @@ func New(
 			panic(err)
 		}
 	}
-	blockInteractions := sequencerante.NewBlockInteractions()
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, configPath, blockInteractions)
+	app.BlockInteractions = sequencerante.NewBlockInteractions()
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, configPath, app.BlockInteractions)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -642,7 +645,6 @@ func New(
 			FeegrantKeeper:    app.FeeGrantKeeper,
 			SignModeHandler:   encodingConfig.TxConfig.SignModeHandler(),
 			SigGasConsumer:    sequencerante.SigVerificationGasConsumer,
-			BlockInteractions: blockInteractions,
 		},
 	)
 	if err != nil {
@@ -854,4 +856,31 @@ func (app *App) Close() (err error) {
 	app.ArweaveBlocksController.StopWait()
 	app.BlockValidator.StopWait()
 	return nil
+}
+
+func (app *App) CheckTx(req abci.RequestCheckTx) abci.ResponseCheckTx {
+	if req.Type == abci.CheckTxType_Recheck {
+		ok, res := app.checkDataItemAlreadyInBlock(req.Tx)
+		if !ok {
+			return res
+		}
+	}
+	return app.BaseApp.CheckTx(req)
+}
+
+func (app *App) checkDataItemAlreadyInBlock(txBytes []byte) (bool, abci.ResponseCheckTx) {
+	tx, err := app.txConfig.TxDecoder()(txBytes)
+	if err != nil {
+		return false, sdkerrors.ResponseCheckTxWithEvents(err, 0, 0, nil, app.Trace())
+	}
+	dataItem, err := sequencerante.GetL2Interaction(tx)
+	if err != nil {
+		return false, sdkerrors.ResponseCheckTxWithEvents(err, 0, 0, nil, app.Trace())
+	}
+	if dataItem != nil && app.BlockInteractions.Contains(dataItem) {
+		err = errors.Wrap(sequencermoduletypes.ErrDataItemAlreadyInBlock,
+			"The data item has already been added to the block")
+		return false, sdkerrors.ResponseCheckTxWithEvents(err, 0, 0, nil, app.Trace())
+	}
+	return true, abci.ResponseCheckTx{}
 }

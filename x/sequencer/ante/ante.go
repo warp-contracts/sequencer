@@ -20,7 +20,6 @@ type HandlerOptions struct {
 	SignModeHandler        authsigning.SignModeHandler
 	SigGasConsumer         func(meter sdk.GasMeter, sig txsigning.SignatureV2, params authtypes.Params) error
 	TxFeeChecker           ante.TxFeeChecker
-	BlockInteractions      *BlockInteractions
 }
 
 // NewAnteHandler returns an AnteHandler that checks and increments sequence
@@ -38,7 +37,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
 		NewSetInfiniteGasMeterDecorator(),
-		NewDataItemTxDecorator(&options.AccountKeeper, options.BlockInteractions),
+		NewDataItemTxDecorator(&options.AccountKeeper),
 		NewArweaveBlockTxDecorator(),
 		ante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
 		ante.NewValidateBasicDecorator(),
