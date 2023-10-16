@@ -78,7 +78,6 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 
 		txSize := protoTxSize(txBytes)
 		if size+txSize > req.MaxTxBytes {
-			// W
 			break
 		}
 		result = append(result, txBytes)
@@ -96,8 +95,7 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 	return abci.ResponsePrepareProposal{Txs: result}
 }
 
-// Returns the transaction with an Arweave block if it is older than an hour and has not been added to the blockchain yet.
-// Additionally, it returns 1 if such a block exists and 0 otherwise.
+// Creates a transaction with an Arweave block
 func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlock *types.NextArweaveBlock, lastSortKeys *LastSortKeys) []byte {
 	msg := &types.MsgArweaveBlock{
 		BlockInfo:    nextArweaveBlock.BlockInfo,
