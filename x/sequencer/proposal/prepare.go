@@ -29,54 +29,76 @@ func NewPrepareProposalHandler(keeper *keeper.Keeper, arweaveController controll
 
 // Sets sort keys and random value for all L2 interactions and adds an Arweave block transaction to the beginning of the block if needed.
 func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepareProposal) abci.ResponsePrepareProposal {
+	// For logging
 	now := time.Now()
-	lastBlock := h.keeper.MustGetLastArweaveBlock(ctx)
-	nextBlock := h.arweaveController.GetNextArweaveBlock(lastBlock.ArweaveBlock.Height + 1)
-	lastSortKeys := newLastSortKeys(h.keeper, ctx)
-	arweaveBlockTx, i := h.createArweaveTx(ctx, nextBlock, lastSortKeys)
-	sortKey := newSortKey(lastBlock.ArweaveBlock.Height+uint64(i), ctx.BlockHeight())
-	var size int64 = 0
 
-	result := make([][]byte, len(req.Txs)+i)
-	if arweaveBlockTx != nil {
-		result[0] = arweaveBlockTx
+	// Helpert struct for assigning last sort keys
+	lastSortKeys := newLastSortKeys(h.keeper, ctx)
+
+	var (
+		// How much space do transactions occupy, there's a limit
+		size int64
+
+		// Helper structure for generating sort keys
+		sortKey *SortKey
+
+		// Encoded tx that will end up in the block
+		result [][]byte
+	)
+
+	// Get the last block that is stored in the blockchain
+	lastBlock := h.keeper.MustGetLastArweaveBlock(ctx)
+	// Try getting the next Arweave block, it may not be there or it may be too fresh to use
+	nextArweaveBlock := h.arweaveController.GetNextArweaveBlock(lastBlock.ArweaveBlock.Height + 1)
+	if nextArweaveBlock == nil ||
+		!types.IsArweaveBlockOldEnough(ctx.BlockHeader(), nextArweaveBlock.BlockInfo) {
+		// Sort keys are generated for the last arweave block that is already in the blockchain
+		sortKey = newSortKey(lastBlock.ArweaveBlock.Height, ctx.BlockHeight())
+		result = make([][]byte, 0, len(req.Txs))
+	} else {
+		// Sort keys are generated for the new block
+		sortKey = newSortKey(lastBlock.ArweaveBlock.Height+1, ctx.BlockHeight())
+		result = make([][]byte, 0, len(req.Txs)+1)
+
+		// There's a new Arweave block, add it as the first tx in sequencer's block
+		arweaveBlockTx := h.createArweaveTx(ctx, nextArweaveBlock, lastSortKeys)
+		result = append(result, arweaveBlockTx)
 		size += protoTxSize(arweaveBlockTx)
 		if size > req.MaxTxBytes {
-			panic(fmt.Sprintf("MaxTxBytes limit (%d) is too small! It is smaller than the size of the Arweave block (%d)",
+			panic(fmt.Errorf("MaxTxBytes limit (%d) is too small! It is smaller than the size of the Arweave block (%d)",
 				req.MaxTxBytes, size))
 		}
+
 	}
 
-	txCount := i
-	for txCount < len(req.Txs)+i {
-		txBytes := h.prepareDataItem(ctx.BlockHeader().LastBlockId.Hash, req.Txs[txCount-i], sortKey, lastSortKeys)
+	// Add transactions that waited in the mempool
+	for i := range req.Txs {
+		// Fill in helper data
+		txBytes := h.prepareDataItem(ctx.BlockHeader().LastBlockId.Hash, req.Txs[i], sortKey, lastSortKeys)
+
 		txSize := protoTxSize(txBytes)
 		if size+txSize > req.MaxTxBytes {
+			// W
 			break
 		}
-		result[txCount] = txBytes
-		txCount++
+		result = append(result, txBytes)
 		size += txSize
 	}
 
 	ctx.Logger().
 		With("height", req.Height).
-		With("number of txs", txCount).
+		With("number of txs", len(result)).
 		With("size of txs", size).
 		With("max size", req.MaxTxBytes).
 		With("execution time", time.Since(now).Milliseconds()).
 		Info("Prepared transactions")
 
-	return abci.ResponsePrepareProposal{Txs: result[:txCount]}
+	return abci.ResponsePrepareProposal{Txs: result}
 }
 
 // Returns the transaction with an Arweave block if it is older than an hour and has not been added to the blockchain yet.
 // Additionally, it returns 1 if such a block exists and 0 otherwise.
-func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlock *types.NextArweaveBlock, lastSortKeys *LastSortKeys) ([]byte, int) {
-	if nextArweaveBlock == nil || !types.IsArweaveBlockOldEnough(ctx.BlockHeader(), nextArweaveBlock.BlockInfo) {
-		return nil, 0
-	}
-
+func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlock *types.NextArweaveBlock, lastSortKeys *LastSortKeys) []byte {
 	msg := &types.MsgArweaveBlock{
 		BlockInfo:    nextArweaveBlock.BlockInfo,
 		Transactions: prepareTransactions(nextArweaveBlock.Transactions, lastSortKeys),
@@ -93,7 +115,7 @@ func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlo
 	if err != nil {
 		panic(err)
 	}
-	return bz, 1
+	return bz
 }
 
 // Sets the LastSortKey and random values for transactions from the Arweave block
