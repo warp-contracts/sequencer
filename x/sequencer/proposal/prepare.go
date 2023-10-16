@@ -31,13 +31,10 @@ func NewPrepareProposalHandler(keeper *keeper.Keeper, arweaveController controll
 func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepareProposal) abci.ResponsePrepareProposal {
 	now := time.Now()
 	lastBlock := h.keeper.MustGetLastArweaveBlock(ctx)
-	arweaveHeight := lastBlock.ArweaveBlock.Height
-	sequencerHeight := ctx.BlockHeight()
-	sequencerBlockHash := ctx.BlockHeader().LastBlockId.Hash
-	nextBlock := h.arweaveController.GetNextArweaveBlock(arweaveHeight + 1)
+	nextBlock := h.arweaveController.GetNextArweaveBlock(lastBlock.ArweaveBlock.Height + 1)
 	lastSortKeys := newLastSortKeys(h.keeper, ctx)
 	arweaveBlockTx, i := h.createArweaveTx(ctx, nextBlock, lastSortKeys)
-	sortKey := newSortKey(arweaveHeight+uint64(i), sequencerHeight)
+	sortKey := newSortKey(lastBlock.ArweaveBlock.Height+uint64(i), ctx.BlockHeight())
 	var size int64 = 0
 
 	result := make([][]byte, len(req.Txs)+i)
@@ -52,7 +49,7 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 
 	txCount := i
 	for txCount < len(req.Txs)+i {
-		txBytes := h.prepareDataItem(sequencerBlockHash, req.Txs[txCount-i], sortKey, lastSortKeys)
+		txBytes := h.prepareDataItem(ctx.BlockHeader().LastBlockId.Hash, req.Txs[txCount-i], sortKey, lastSortKeys)
 		txSize := protoTxSize(txBytes)
 		if size+txSize > req.MaxTxBytes {
 			break
