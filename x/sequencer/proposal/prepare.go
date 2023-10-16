@@ -29,57 +29,74 @@ func NewPrepareProposalHandler(keeper *keeper.Keeper, arweaveController controll
 
 // Sets sort keys and random value for all L2 interactions and adds an Arweave block transaction to the beginning of the block if needed.
 func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepareProposal) abci.ResponsePrepareProposal {
+	// For logging
 	now := time.Now()
-	lastBlock := h.keeper.MustGetLastArweaveBlock(ctx)
-	arweaveHeight := lastBlock.ArweaveBlock.Height
-	sequencerHeight := ctx.BlockHeight()
-	sequencerBlockHash := ctx.BlockHeader().LastBlockId.Hash
-	nextBlock := h.arweaveController.GetNextArweaveBlock(arweaveHeight + 1)
-	lastSortKeys := newLastSortKeys(h.keeper, ctx)
-	arweaveBlockTx, i := h.createArweaveTx(ctx, nextBlock, lastSortKeys)
-	sortKey := newSortKey(arweaveHeight+uint64(i), sequencerHeight)
-	var size int64 = 0
 
-	result := make([][]byte, len(req.Txs)+i)
-	if arweaveBlockTx != nil {
-		result[0] = arweaveBlockTx
+	// Helpert struct for assigning last sort keys
+	lastSortKeys := newLastSortKeys(h.keeper, ctx)
+
+	var (
+		// How much space do transactions occupy, there's a limit
+		size int64
+
+		// Helper structure for generating sort keys
+		sortKey *SortKey
+
+		// Encoded tx that will end up in the block
+		result [][]byte
+	)
+
+	// Get the last block that is stored in the blockchain
+	lastBlock := h.keeper.MustGetLastArweaveBlock(ctx)
+	// Try getting the next Arweave block, it may not be there or it may be too fresh to use
+	nextArweaveBlock := h.arweaveController.GetNextArweaveBlock(lastBlock.ArweaveBlock.Height + 1)
+	if nextArweaveBlock == nil ||
+		!types.IsArweaveBlockOldEnough(ctx.BlockHeader(), nextArweaveBlock.BlockInfo) {
+		// Sort keys are generated for the last arweave block that is already in the blockchain
+		sortKey = newSortKey(lastBlock.ArweaveBlock.Height, ctx.BlockHeight())
+		result = make([][]byte, 0, len(req.Txs))
+	} else {
+		// Sort keys are generated for the new block
+		sortKey = newSortKey(lastBlock.ArweaveBlock.Height+1, ctx.BlockHeight())
+		result = make([][]byte, 0, len(req.Txs)+1)
+
+		// There's a new Arweave block, add it as the first tx in sequencer's block
+		arweaveBlockTx := h.createArweaveTx(ctx, nextArweaveBlock, lastSortKeys)
+		result = append(result, arweaveBlockTx)
 		size += protoTxSize(arweaveBlockTx)
 		if size > req.MaxTxBytes {
-			panic(fmt.Sprintf("MaxTxBytes limit (%d) is too small! It is smaller than the size of the Arweave block (%d)",
+			panic(fmt.Errorf("MaxTxBytes limit (%d) is too small! It is smaller than the size of the Arweave block (%d)",
 				req.MaxTxBytes, size))
 		}
+
 	}
 
-	txCount := i
-	for txCount < len(req.Txs)+i {
-		txBytes := h.prepareDataItem(sequencerBlockHash, req.Txs[txCount-i], sortKey, lastSortKeys)
+	// Add transactions that waited in the mempool
+	for i := range req.Txs {
+		// Fill in helper data
+		txBytes := h.prepareDataItem(ctx.BlockHeader().LastBlockId.Hash, req.Txs[i], sortKey, lastSortKeys)
+
 		txSize := protoTxSize(txBytes)
 		if size+txSize > req.MaxTxBytes {
 			break
 		}
-		result[txCount] = txBytes
-		txCount++
+		result = append(result, txBytes)
 		size += txSize
 	}
 
 	ctx.Logger().
 		With("height", req.Height).
-		With("number of txs", txCount).
+		With("number of txs", len(result)).
 		With("size of txs", size).
 		With("max size", req.MaxTxBytes).
 		With("execution time", time.Since(now).Milliseconds()).
 		Info("Prepared transactions")
 
-	return abci.ResponsePrepareProposal{Txs: result[:txCount]}
+	return abci.ResponsePrepareProposal{Txs: result}
 }
 
-// Returns the transaction with an Arweave block if it is older than an hour and has not been added to the blockchain yet.
-// Additionally, it returns 1 if such a block exists and 0 otherwise.
-func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlock *types.NextArweaveBlock, lastSortKeys *LastSortKeys) ([]byte, int) {
-	if nextArweaveBlock == nil || !types.IsArweaveBlockOldEnough(ctx.BlockHeader(), nextArweaveBlock.BlockInfo) {
-		return nil, 0
-	}
-
+// Creates a transaction with an Arweave block
+func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlock *types.NextArweaveBlock, lastSortKeys *LastSortKeys) []byte {
 	msg := &types.MsgArweaveBlock{
 		BlockInfo:    nextArweaveBlock.BlockInfo,
 		Transactions: prepareTransactions(nextArweaveBlock.Transactions, lastSortKeys),
@@ -96,7 +113,7 @@ func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlo
 	if err != nil {
 		panic(err)
 	}
-	return bz, 1
+	return bz
 }
 
 // Sets the LastSortKey and random values for transactions from the Arweave block
@@ -124,35 +141,40 @@ func (h *prepareProposalHandler) prepareDataItem(sequencerBlockHash []byte, txBy
 	if err != nil {
 		panic(err)
 	}
-	if dataItem != nil {
-		// set sort key
-		dataItem.SortKey = sortKey.GetNextValue()
-
-		// set last sort key
-		contract, err := dataItem.GetContractFromTags()
-		if err != nil {
-			panic(err)
-		}
-		dataItem.LastSortKey = lastSortKeys.getAndStoreLastSortKey(contract, dataItem.SortKey)
-
-		// set random value
-		dataItem.Random = generateRandomL2(sequencerBlockHash, dataItem.SortKey)
-
-		// encode tx
-		txBuilder, err := h.txConfig.WrapTxBuilder(tx)
-		if err != nil {
-			panic(err)
-		}
-		err = txBuilder.SetMsgs(dataItem)
-		if err != nil {
-			panic(err)
-		}
-		txBytes, err = h.txConfig.TxEncoder()(txBuilder.GetTx())
-		if err != nil {
-			panic(err)
-		}
+	if dataItem == nil {
+		// Not a data item
+		return txBytes
 	}
-	return txBytes
+
+	dataItem.SortKey = sortKey.GetNextValue()
+
+	// Set last sort key
+	contract, err := dataItem.GetContractFromTags()
+	if err != nil {
+		panic(err)
+	}
+	dataItem.LastSortKey = lastSortKeys.getAndStoreLastSortKey(contract, dataItem.SortKey)
+
+	// Set random value
+	dataItem.Random = generateRandomL2(sequencerBlockHash, dataItem.SortKey)
+
+	// Encode tx
+	txBuilder, err := h.txConfig.WrapTxBuilder(tx)
+	if err != nil {
+		panic(err)
+	}
+
+	err = txBuilder.SetMsgs(dataItem)
+	if err != nil {
+		panic(err)
+	}
+
+	out, err := h.txConfig.TxEncoder()(txBuilder.GetTx())
+	if err != nil {
+		panic(err)
+	}
+
+	return out
 }
 
 // The transaction size after encoding using Protobuf.
@@ -164,5 +186,4 @@ func protoTxSize(tx []byte) int64 {
 
 func varIntSize(x uint64) int64 {
 	return (int64(math_bits.Len64(x|1)) + 6) / 7
-
 }
