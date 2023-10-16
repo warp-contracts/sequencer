@@ -141,35 +141,40 @@ func (h *prepareProposalHandler) prepareDataItem(sequencerBlockHash []byte, txBy
 	if err != nil {
 		panic(err)
 	}
-	if dataItem != nil {
-		// set sort key
-		dataItem.SortKey = sortKey.GetNextValue()
-
-		// set last sort key
-		contract, err := dataItem.GetContractFromTags()
-		if err != nil {
-			panic(err)
-		}
-		dataItem.LastSortKey = lastSortKeys.getAndStoreLastSortKey(contract, dataItem.SortKey)
-
-		// set random value
-		dataItem.Random = generateRandomL2(sequencerBlockHash, dataItem.SortKey)
-
-		// encode tx
-		txBuilder, err := h.txConfig.WrapTxBuilder(tx)
-		if err != nil {
-			panic(err)
-		}
-		err = txBuilder.SetMsgs(dataItem)
-		if err != nil {
-			panic(err)
-		}
-		txBytes, err = h.txConfig.TxEncoder()(txBuilder.GetTx())
-		if err != nil {
-			panic(err)
-		}
+	if dataItem == nil {
+		// Not a data item
+		return txBytes
 	}
-	return txBytes
+
+	dataItem.SortKey = sortKey.GetNextValue()
+
+	// Set last sort key
+	contract, err := dataItem.GetContractFromTags()
+	if err != nil {
+		panic(err)
+	}
+	dataItem.LastSortKey = lastSortKeys.getAndStoreLastSortKey(contract, dataItem.SortKey)
+
+	// Set random value
+	dataItem.Random = generateRandomL2(sequencerBlockHash, dataItem.SortKey)
+
+	// Encode tx
+	txBuilder, err := h.txConfig.WrapTxBuilder(tx)
+	if err != nil {
+		panic(err)
+	}
+
+	err = txBuilder.SetMsgs(dataItem)
+	if err != nil {
+		panic(err)
+	}
+
+	out, err := h.txConfig.TxEncoder()(txBuilder.GetTx())
+	if err != nil {
+		panic(err)
+	}
+
+	return out
 }
 
 // The transaction size after encoding using Protobuf.
@@ -181,5 +186,4 @@ func protoTxSize(tx []byte) int64 {
 
 func varIntSize(x uint64) int64 {
 	return (int64(math_bits.Len64(x|1)) + 6) / 7
-
 }
