@@ -15,7 +15,7 @@ import (
 
 const (
 	LAST_ARWEAVE_BLOCK_FILE = "last_arweave_block.json"
-	LAST_SORT_KEYS_FILE     = "last_sort_keys.json"
+	PREV_SORT_KEYS_FILE     = "prev_sort_keys.json"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.
@@ -33,15 +33,15 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, 
 	}
 	k.SetLastArweaveBlock(ctx, *lastArweaveBlock)
 
-	// Set all the lastSortKey
-	var lastSortKeys []types.LastSortKey
-	if len(genState.LastSortKeyList) == 0 {
-		lastSortKeys = readLastSortKeysFromFile(ctx.Logger(), configPath)
+	// Set all the prevSortKey
+	var prevSortKeys []types.PrevSortKey
+	if len(genState.PrevSortKeyList) == 0 {
+		prevSortKeys = readPrevSortKeysFromFile(ctx.Logger(), configPath)
 	} else {
-		lastSortKeys = genState.GetLastSortKeyList()
+		prevSortKeys = genState.GetPrevSortKeyList()
 	}
-	for _, elem := range lastSortKeys {
-		k.SetLastSortKey(ctx, elem)
+	for _, elem := range prevSortKeys {
+		k.SetPrevSortKey(ctx, elem)
 	}
 
 	// this line is used by starport scaffolding # genesis/module/init
@@ -67,16 +67,16 @@ func readLastArweaveBlockFromFile(logger log.Logger, configPath string) (*types.
 	}, nil
 }
 
-func readLastSortKeysFromFile(logger log.Logger, configPath string) []types.LastSortKey {
-	filePath := filepath.Join(configPath, LAST_SORT_KEYS_FILE)
-	var keys []types.LastSortKey
+func readPrevSortKeysFromFile(logger log.Logger, configPath string) []types.PrevSortKey {
+	filePath := filepath.Join(configPath, PREV_SORT_KEYS_FILE)
+	var keys []types.PrevSortKey
 
 	jsonFile, err := os.ReadFile(filePath)
 	if err != nil {
 		logger.
 			With("err", err).
 			With("file", filePath).
-			Info("Unable to retrieve last sort keys from the file")
+			Info("Unable to retrieve prev sort keys from the file")
 		return keys
 	}
 
@@ -85,14 +85,14 @@ func readLastSortKeysFromFile(logger log.Logger, configPath string) []types.Last
 		logger.
 			With("err", err).
 			With("file", filePath).
-			Info("Unable to unmarshal last sort keys from the file")
+			Info("Unable to unmarshal prev sort keys from the file")
 		return keys
 	}
 
 	logger.
 		With("number of keys", len(keys)).
 		With("file", filePath).
-		Info("Last sort keys loaded from the file")
+		Info("Prev sort keys loaded from the file")
 	return keys
 }
 
@@ -106,7 +106,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	if found {
 		genesis.LastArweaveBlock = &lastArweaveBlock
 	}
-	genesis.LastSortKeyList = k.GetAllLastSortKey(ctx)
+	genesis.PrevSortKeyList = k.GetAllPrevSortKey(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

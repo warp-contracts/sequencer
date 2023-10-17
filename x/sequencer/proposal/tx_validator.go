@@ -18,15 +18,15 @@ type TxValidator struct {
 	lastArweaveBlock     *types.LastArweaveBlock
 	nextArweaveBlock     *types.NextArweaveBlock
 	sortKey              *SortKey
-	lastSortKeys         *LastSortKeys
+	prevSortKeys         *PrevSortKeys
 }
 
 func newTxValidator(ctx sdk.Context, keeper *keeper.Keeper, controller controller.ArweaveBlocksController) *TxValidator {
 	lastArweaveBlock := keeper.MustGetLastArweaveBlock(ctx)
 	nextArweaveBlock := controller.GetNextArweaveBlock(lastArweaveBlock.ArweaveBlock.Height + 1)
 	sortKey := newSortKey(lastArweaveBlock.ArweaveBlock.Height, ctx.BlockHeight())
-	lastSortKeys := newLastSortKeys(keeper, ctx)
-	return &TxValidator{ctx.BlockHeader(), &lastArweaveBlock, nextArweaveBlock, sortKey, lastSortKeys}
+	prevSortKeys := newPrevSortKeys(keeper, ctx)
+	return &TxValidator{ctx.BlockHeader(), &lastArweaveBlock, nextArweaveBlock, sortKey, prevSortKeys}
 }
 
 func (tv *TxValidator) validateSequentially(txIndex int, tx sdk.Tx) error {

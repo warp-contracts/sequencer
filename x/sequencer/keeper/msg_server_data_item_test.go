@@ -18,7 +18,7 @@ func TestDataItemMsgServer(t *testing.T) {
 	_, err := srv.DataItem(wctx, &msg)
 	require.NoError(t, err)
 
-	result, found := k.GetLastSortKey(ctx, "abc")
+	result, found := k.GetPrevSortKey(ctx, "abc")
 	require.True(t, found)
 	require.Equal(t, "abc", result.Contract)
 	require.Equal(t, "1,2,3", result.SortKey)

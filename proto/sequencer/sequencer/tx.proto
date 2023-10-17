@@ -19,7 +19,7 @@ service Msg {
 message MsgDataItem {
   bytes data_item = 1 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem", (gogoproto.nullable) = false];
   string sort_key = 2;
-  string last_sort_key = 3;
+  string prev_sort_key = 3;
   bytes random = 4;
 }
 

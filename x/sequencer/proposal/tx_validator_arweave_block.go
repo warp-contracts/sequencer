@@ -25,17 +25,17 @@ func (tv *TxValidator) validateSequentiallyArweaveBlock(txIndex int, tx sdk.Tx) 
 	arweaveBlock := getArweaveBlockMsg(tx)
 	if arweaveBlock != nil {
 		tv.sortKey.IncreaseArweaveHeight()
-		return tv.validateLastSortKeys(arweaveBlock)
+		return tv.validatePrevSortKeys(arweaveBlock)
 	}
 	return nil
 }
 
-func (tv *TxValidator) validateLastSortKeys(block *types.MsgArweaveBlock) error {
+func (tv *TxValidator) validatePrevSortKeys(block *types.MsgArweaveBlock) error {
 	for i, tx := range block.Transactions {
-		expectedLastSortKey := tv.lastSortKeys.getAndStoreLastSortKey(tx.Transaction.Contract, tx.Transaction.SortKey)
-		if tx.LastSortKey != expectedLastSortKey {
-			return errors.Wrapf(types.ErrInvalidLastSortKey, "Arweave block height: %d, transaction index: %d, expected: %s, actual: %s",
-				block.BlockInfo.Height, i, expectedLastSortKey, tx.LastSortKey)
+		expectedPrevSortKey := tv.prevSortKeys.getAndStorePrevSortKey(tx.Transaction.Contract, tx.Transaction.SortKey)
+		if tx.PrevSortKey != expectedPrevSortKey {
+			return errors.Wrapf(types.ErrInvalidPrevSortKey, "Arweave block height: %d, transaction index: %d, expected: %s, actual: %s",
+				block.BlockInfo.Height, i, expectedPrevSortKey, tx.PrevSortKey)
 		}
 	}
 	return nil

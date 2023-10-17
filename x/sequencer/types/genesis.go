@@ -12,7 +12,7 @@ const DefaultIndex uint64 = 1
 func DefaultGenesis() *GenesisState {
 	return &GenesisState{
 		LastArweaveBlock: nil,
-		LastSortKeyList:  []LastSortKey{},
+		PrevSortKeyList:  []PrevSortKey{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -21,15 +21,15 @@ func DefaultGenesis() *GenesisState {
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
 func (gs GenesisState) Validate() error {
-	// Check for duplicated index in lastSortKey
-	lastSortKeyIndexMap := make(map[string]struct{})
+	// Check for duplicated index in prevSortKey
+	prevSortKeyIndexMap := make(map[string]struct{})
 
-	for _, elem := range gs.LastSortKeyList {
-		index := string(LastSortKeyKey(elem.Contract))
-		if _, ok := lastSortKeyIndexMap[index]; ok {
-			return fmt.Errorf("duplicated index for lastSortKey")
+	for _, elem := range gs.PrevSortKeyList {
+		index := string(PrevSortKeyKey(elem.Contract))
+		if _, ok := prevSortKeyIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for prevSortKey")
 		}
-		lastSortKeyIndexMap[index] = struct{}{}
+		prevSortKeyIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

@@ -193,22 +193,22 @@ func (m *QueryGetLastArweaveBlockResponse) GetLastArweaveBlock() LastArweaveBloc
 	return LastArweaveBlock{}
 }
 
-type QueryGetLastSortKeyRequest struct {
+type QueryGetPrevSortKeyRequest struct {
 	Contract string `protobuf:"bytes,1,opt,name=contract,proto3" json:"contract,omitempty"`
 }
 
-func (m *QueryGetLastSortKeyRequest) Reset()         { *m = QueryGetLastSortKeyRequest{} }
-func (m *QueryGetLastSortKeyRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryGetLastSortKeyRequest) ProtoMessage()    {}
-func (*QueryGetLastSortKeyRequest) Descriptor() ([]byte, []int) {
+func (m *QueryGetPrevSortKeyRequest) Reset()         { *m = QueryGetPrevSortKeyRequest{} }
+func (m *QueryGetPrevSortKeyRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryGetPrevSortKeyRequest) ProtoMessage()    {}
+func (*QueryGetPrevSortKeyRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6cc648c12b425b9e, []int{4}
 }
-func (m *QueryGetLastSortKeyRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetPrevSortKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetLastSortKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetPrevSortKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetLastSortKeyRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetPrevSortKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -218,41 +218,41 @@ func (m *QueryGetLastSortKeyRequest) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *QueryGetLastSortKeyRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetLastSortKeyRequest.Merge(m, src)
+func (m *QueryGetPrevSortKeyRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetPrevSortKeyRequest.Merge(m, src)
 }
-func (m *QueryGetLastSortKeyRequest) XXX_Size() int {
+func (m *QueryGetPrevSortKeyRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetLastSortKeyRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetLastSortKeyRequest.DiscardUnknown(m)
+func (m *QueryGetPrevSortKeyRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetPrevSortKeyRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetLastSortKeyRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetPrevSortKeyRequest proto.InternalMessageInfo
 
-func (m *QueryGetLastSortKeyRequest) GetContract() string {
+func (m *QueryGetPrevSortKeyRequest) GetContract() string {
 	if m != nil {
 		return m.Contract
 	}
 	return ""
 }
 
-type QueryGetLastSortKeyResponse struct {
-	LastSortKey LastSortKey `protobuf:"bytes,1,opt,name=lastSortKey,proto3" json:"lastSortKey"`
+type QueryGetPrevSortKeyResponse struct {
+	PrevSortKey PrevSortKey `protobuf:"bytes,1,opt,name=prevSortKey,proto3" json:"prevSortKey"`
 }
 
-func (m *QueryGetLastSortKeyResponse) Reset()         { *m = QueryGetLastSortKeyResponse{} }
-func (m *QueryGetLastSortKeyResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryGetLastSortKeyResponse) ProtoMessage()    {}
-func (*QueryGetLastSortKeyResponse) Descriptor() ([]byte, []int) {
+func (m *QueryGetPrevSortKeyResponse) Reset()         { *m = QueryGetPrevSortKeyResponse{} }
+func (m *QueryGetPrevSortKeyResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryGetPrevSortKeyResponse) ProtoMessage()    {}
+func (*QueryGetPrevSortKeyResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6cc648c12b425b9e, []int{5}
 }
-func (m *QueryGetLastSortKeyResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryGetPrevSortKeyResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryGetLastSortKeyResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryGetPrevSortKeyResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryGetLastSortKeyResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryGetPrevSortKeyResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -262,41 +262,41 @@ func (m *QueryGetLastSortKeyResponse) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *QueryGetLastSortKeyResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryGetLastSortKeyResponse.Merge(m, src)
+func (m *QueryGetPrevSortKeyResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryGetPrevSortKeyResponse.Merge(m, src)
 }
-func (m *QueryGetLastSortKeyResponse) XXX_Size() int {
+func (m *QueryGetPrevSortKeyResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryGetLastSortKeyResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryGetLastSortKeyResponse.DiscardUnknown(m)
+func (m *QueryGetPrevSortKeyResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryGetPrevSortKeyResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryGetLastSortKeyResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryGetPrevSortKeyResponse proto.InternalMessageInfo
 
-func (m *QueryGetLastSortKeyResponse) GetLastSortKey() LastSortKey {
+func (m *QueryGetPrevSortKeyResponse) GetPrevSortKey() PrevSortKey {
 	if m != nil {
-		return m.LastSortKey
+		return m.PrevSortKey
 	}
-	return LastSortKey{}
+	return PrevSortKey{}
 }
 
-type QueryAllLastSortKeyRequest struct {
+type QueryAllPrevSortKeyRequest struct {
 	Pagination *query.PageRequest `protobuf:"bytes,1,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryAllLastSortKeyRequest) Reset()         { *m = QueryAllLastSortKeyRequest{} }
-func (m *QueryAllLastSortKeyRequest) String() string { return proto.CompactTextString(m) }
-func (*QueryAllLastSortKeyRequest) ProtoMessage()    {}
-func (*QueryAllLastSortKeyRequest) Descriptor() ([]byte, []int) {
+func (m *QueryAllPrevSortKeyRequest) Reset()         { *m = QueryAllPrevSortKeyRequest{} }
+func (m *QueryAllPrevSortKeyRequest) String() string { return proto.CompactTextString(m) }
+func (*QueryAllPrevSortKeyRequest) ProtoMessage()    {}
+func (*QueryAllPrevSortKeyRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6cc648c12b425b9e, []int{6}
 }
-func (m *QueryAllLastSortKeyRequest) XXX_Unmarshal(b []byte) error {
+func (m *QueryAllPrevSortKeyRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryAllLastSortKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryAllPrevSortKeyRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryAllLastSortKeyRequest.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryAllPrevSortKeyRequest.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -306,42 +306,42 @@ func (m *QueryAllLastSortKeyRequest) XXX_Marshal(b []byte, deterministic bool) (
 		return b[:n], nil
 	}
 }
-func (m *QueryAllLastSortKeyRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllLastSortKeyRequest.Merge(m, src)
+func (m *QueryAllPrevSortKeyRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryAllPrevSortKeyRequest.Merge(m, src)
 }
-func (m *QueryAllLastSortKeyRequest) XXX_Size() int {
+func (m *QueryAllPrevSortKeyRequest) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryAllLastSortKeyRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllLastSortKeyRequest.DiscardUnknown(m)
+func (m *QueryAllPrevSortKeyRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryAllPrevSortKeyRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryAllLastSortKeyRequest proto.InternalMessageInfo
+var xxx_messageInfo_QueryAllPrevSortKeyRequest proto.InternalMessageInfo
 
-func (m *QueryAllLastSortKeyRequest) GetPagination() *query.PageRequest {
+func (m *QueryAllPrevSortKeyRequest) GetPagination() *query.PageRequest {
 	if m != nil {
 		return m.Pagination
 	}
 	return nil
 }
 
-type QueryAllLastSortKeyResponse struct {
-	LastSortKey []LastSortKey       `protobuf:"bytes,1,rep,name=lastSortKey,proto3" json:"lastSortKey"`
+type QueryAllPrevSortKeyResponse struct {
+	PrevSortKey []PrevSortKey       `protobuf:"bytes,1,rep,name=prevSortKey,proto3" json:"prevSortKey"`
 	Pagination  *query.PageResponse `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
 }
 
-func (m *QueryAllLastSortKeyResponse) Reset()         { *m = QueryAllLastSortKeyResponse{} }
-func (m *QueryAllLastSortKeyResponse) String() string { return proto.CompactTextString(m) }
-func (*QueryAllLastSortKeyResponse) ProtoMessage()    {}
-func (*QueryAllLastSortKeyResponse) Descriptor() ([]byte, []int) {
+func (m *QueryAllPrevSortKeyResponse) Reset()         { *m = QueryAllPrevSortKeyResponse{} }
+func (m *QueryAllPrevSortKeyResponse) String() string { return proto.CompactTextString(m) }
+func (*QueryAllPrevSortKeyResponse) ProtoMessage()    {}
+func (*QueryAllPrevSortKeyResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6cc648c12b425b9e, []int{7}
 }
-func (m *QueryAllLastSortKeyResponse) XXX_Unmarshal(b []byte) error {
+func (m *QueryAllPrevSortKeyResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *QueryAllLastSortKeyResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *QueryAllPrevSortKeyResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_QueryAllLastSortKeyResponse.Marshal(b, m, deterministic)
+		return xxx_messageInfo_QueryAllPrevSortKeyResponse.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -351,26 +351,26 @@ func (m *QueryAllLastSortKeyResponse) XXX_Marshal(b []byte, deterministic bool) 
 		return b[:n], nil
 	}
 }
-func (m *QueryAllLastSortKeyResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_QueryAllLastSortKeyResponse.Merge(m, src)
+func (m *QueryAllPrevSortKeyResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_QueryAllPrevSortKeyResponse.Merge(m, src)
 }
-func (m *QueryAllLastSortKeyResponse) XXX_Size() int {
+func (m *QueryAllPrevSortKeyResponse) XXX_Size() int {
 	return m.Size()
 }
-func (m *QueryAllLastSortKeyResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_QueryAllLastSortKeyResponse.DiscardUnknown(m)
+func (m *QueryAllPrevSortKeyResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_QueryAllPrevSortKeyResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_QueryAllLastSortKeyResponse proto.InternalMessageInfo
+var xxx_messageInfo_QueryAllPrevSortKeyResponse proto.InternalMessageInfo
 
-func (m *QueryAllLastSortKeyResponse) GetLastSortKey() []LastSortKey {
+func (m *QueryAllPrevSortKeyResponse) GetPrevSortKey() []PrevSortKey {
 	if m != nil {
-		return m.LastSortKey
+		return m.PrevSortKey
 	}
 	return nil
 }
 
-func (m *QueryAllLastSortKeyResponse) GetPagination() *query.PageResponse {
+func (m *QueryAllPrevSortKeyResponse) GetPagination() *query.PageResponse {
 	if m != nil {
 		return m.Pagination
 	}
@@ -382,53 +382,54 @@ func init() {
 	proto.RegisterType((*QueryParamsResponse)(nil), "sequencer.sequencer.QueryParamsResponse")
 	proto.RegisterType((*QueryGetLastArweaveBlockRequest)(nil), "sequencer.sequencer.QueryGetLastArweaveBlockRequest")
 	proto.RegisterType((*QueryGetLastArweaveBlockResponse)(nil), "sequencer.sequencer.QueryGetLastArweaveBlockResponse")
-	proto.RegisterType((*QueryGetLastSortKeyRequest)(nil), "sequencer.sequencer.QueryGetLastSortKeyRequest")
-	proto.RegisterType((*QueryGetLastSortKeyResponse)(nil), "sequencer.sequencer.QueryGetLastSortKeyResponse")
-	proto.RegisterType((*QueryAllLastSortKeyRequest)(nil), "sequencer.sequencer.QueryAllLastSortKeyRequest")
-	proto.RegisterType((*QueryAllLastSortKeyResponse)(nil), "sequencer.sequencer.QueryAllLastSortKeyResponse")
+	proto.RegisterType((*QueryGetPrevSortKeyRequest)(nil), "sequencer.sequencer.QueryGetPrevSortKeyRequest")
+	proto.RegisterType((*QueryGetPrevSortKeyResponse)(nil), "sequencer.sequencer.QueryGetPrevSortKeyResponse")
+	proto.RegisterType((*QueryAllPrevSortKeyRequest)(nil), "sequencer.sequencer.QueryAllPrevSortKeyRequest")
+	proto.RegisterType((*QueryAllPrevSortKeyResponse)(nil), "sequencer.sequencer.QueryAllPrevSortKeyResponse")
 }
 
 func init() { proto.RegisterFile("sequencer/sequencer/query.proto", fileDescriptor_6cc648c12b425b9e) }
 
 var fileDescriptor_6cc648c12b425b9e = []byte{
-	// 592 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x94, 0x41, 0x6b, 0x13, 0x41,
-	0x14, 0xc7, 0xb3, 0xd5, 0x06, 0x9d, 0x80, 0xc8, 0xb4, 0x07, 0xd9, 0xca, 0x26, 0x2e, 0x68, 0x4a,
-	0xa9, 0x3b, 0x26, 0xb5, 0xd2, 0x82, 0x14, 0x12, 0xc4, 0x0a, 0x0a, 0xc6, 0x78, 0x10, 0xbc, 0x84,
-	0xc9, 0x3a, 0xac, 0xa1, 0x9b, 0x9d, 0xed, 0xce, 0xa4, 0x35, 0x14, 0x2f, 0x7e, 0x01, 0x05, 0xbf,
-	0x87, 0x78, 0xf2, 0xea, 0x49, 0xe8, 0xb1, 0xe0, 0xc5, 0x93, 0x48, 0xe2, 0x07, 0x91, 0xcc, 0xbc,
-	0x24, 0x9b, 0x64, 0xb7, 0x49, 0xbd, 0x4d, 0x66, 0xfe, 0xef, 0xfd, 0x7f, 0x93, 0xfd, 0xbf, 0x41,
-	0x79, 0xc1, 0x0e, 0x3b, 0x2c, 0x70, 0x59, 0x44, 0xc6, 0xab, 0xc3, 0x0e, 0x8b, 0xba, 0x4e, 0x18,
-	0x71, 0xc9, 0xf1, 0xca, 0x68, 0xdb, 0x19, 0xad, 0xcc, 0x55, 0x8f, 0x7b, 0x5c, 0x9d, 0x93, 0xc1,
-	0x4a, 0x4b, 0xcd, 0x9b, 0x1e, 0xe7, 0x9e, 0xcf, 0x08, 0x0d, 0x5b, 0x84, 0x06, 0x01, 0x97, 0x54,
-	0xb6, 0x78, 0x20, 0xe0, 0x74, 0xc3, 0xe5, 0xa2, 0xcd, 0x05, 0x69, 0x52, 0xc1, 0xb4, 0x03, 0x39,
-	0x2a, 0x35, 0x99, 0xa4, 0x25, 0x12, 0x52, 0xaf, 0x15, 0x28, 0x31, 0x68, 0x0b, 0x49, 0x54, 0x21,
-	0x8d, 0x68, 0x7b, 0xd8, 0x6d, 0x33, 0x49, 0xe1, 0x53, 0x21, 0x1b, 0x34, 0x3a, 0x66, 0xf4, 0x88,
-	0x35, 0x9a, 0x3e, 0x77, 0x0f, 0x40, 0x5d, 0x4c, 0x55, 0x0b, 0x1e, 0xc9, 0xc6, 0x01, 0x83, 0xdb,
-	0xda, 0xab, 0x08, 0xbf, 0x18, 0xa0, 0xd5, 0x94, 0x57, 0x7d, 0xa0, 0x15, 0xd2, 0xae, 0xa1, 0x95,
-	0x89, 0x5d, 0x11, 0xf2, 0x40, 0x30, 0xbc, 0x8b, 0xb2, 0x9a, 0xe9, 0x86, 0x51, 0x30, 0xd6, 0x73,
-	0xe5, 0x35, 0x27, 0xe1, 0xbf, 0x72, 0x74, 0x51, 0xf5, 0xf2, 0xe9, 0xef, 0x7c, 0xa6, 0x0e, 0x05,
-	0xf6, 0x2d, 0x94, 0x57, 0x1d, 0xf7, 0x99, 0x7c, 0x46, 0x85, 0xac, 0x68, 0xe6, 0xea, 0x00, 0x79,
-	0x68, 0x7a, 0x82, 0x0a, 0xe9, 0x12, 0x20, 0x78, 0x85, 0xae, 0x4f, 0x9f, 0x01, 0xcb, 0xed, 0x44,
-	0x96, 0x69, 0x31, 0x50, 0xcd, 0x34, 0xb1, 0x77, 0x90, 0x19, 0x37, 0x7f, 0xc9, 0x23, 0xf9, 0x94,
-	0x75, 0x01, 0x0d, 0x9b, 0xe8, 0x8a, 0xcb, 0x03, 0x19, 0x51, 0x57, 0x2a, 0xbb, 0xab, 0xf5, 0xd1,
-	0x6f, 0xdb, 0x43, 0x6b, 0x89, 0x95, 0x40, 0xfc, 0x04, 0xe5, 0xfc, 0xf1, 0x36, 0xc0, 0x16, 0x52,
-	0x61, 0x41, 0x07, 0x9c, 0xf1, 0x52, 0xfb, 0x0d, 0x20, 0x56, 0x7c, 0x3f, 0x01, 0xf1, 0x31, 0x42,
-	0xe3, 0x54, 0x81, 0xcd, 0x1d, 0x47, 0x47, 0xd0, 0x19, 0x44, 0xd0, 0xd1, 0x21, 0x87, 0x08, 0x3a,
-	0x35, 0xea, 0x31, 0xa8, 0xad, 0xc7, 0x2a, 0xed, 0xaf, 0x06, 0xdc, 0x67, 0xda, 0x26, 0xed, 0x3e,
-	0x97, 0xfe, 0xf3, 0x3e, 0x78, 0x7f, 0x82, 0x78, 0x49, 0x11, 0x17, 0xe7, 0x12, 0x6b, 0x8c, 0x38,
-	0x72, 0xf9, 0xc7, 0x32, 0x5a, 0x56, 0xc8, 0xf8, 0xa3, 0x81, 0xb2, 0x3a, 0x7e, 0xb8, 0x98, 0x88,
-	0x34, 0x9b, 0x75, 0x73, 0x7d, 0xbe, 0x50, 0x7b, 0xda, 0xe5, 0x0f, 0x3f, 0xff, 0x7e, 0x5e, 0xda,
-	0xc4, 0x1b, 0xe4, 0x98, 0x46, 0xe1, 0xdd, 0x61, 0x02, 0x04, 0x49, 0x1f, 0x5e, 0xfc, 0xdd, 0x98,
-	0x4d, 0x2c, 0xbe, 0x9f, 0x6e, 0x99, 0x3e, 0x1f, 0xe6, 0xf6, 0x05, 0xab, 0x80, 0x7a, 0x4f, 0x51,
-	0xef, 0xe0, 0x07, 0x8b, 0x50, 0xcf, 0x3e, 0x28, 0xf8, 0x9b, 0x81, 0x72, 0xb1, 0x2f, 0x89, 0xc9,
-	0x5c, 0x8c, 0xc9, 0x64, 0x9a, 0xf7, 0x16, 0x2f, 0x00, 0xe4, 0x47, 0x0a, 0x79, 0x0f, 0x3f, 0x5c,
-	0x18, 0x79, 0xf8, 0xaa, 0x91, 0x93, 0xa1, 0xf8, 0x3d, 0xfe, 0x62, 0xa0, 0x6b, 0xb1, 0xee, 0x15,
-	0xdf, 0x3f, 0x8f, 0x3d, 0x71, 0xaa, 0xce, 0x63, 0x4f, 0x9e, 0x0f, 0x7b, 0x57, 0xb1, 0x6f, 0xe1,
-	0xd2, 0x85, 0xd9, 0xab, 0xcf, 0x4f, 0x7b, 0x96, 0x71, 0xd6, 0xb3, 0x8c, 0x3f, 0x3d, 0xcb, 0xf8,
-	0xd4, 0xb7, 0x32, 0x67, 0x7d, 0x2b, 0xf3, 0xab, 0x6f, 0x65, 0x5e, 0x6f, 0x7b, 0x2d, 0xf9, 0xb6,
-	0xd3, 0x74, 0x5c, 0xde, 0x4e, 0x6f, 0xfb, 0x2e, 0xb6, 0x96, 0xdd, 0x90, 0x89, 0x66, 0x56, 0xbd,
-	0xf1, 0x5b, 0xff, 0x02, 0x00, 0x00, 0xff, 0xff, 0xc3, 0x39, 0xde, 0x65, 0xf4, 0x06, 0x00, 0x00,
+	// 599 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x94, 0xd1, 0x6b, 0x13, 0x31,
+	0x1c, 0xc7, 0x7b, 0xd3, 0x15, 0x4d, 0x41, 0x24, 0xdb, 0x83, 0xdc, 0xe4, 0x5a, 0x0f, 0xb4, 0x63,
+	0xcc, 0x8b, 0xed, 0x9c, 0x6c, 0x20, 0x83, 0x16, 0x71, 0x82, 0x82, 0xb5, 0x3e, 0x08, 0xbe, 0x94,
+	0xf4, 0x0c, 0x67, 0xd9, 0xf5, 0x72, 0x4b, 0xd2, 0xce, 0x32, 0x7c, 0xf1, 0x1f, 0x50, 0xf0, 0xff,
+	0x10, 0x9f, 0x7c, 0xf5, 0x49, 0xd8, 0xe3, 0xc0, 0x17, 0x9f, 0x44, 0x5a, 0xff, 0x10, 0x69, 0x92,
+	0xb6, 0xb7, 0x36, 0xd7, 0x75, 0xbe, 0xe5, 0x92, 0xef, 0xef, 0xf7, 0xfd, 0x24, 0xf7, 0x4d, 0x40,
+	0x9e, 0x93, 0xc3, 0x0e, 0x89, 0x7c, 0xc2, 0xd0, 0x64, 0x74, 0xd8, 0x21, 0xac, 0xe7, 0xc5, 0x8c,
+	0x0a, 0x0a, 0x57, 0xc6, 0xd3, 0xde, 0x78, 0x64, 0xaf, 0x06, 0x34, 0xa0, 0x72, 0x1d, 0x0d, 0x47,
+	0x4a, 0x6a, 0xdf, 0x0c, 0x28, 0x0d, 0x42, 0x82, 0x70, 0xdc, 0x42, 0x38, 0x8a, 0xa8, 0xc0, 0xa2,
+	0x45, 0x23, 0xae, 0x57, 0x37, 0x7c, 0xca, 0xdb, 0x94, 0xa3, 0x26, 0xe6, 0x44, 0x39, 0xa0, 0x6e,
+	0xa9, 0x49, 0x04, 0x2e, 0xa1, 0x18, 0x07, 0xad, 0x48, 0x8a, 0xb5, 0xb6, 0x60, 0xa2, 0x8a, 0x31,
+	0xc3, 0xed, 0x51, 0xb7, 0x4d, 0x93, 0x22, 0xc4, 0x5c, 0x34, 0x30, 0x3b, 0x22, 0xb8, 0x4b, 0x1a,
+	0xcd, 0x90, 0xfa, 0x07, 0x5a, 0x5d, 0x34, 0xf6, 0x63, 0xa4, 0xdb, 0xe0, 0x94, 0x89, 0xc6, 0x01,
+	0xd1, 0xbb, 0x75, 0x57, 0x01, 0x7c, 0x31, 0x44, 0xab, 0x49, 0xaf, 0xfa, 0x50, 0xcb, 0x85, 0x5b,
+	0x03, 0x2b, 0x67, 0x66, 0x79, 0x4c, 0x23, 0x4e, 0xe0, 0x2e, 0xc8, 0x2a, 0xa6, 0x1b, 0x56, 0xc1,
+	0x5a, 0xcf, 0x95, 0xd7, 0x3c, 0xc3, 0x59, 0x79, 0xaa, 0xa8, 0x7a, 0xf9, 0xe4, 0x77, 0x3e, 0x53,
+	0xd7, 0x05, 0xee, 0x2d, 0x90, 0x97, 0x1d, 0xf7, 0x89, 0x78, 0x86, 0xb9, 0xa8, 0x28, 0xe6, 0xea,
+	0x10, 0x79, 0x64, 0x7a, 0x0c, 0x0a, 0xe9, 0x12, 0x4d, 0xf0, 0x0a, 0x5c, 0x9f, 0x5e, 0xd3, 0x2c,
+	0xb7, 0x8d, 0x2c, 0xd3, 0x62, 0x4d, 0x35, 0xd3, 0xc4, 0xdd, 0x01, 0xf6, 0xc8, 0xbc, 0xc6, 0x48,
+	0xf7, 0x25, 0x65, 0xe2, 0x29, 0xe9, 0x69, 0x34, 0x68, 0x83, 0x2b, 0x3e, 0x8d, 0x04, 0xc3, 0xbe,
+	0x90, 0x76, 0x57, 0xeb, 0xe3, 0x6f, 0x37, 0x00, 0x6b, 0xc6, 0x4a, 0x4d, 0xfc, 0x04, 0xe4, 0xe2,
+	0xc9, 0xb4, 0x86, 0x2d, 0x98, 0x0f, 0x6e, 0xa2, 0xd3, 0x9c, 0xc9, 0x52, 0xf7, 0x8d, 0x46, 0xac,
+	0x84, 0xa1, 0x01, 0xf1, 0x31, 0x00, 0x93, 0x54, 0x69, 0x9b, 0x3b, 0x9e, 0x8a, 0xa0, 0x37, 0x8c,
+	0xa0, 0xa7, 0x42, 0xae, 0x23, 0xe8, 0xd5, 0x70, 0x40, 0x74, 0x6d, 0x3d, 0x51, 0xe9, 0x7e, 0xb5,
+	0xf4, 0x7e, 0xa6, 0x6d, 0xd2, 0xf6, 0x73, 0xe9, 0x3f, 0xf7, 0x03, 0xf7, 0xcf, 0x10, 0x2f, 0x49,
+	0xe2, 0xe2, 0xb9, 0xc4, 0x0a, 0x23, 0x89, 0x5c, 0xfe, 0xb1, 0x0c, 0x96, 0x25, 0x32, 0xfc, 0x68,
+	0x81, 0xac, 0x8a, 0x1f, 0x2c, 0x1a, 0x91, 0x66, 0xb3, 0x6e, 0xaf, 0x9f, 0x2f, 0x54, 0x9e, 0x6e,
+	0xf9, 0xc3, 0xcf, 0xbf, 0x9f, 0x97, 0x36, 0xe1, 0x06, 0x3a, 0xc2, 0x2c, 0xbe, 0x3b, 0x4a, 0x00,
+	0x47, 0xe9, 0x97, 0x17, 0x7e, 0xb7, 0x66, 0x13, 0x0b, 0xef, 0xa7, 0x5b, 0xa6, 0xdf, 0x0f, 0x7b,
+	0xfb, 0x82, 0x55, 0x9a, 0x7a, 0x4f, 0x52, 0xef, 0xc0, 0x07, 0x8b, 0x50, 0xcf, 0x3e, 0x28, 0xf0,
+	0x9b, 0x05, 0x72, 0x89, 0x3f, 0x09, 0xd1, 0x5c, 0x8c, 0xd9, 0x64, 0xda, 0xf7, 0x16, 0x2f, 0xd0,
+	0xc8, 0x8f, 0x24, 0xf2, 0x1e, 0x7c, 0xb8, 0xd0, 0x41, 0x27, 0x5f, 0x35, 0x74, 0x3c, 0x12, 0xbf,
+	0x87, 0x5f, 0x2c, 0x70, 0x2d, 0xd1, 0xbd, 0x12, 0x86, 0xf3, 0xd8, 0x8d, 0xb7, 0x6a, 0x1e, 0xbb,
+	0xf9, 0x7e, 0xb8, 0xbb, 0x92, 0x7d, 0x0b, 0x96, 0x2e, 0xcc, 0x5e, 0x7d, 0x7e, 0xd2, 0x77, 0xac,
+	0xd3, 0xbe, 0x63, 0xfd, 0xe9, 0x3b, 0xd6, 0xa7, 0x81, 0x93, 0x39, 0x1d, 0x38, 0x99, 0x5f, 0x03,
+	0x27, 0xf3, 0x7a, 0x3b, 0x68, 0x89, 0xb7, 0x9d, 0xa6, 0xe7, 0xd3, 0x76, 0x7a, 0xdb, 0x77, 0x89,
+	0xb1, 0xe8, 0xc5, 0x84, 0x37, 0xb3, 0xf2, 0x8d, 0xdf, 0xfa, 0x17, 0x00, 0x00, 0xff, 0xff, 0x13,
+	0x91, 0x00, 0xec, 0xf4, 0x06, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -447,9 +448,9 @@ type QueryClient interface {
 	Params(ctx context.Context, in *QueryParamsRequest, opts ...grpc.CallOption) (*QueryParamsResponse, error)
 	// Queries a LastArweaveBlock by index.
 	LastArweaveBlock(ctx context.Context, in *QueryGetLastArweaveBlockRequest, opts ...grpc.CallOption) (*QueryGetLastArweaveBlockResponse, error)
-	// Queries a list of LastSortKey items.
-	LastSortKey(ctx context.Context, in *QueryGetLastSortKeyRequest, opts ...grpc.CallOption) (*QueryGetLastSortKeyResponse, error)
-	LastSortKeyAll(ctx context.Context, in *QueryAllLastSortKeyRequest, opts ...grpc.CallOption) (*QueryAllLastSortKeyResponse, error)
+	// Queries a list of PrevSortKey items.
+	PrevSortKey(ctx context.Context, in *QueryGetPrevSortKeyRequest, opts ...grpc.CallOption) (*QueryGetPrevSortKeyResponse, error)
+	PrevSortKeyAll(ctx context.Context, in *QueryAllPrevSortKeyRequest, opts ...grpc.CallOption) (*QueryAllPrevSortKeyResponse, error)
 }
 
 type queryClient struct {
@@ -478,18 +479,18 @@ func (c *queryClient) LastArweaveBlock(ctx context.Context, in *QueryGetLastArwe
 	return out, nil
 }
 
-func (c *queryClient) LastSortKey(ctx context.Context, in *QueryGetLastSortKeyRequest, opts ...grpc.CallOption) (*QueryGetLastSortKeyResponse, error) {
-	out := new(QueryGetLastSortKeyResponse)
-	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Query/LastSortKey", in, out, opts...)
+func (c *queryClient) PrevSortKey(ctx context.Context, in *QueryGetPrevSortKeyRequest, opts ...grpc.CallOption) (*QueryGetPrevSortKeyResponse, error) {
+	out := new(QueryGetPrevSortKeyResponse)
+	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Query/PrevSortKey", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *queryClient) LastSortKeyAll(ctx context.Context, in *QueryAllLastSortKeyRequest, opts ...grpc.CallOption) (*QueryAllLastSortKeyResponse, error) {
-	out := new(QueryAllLastSortKeyResponse)
-	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Query/LastSortKeyAll", in, out, opts...)
+func (c *queryClient) PrevSortKeyAll(ctx context.Context, in *QueryAllPrevSortKeyRequest, opts ...grpc.CallOption) (*QueryAllPrevSortKeyResponse, error) {
+	out := new(QueryAllPrevSortKeyResponse)
+	err := c.cc.Invoke(ctx, "/sequencer.sequencer.Query/PrevSortKeyAll", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -502,9 +503,9 @@ type QueryServer interface {
 	Params(context.Context, *QueryParamsRequest) (*QueryParamsResponse, error)
 	// Queries a LastArweaveBlock by index.
 	LastArweaveBlock(context.Context, *QueryGetLastArweaveBlockRequest) (*QueryGetLastArweaveBlockResponse, error)
-	// Queries a list of LastSortKey items.
-	LastSortKey(context.Context, *QueryGetLastSortKeyRequest) (*QueryGetLastSortKeyResponse, error)
-	LastSortKeyAll(context.Context, *QueryAllLastSortKeyRequest) (*QueryAllLastSortKeyResponse, error)
+	// Queries a list of PrevSortKey items.
+	PrevSortKey(context.Context, *QueryGetPrevSortKeyRequest) (*QueryGetPrevSortKeyResponse, error)
+	PrevSortKeyAll(context.Context, *QueryAllPrevSortKeyRequest) (*QueryAllPrevSortKeyResponse, error)
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
@@ -517,11 +518,11 @@ func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsReq
 func (*UnimplementedQueryServer) LastArweaveBlock(ctx context.Context, req *QueryGetLastArweaveBlockRequest) (*QueryGetLastArweaveBlockResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LastArweaveBlock not implemented")
 }
-func (*UnimplementedQueryServer) LastSortKey(ctx context.Context, req *QueryGetLastSortKeyRequest) (*QueryGetLastSortKeyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LastSortKey not implemented")
+func (*UnimplementedQueryServer) PrevSortKey(ctx context.Context, req *QueryGetPrevSortKeyRequest) (*QueryGetPrevSortKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PrevSortKey not implemented")
 }
-func (*UnimplementedQueryServer) LastSortKeyAll(ctx context.Context, req *QueryAllLastSortKeyRequest) (*QueryAllLastSortKeyResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LastSortKeyAll not implemented")
+func (*UnimplementedQueryServer) PrevSortKeyAll(ctx context.Context, req *QueryAllPrevSortKeyRequest) (*QueryAllPrevSortKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PrevSortKeyAll not implemented")
 }
 
 func RegisterQueryServer(s grpc1.Server, srv QueryServer) {
@@ -564,38 +565,38 @@ func _Query_LastArweaveBlock_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_LastSortKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryGetLastSortKeyRequest)
+func _Query_PrevSortKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetPrevSortKeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).LastSortKey(ctx, in)
+		return srv.(QueryServer).PrevSortKey(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/sequencer.sequencer.Query/LastSortKey",
+		FullMethod: "/sequencer.sequencer.Query/PrevSortKey",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).LastSortKey(ctx, req.(*QueryGetLastSortKeyRequest))
+		return srv.(QueryServer).PrevSortKey(ctx, req.(*QueryGetPrevSortKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Query_LastSortKeyAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(QueryAllLastSortKeyRequest)
+func _Query_PrevSortKeyAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryAllPrevSortKeyRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(QueryServer).LastSortKeyAll(ctx, in)
+		return srv.(QueryServer).PrevSortKeyAll(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/sequencer.sequencer.Query/LastSortKeyAll",
+		FullMethod: "/sequencer.sequencer.Query/PrevSortKeyAll",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(QueryServer).LastSortKeyAll(ctx, req.(*QueryAllLastSortKeyRequest))
+		return srv.(QueryServer).PrevSortKeyAll(ctx, req.(*QueryAllPrevSortKeyRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -613,12 +614,12 @@ var _Query_serviceDesc = grpc.ServiceDesc{
 			Handler:    _Query_LastArweaveBlock_Handler,
 		},
 		{
-			MethodName: "LastSortKey",
-			Handler:    _Query_LastSortKey_Handler,
+			MethodName: "PrevSortKey",
+			Handler:    _Query_PrevSortKey_Handler,
 		},
 		{
-			MethodName: "LastSortKeyAll",
-			Handler:    _Query_LastSortKeyAll_Handler,
+			MethodName: "PrevSortKeyAll",
+			Handler:    _Query_PrevSortKeyAll_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -737,7 +738,7 @@ func (m *QueryGetLastArweaveBlockResponse) MarshalToSizedBuffer(dAtA []byte) (in
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetLastSortKeyRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetPrevSortKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -747,12 +748,12 @@ func (m *QueryGetLastSortKeyRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetLastSortKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetPrevSortKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetLastSortKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetPrevSortKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -767,7 +768,7 @@ func (m *QueryGetLastSortKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryGetLastSortKeyResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryGetPrevSortKeyResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -777,18 +778,18 @@ func (m *QueryGetLastSortKeyResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryGetLastSortKeyResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryGetPrevSortKeyResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryGetLastSortKeyResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryGetPrevSortKeyResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
 	_ = l
 	{
-		size, err := m.LastSortKey.MarshalToSizedBuffer(dAtA[:i])
+		size, err := m.PrevSortKey.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -800,7 +801,7 @@ func (m *QueryGetLastSortKeyResponse) MarshalToSizedBuffer(dAtA []byte) (int, er
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryAllLastSortKeyRequest) Marshal() (dAtA []byte, err error) {
+func (m *QueryAllPrevSortKeyRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -810,12 +811,12 @@ func (m *QueryAllLastSortKeyRequest) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryAllLastSortKeyRequest) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryAllPrevSortKeyRequest) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryAllLastSortKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryAllPrevSortKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -835,7 +836,7 @@ func (m *QueryAllLastSortKeyRequest) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
-func (m *QueryAllLastSortKeyResponse) Marshal() (dAtA []byte, err error) {
+func (m *QueryAllPrevSortKeyResponse) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -845,12 +846,12 @@ func (m *QueryAllLastSortKeyResponse) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *QueryAllLastSortKeyResponse) MarshalTo(dAtA []byte) (int, error) {
+func (m *QueryAllPrevSortKeyResponse) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *QueryAllLastSortKeyResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *QueryAllPrevSortKeyResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -867,10 +868,10 @@ func (m *QueryAllLastSortKeyResponse) MarshalToSizedBuffer(dAtA []byte) (int, er
 		i--
 		dAtA[i] = 0x12
 	}
-	if len(m.LastSortKey) > 0 {
-		for iNdEx := len(m.LastSortKey) - 1; iNdEx >= 0; iNdEx-- {
+	if len(m.PrevSortKey) > 0 {
+		for iNdEx := len(m.PrevSortKey) - 1; iNdEx >= 0; iNdEx-- {
 			{
-				size, err := m.LastSortKey[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				size, err := m.PrevSortKey[iNdEx].MarshalToSizedBuffer(dAtA[:i])
 				if err != nil {
 					return 0, err
 				}
@@ -935,7 +936,7 @@ func (m *QueryGetLastArweaveBlockResponse) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetLastSortKeyRequest) Size() (n int) {
+func (m *QueryGetPrevSortKeyRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -948,18 +949,18 @@ func (m *QueryGetLastSortKeyRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryGetLastSortKeyResponse) Size() (n int) {
+func (m *QueryGetPrevSortKeyResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	l = m.LastSortKey.Size()
+	l = m.PrevSortKey.Size()
 	n += 1 + l + sovQuery(uint64(l))
 	return n
 }
 
-func (m *QueryAllLastSortKeyRequest) Size() (n int) {
+func (m *QueryAllPrevSortKeyRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -972,14 +973,14 @@ func (m *QueryAllLastSortKeyRequest) Size() (n int) {
 	return n
 }
 
-func (m *QueryAllLastSortKeyResponse) Size() (n int) {
+func (m *QueryAllPrevSortKeyResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if len(m.LastSortKey) > 0 {
-		for _, e := range m.LastSortKey {
+	if len(m.PrevSortKey) > 0 {
+		for _, e := range m.PrevSortKey {
 			l = e.Size()
 			n += 1 + l + sovQuery(uint64(l))
 		}
@@ -1263,7 +1264,7 @@ func (m *QueryGetLastArweaveBlockResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetLastSortKeyRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryGetPrevSortKeyRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1286,10 +1287,10 @@ func (m *QueryGetLastSortKeyRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetLastSortKeyRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetPrevSortKeyRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetLastSortKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetPrevSortKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1345,7 +1346,7 @@ func (m *QueryGetLastSortKeyRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryGetLastSortKeyResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryGetPrevSortKeyResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1368,15 +1369,15 @@ func (m *QueryGetLastSortKeyResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryGetLastSortKeyResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryGetPrevSortKeyResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryGetLastSortKeyResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryGetPrevSortKeyResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LastSortKey", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PrevSortKey", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1403,7 +1404,7 @@ func (m *QueryGetLastSortKeyResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.LastSortKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.PrevSortKey.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1428,7 +1429,7 @@ func (m *QueryGetLastSortKeyResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryAllLastSortKeyRequest) Unmarshal(dAtA []byte) error {
+func (m *QueryAllPrevSortKeyRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1451,10 +1452,10 @@ func (m *QueryAllLastSortKeyRequest) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllLastSortKeyRequest: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryAllPrevSortKeyRequest: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllLastSortKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryAllPrevSortKeyRequest: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
@@ -1514,7 +1515,7 @@ func (m *QueryAllLastSortKeyRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-func (m *QueryAllLastSortKeyResponse) Unmarshal(dAtA []byte) error {
+func (m *QueryAllPrevSortKeyResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -1537,15 +1538,15 @@ func (m *QueryAllLastSortKeyResponse) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: QueryAllLastSortKeyResponse: wiretype end group for non-group")
+			return fmt.Errorf("proto: QueryAllPrevSortKeyResponse: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: QueryAllLastSortKeyResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: QueryAllPrevSortKeyResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field LastSortKey", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PrevSortKey", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -1572,8 +1573,8 @@ func (m *QueryAllLastSortKeyResponse) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LastSortKey = append(m.LastSortKey, LastSortKey{})
-			if err := m.LastSortKey[len(m.LastSortKey)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			m.PrevSortKey = append(m.PrevSortKey, PrevSortKey{})
+			if err := m.PrevSortKey[len(m.PrevSortKey)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

@@ -88,45 +88,45 @@ func TestCheckSortKeyTwoSameSortKeysInBlock(t *testing.T) {
 	require.ErrorIs(t, err, types.ErrInvalidSortKey)
 }
 
-func TestCheckLastSortKeyEmptyKey(t *testing.T) {
+func TestCheckPrevSortKeyEmptyKey(t *testing.T) {
 	validator, msg := validatorAndMsg(t)
 
-	err := validator.checkLastSortKey(&msg)
+	err := validator.checkPrevSortKey(&msg)
 
 	require.NoError(t, err)
 }
 
-func TestCheckLastSortKeyNotEmptyFirstKey(t *testing.T) {
+func TestCheckPrevSortKeyNotEmptyFirstKey(t *testing.T) {
 	validator, msg := validatorAndMsg(t)
-	msg.LastSortKey = "1,2,3"
+	msg.PrevSortKey = "1,2,3"
 
-	err := validator.checkLastSortKey(&msg)
+	err := validator.checkPrevSortKey(&msg)
 
-	require.ErrorIs(t, err, types.ErrInvalidLastSortKey)
+	require.ErrorIs(t, err, types.ErrInvalidPrevSortKey)
 }
 
-func TestCheckLastSortKeyTwoMessagesInBlock(t *testing.T) {
+func TestCheckPrevSortKeyTwoMessagesInBlock(t *testing.T) {
 	validator, msg := validatorAndMsg(t)
 
 	msg.SortKey = "000001431216,0000000000123,00000000"
-	err := validator.checkLastSortKey(&msg)
+	err := validator.checkPrevSortKey(&msg)
 	require.NoError(t, err)
 
 	msg.SortKey = "000001431216,0000000000123,00000001"
-	msg.LastSortKey = "000001431216,0000000000123,00000000"
-	err = validator.checkLastSortKey(&msg)
+	msg.PrevSortKey = "000001431216,0000000000123,00000000"
+	err = validator.checkPrevSortKey(&msg)
 	require.NoError(t, err)
 }
 
-func TestCheckLastSortKeyTwoMessagesInBlockInvalidKey(t *testing.T) {
+func TestCheckPrevSortKeyTwoMessagesInBlockInvalidKey(t *testing.T) {
 	validator, msg := validatorAndMsg(t)
 
 	msg.SortKey = "000001431216,0000000000123,00000000"
-	err := validator.checkLastSortKey(&msg)
+	err := validator.checkPrevSortKey(&msg)
 	require.NoError(t, err)
 
 	msg.SortKey = "000001431216,0000000000123,00000001"
-	msg.LastSortKey = "000001431216,0000000000123,00000001"
-	err = validator.checkLastSortKey(&msg)
-	require.ErrorIs(t, err, types.ErrInvalidLastSortKey)
+	msg.PrevSortKey = "000001431216,0000000000123,00000001"
+	err = validator.checkPrevSortKey(&msg)
+	require.ErrorIs(t, err, types.ErrInvalidPrevSortKey)
 }

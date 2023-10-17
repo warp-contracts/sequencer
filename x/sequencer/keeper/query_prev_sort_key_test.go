@@ -18,33 +18,33 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func TestLastSortKeyQuerySingle(t *testing.T) {
+func TestPrevSortKeyQuerySingle(t *testing.T) {
 	keeper, ctx := keepertest.SequencerKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLastSortKey(keeper, ctx, 2)
+	msgs := createNPrevSortKey(keeper, ctx, 2)
 	tests := []struct {
 		desc     string
-		request  *types.QueryGetLastSortKeyRequest
-		response *types.QueryGetLastSortKeyResponse
+		request  *types.QueryGetPrevSortKeyRequest
+		response *types.QueryGetPrevSortKeyResponse
 		err      error
 	}{
 		{
 			desc: "First",
-			request: &types.QueryGetLastSortKeyRequest{
+			request: &types.QueryGetPrevSortKeyRequest{
 				Contract: msgs[0].Contract,
 			},
-			response: &types.QueryGetLastSortKeyResponse{LastSortKey: msgs[0]},
+			response: &types.QueryGetPrevSortKeyResponse{PrevSortKey: msgs[0]},
 		},
 		{
 			desc: "Second",
-			request: &types.QueryGetLastSortKeyRequest{
+			request: &types.QueryGetPrevSortKeyRequest{
 				Contract: msgs[1].Contract,
 			},
-			response: &types.QueryGetLastSortKeyResponse{LastSortKey: msgs[1]},
+			response: &types.QueryGetPrevSortKeyResponse{PrevSortKey: msgs[1]},
 		},
 		{
 			desc: "KeyNotFound",
-			request: &types.QueryGetLastSortKeyRequest{
+			request: &types.QueryGetPrevSortKeyRequest{
 				Contract: strconv.Itoa(100000),
 			},
 			err: status.Error(codes.NotFound, "not found"),
@@ -56,7 +56,7 @@ func TestLastSortKeyQuerySingle(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.desc, func(t *testing.T) {
-			response, err := keeper.LastSortKey(wctx, tc.request)
+			response, err := keeper.PrevSortKey(wctx, tc.request)
 			if tc.err != nil {
 				require.ErrorIs(t, err, tc.err)
 			} else {
@@ -70,13 +70,13 @@ func TestLastSortKeyQuerySingle(t *testing.T) {
 	}
 }
 
-func TestLastSortKeyQueryPaginated(t *testing.T) {
+func TestPrevSortKeyQueryPaginated(t *testing.T) {
 	keeper, ctx := keepertest.SequencerKeeper(t)
 	wctx := sdk.WrapSDKContext(ctx)
-	msgs := createNLastSortKey(keeper, ctx, 5)
+	msgs := createNPrevSortKey(keeper, ctx, 5)
 
-	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllLastSortKeyRequest {
-		return &types.QueryAllLastSortKeyRequest{
+	request := func(next []byte, offset, limit uint64, total bool) *types.QueryAllPrevSortKeyRequest {
+		return &types.QueryAllPrevSortKeyRequest{
 			Pagination: &query.PageRequest{
 				Key:        next,
 				Offset:     offset,
@@ -88,12 +88,12 @@ func TestLastSortKeyQueryPaginated(t *testing.T) {
 	t.Run("ByOffset", func(t *testing.T) {
 		step := 2
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.LastSortKeyAll(wctx, request(nil, uint64(i), uint64(step), false))
+			resp, err := keeper.PrevSortKeyAll(wctx, request(nil, uint64(i), uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.LastSortKey), step)
+			require.LessOrEqual(t, len(resp.PrevSortKey), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.LastSortKey),
+				nullify.Fill(resp.PrevSortKey),
 			)
 		}
 	})
@@ -101,27 +101,27 @@ func TestLastSortKeyQueryPaginated(t *testing.T) {
 		step := 2
 		var next []byte
 		for i := 0; i < len(msgs); i += step {
-			resp, err := keeper.LastSortKeyAll(wctx, request(next, 0, uint64(step), false))
+			resp, err := keeper.PrevSortKeyAll(wctx, request(next, 0, uint64(step), false))
 			require.NoError(t, err)
-			require.LessOrEqual(t, len(resp.LastSortKey), step)
+			require.LessOrEqual(t, len(resp.PrevSortKey), step)
 			require.Subset(t,
 				nullify.Fill(msgs),
-				nullify.Fill(resp.LastSortKey),
+				nullify.Fill(resp.PrevSortKey),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
-		resp, err := keeper.LastSortKeyAll(wctx, request(nil, 0, 0, true))
+		resp, err := keeper.PrevSortKeyAll(wctx, request(nil, 0, 0, true))
 		require.NoError(t, err)
 		require.Equal(t, len(msgs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(msgs),
-			nullify.Fill(resp.LastSortKey),
+			nullify.Fill(resp.PrevSortKey),
 		)
 	})
 	t.Run("InvalidRequest", func(t *testing.T) {
-		_, err := keeper.LastSortKeyAll(wctx, nil)
+		_, err := keeper.PrevSortKeyAll(wctx, nil)
 		require.ErrorIs(t, err, status.Error(codes.InvalidArgument, "invalid request"))
 	})
 }

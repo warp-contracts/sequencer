@@ -15,21 +15,21 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNLastSortKey(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.LastSortKey {
-	items := make([]types.LastSortKey, n)
+func createNPrevSortKey(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.PrevSortKey {
+	items := make([]types.PrevSortKey, n)
 	for i := range items {
 		items[i].Contract = strconv.Itoa(i)
 
-		keeper.SetLastSortKey(ctx, items[i])
+		keeper.SetPrevSortKey(ctx, items[i])
 	}
 	return items
 }
 
-func TestLastSortKeyGet(t *testing.T) {
+func TestPrevSortKeyGet(t *testing.T) {
 	keeper, ctx := keepertest.SequencerKeeper(t)
-	items := createNLastSortKey(keeper, ctx, 10)
+	items := createNPrevSortKey(keeper, ctx, 10)
 	for _, item := range items {
-		rst, found := keeper.GetLastSortKey(ctx,
+		rst, found := keeper.GetPrevSortKey(ctx,
 			item.Contract,
 		)
 		require.True(t, found)
@@ -39,25 +39,25 @@ func TestLastSortKeyGet(t *testing.T) {
 		)
 	}
 }
-func TestLastSortKeyRemove(t *testing.T) {
+func TestPrevSortKeyRemove(t *testing.T) {
 	keeper, ctx := keepertest.SequencerKeeper(t)
-	items := createNLastSortKey(keeper, ctx, 10)
+	items := createNPrevSortKey(keeper, ctx, 10)
 	for _, item := range items {
-		keeper.RemoveLastSortKey(ctx,
+		keeper.RemovePrevSortKey(ctx,
 			item.Contract,
 		)
-		_, found := keeper.GetLastSortKey(ctx,
+		_, found := keeper.GetPrevSortKey(ctx,
 			item.Contract,
 		)
 		require.False(t, found)
 	}
 }
 
-func TestLastSortKeyGetAll(t *testing.T) {
+func TestPrevSortKeyGetAll(t *testing.T) {
 	keeper, ctx := keepertest.SequencerKeeper(t)
-	items := createNLastSortKey(keeper, ctx, 10)
+	items := createNPrevSortKey(keeper, ctx, 10)
 	require.ElementsMatch(t,
 		nullify.Fill(items),
-		nullify.Fill(keeper.GetAllLastSortKey(ctx)),
+		nullify.Fill(keeper.GetAllPrevSortKey(ctx)),
 	)
 }

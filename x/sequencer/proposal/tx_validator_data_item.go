@@ -27,7 +27,7 @@ func (tv *TxValidator) validateSequentiallyDataItem(txIndex int, tx sdk.Tx) erro
 		if err := tv.checkSortKey(dataItem); err != nil {
 			return err
 		}
-		return tv.checkLastSortKey(dataItem)
+		return tv.checkPrevSortKey(dataItem)
 	}
 
 	return nil
@@ -42,15 +42,15 @@ func (tv *TxValidator) checkSortKey(dataItem *types.MsgDataItem) error {
 	return nil
 }
 
-func (tv *TxValidator) checkLastSortKey(dataItem *types.MsgDataItem) error {
+func (tv *TxValidator) checkPrevSortKey(dataItem *types.MsgDataItem) error {
 	contract, err := dataItem.GetContractFromTags()
 	if err != nil {
 		return err
 	}
 
-	expectedLastSortKey := tv.lastSortKeys.getAndStoreLastSortKey(contract, dataItem.SortKey)
-	if expectedLastSortKey != dataItem.LastSortKey {
-		return errors.Wrapf(types.ErrInvalidLastSortKey, "expected: %s, actual: %s", expectedLastSortKey, dataItem.LastSortKey)
+	expectedPrevSortKey := tv.prevSortKeys.getAndStorePrevSortKey(contract, dataItem.SortKey)
+	if expectedPrevSortKey != dataItem.PrevSortKey {
+		return errors.Wrapf(types.ErrInvalidPrevSortKey, "expected: %s, actual: %s", expectedPrevSortKey, dataItem.PrevSortKey)
 	}
 
 	return nil

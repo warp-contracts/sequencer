@@ -15,7 +15,7 @@ func TestGenesis(t *testing.T) {
 		Params: types.DefaultParams(),
 
 		LastArweaveBlock: &types.LastArweaveBlock{},
-		LastSortKeyList: []types.LastSortKey{
+		PrevSortKeyList: []types.PrevSortKey{
 			{
 				Contract: "0",
 			},
@@ -35,6 +35,6 @@ func TestGenesis(t *testing.T) {
 	nullify.Fill(got)
 
 	require.Equal(t, genesisState.LastArweaveBlock, got.LastArweaveBlock)
-	require.ElementsMatch(t, genesisState.LastSortKeyList, got.LastSortKeyList)
+	require.ElementsMatch(t, genesisState.PrevSortKeyList, got.PrevSortKeyList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

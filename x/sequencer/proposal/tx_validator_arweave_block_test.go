@@ -12,7 +12,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func mockValidator(t *testing.T, lastBlock *types.LastArweaveBlock, nextBlock *types.ArweaveBlockInfo, lastSortKey *types.LastSortKey) *TxValidator {
+func mockValidator(t *testing.T, lastBlock *types.LastArweaveBlock, nextBlock *types.ArweaveBlockInfo, prevSortKey *types.PrevSortKey) *TxValidator {
 	keeper, ctx := keepertest.SequencerKeeper(t)
 
 	if lastBlock == nil {
@@ -21,8 +21,8 @@ func mockValidator(t *testing.T, lastBlock *types.LastArweaveBlock, nextBlock *t
 		keeper.SetLastArweaveBlock(ctx, *lastBlock)
 	}
 
-	if lastSortKey != nil {
-		keeper.SetLastSortKey(ctx, *lastSortKey)
+	if prevSortKey != nil {
+		keeper.SetPrevSortKey(ctx, *prevSortKey)
 	}
 
 	blockHeader := ctx.BlockHeader()
@@ -34,19 +34,19 @@ func mockValidator(t *testing.T, lastBlock *types.LastArweaveBlock, nextBlock *t
 	return newTxValidator(ctx.WithBlockHeader(blockHeader), keeper, controller)
 }
 
-func TestValidateLastSortKeysMismatch(t *testing.T) {
-	txs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3"}, LastSortKey: "1,2,2"}}
+func TestValidatePrevSortKeysMismatch(t *testing.T) {
+	txs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3"}, PrevSortKey: "1,2,2"}}
 	block := &types.MsgArweaveBlock{
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
 		Transactions: txs,
 	}
 	validator := mockValidator(t, &types.LastArweaveBlock{
 		ArweaveBlock: block.BlockInfo,
-	}, nil, &types.LastSortKey{Contract: "abc", SortKey: "1,2,1"})
+	}, nil, &types.PrevSortKey{Contract: "abc", SortKey: "1,2,1"})
 
-	err := validator.validateLastSortKeys(block)
+	err := validator.validatePrevSortKeys(block)
 
-	require.ErrorIs(t, err, types.ErrInvalidLastSortKey)
+	require.ErrorIs(t, err, types.ErrInvalidPrevSortKey)
 }
 
 func TestValidateIndex(t *testing.T) {
@@ -302,7 +302,7 @@ func TestCheckTransactionsSortKeyMismatch(t *testing.T) {
 }
 
 func TestCheckTransactionsInvalidRandom(t *testing.T) {
-	actualTxs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3"}, LastSortKey: "1,1,1"}}
+	actualTxs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{Contract: "abc", Id: "123", SortKey: "1,2,3"}, PrevSortKey: "1,1,1"}}
 	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
 	block := &types.MsgArweaveBlock{
 		BlockInfo:    test.ArweaveBlock().BlockInfo,
@@ -319,7 +319,7 @@ func TestCheckTransactionsInvalidRandom(t *testing.T) {
 
 func TestCheckTransactions(t *testing.T) {
 	actualTxs := []*types.ArweaveTransactionWithInfo{{Transaction: &types.ArweaveTransaction{
-		Contract: "abc", Id: "123", SortKey: "1,2,3"}, LastSortKey: "1,1,1",
+		Contract: "abc", Id: "123", SortKey: "1,2,3"}, PrevSortKey: "1,1,1",
 		Random: []byte{190, 96, 22, 62, 107, 198, 68, 216, 15, 189, 0, 227, 101, 238, 190, 27, 213, 120, 74, 38, 183, 173, 90, 197, 69, 66, 142, 157, 121, 160, 9, 117}}}
 	expectedTxs := []*types.ArweaveTransaction{{Contract: "abc", Id: "123", SortKey: "1,2,3"}}
 	block := &types.MsgArweaveBlock{

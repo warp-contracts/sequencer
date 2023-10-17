@@ -34,7 +34,7 @@ var (
 	ErrArweaveBlockMissing         = errors.Register(ModuleName, 1123, "arweave block is missing")
 	ErrDataItemAlreadyInBlock      = errors.Register(ModuleName, 1124, "data item already in block")
 	ErrInvalidSortKey              = errors.Register(ModuleName, 1125, "invalid sort key")
-	ErrInvalidLastSortKey          = errors.Register(ModuleName, 1126, "invalid last sort key")
+	ErrInvalidPrevSortKey          = errors.Register(ModuleName, 1126, "invalid prev sort key")
 	ErrInvalidRandomValue          = errors.Register(ModuleName, 1127, "invalid random value")
 	ErrInvalidTxIndex              = errors.Register(ModuleName, 1128, "invalid transaction index")
 	ErrInvalidTxNumber             = errors.Register(ModuleName, 1129, "invalid number of transactions")

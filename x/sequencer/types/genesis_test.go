@@ -21,7 +21,7 @@ func TestGenesisState_Validate(t *testing.T) {
 			genState: &GenesisState{
 
 				LastArweaveBlock: &LastArweaveBlock{},
-				LastSortKeyList: []LastSortKey{
+				PrevSortKeyList: []PrevSortKey{
 					{
 						Contract: "0",
 					},
@@ -34,9 +34,9 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: true,
 		},
 		{
-			desc: "duplicated lastSortKey",
+			desc: "duplicated prevSortKey",
 			genState: &GenesisState{
-				LastSortKeyList: []LastSortKey{
+				PrevSortKeyList: []PrevSortKey{
 					{
 						Contract: "0",
 					},

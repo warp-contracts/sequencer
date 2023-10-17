@@ -8,6 +8,6 @@ option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 // L1 interaction with a sort key value from the previous interaction with the contract
 message ArweaveTransactionWithInfo {
   ArweaveTransaction transaction = 1;
-  string last_sort_key = 2;
+  string prev_sort_key = 2;
   bytes random = 3;
 }

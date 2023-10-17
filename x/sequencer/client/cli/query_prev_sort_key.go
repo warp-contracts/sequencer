@@ -8,10 +8,10 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func CmdListLastSortKey() *cobra.Command {
+func CmdListPrevSortKey() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-last-sort-key",
-		Short: "list all last-sort-key",
+		Use:   "list-prev-dort-key",
+		Short: "list all prev-dort-key",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -25,11 +25,11 @@ func CmdListLastSortKey() *cobra.Command {
 
 			queryClient := types.NewQueryClient(clientCtx)
 
-			params := &types.QueryAllLastSortKeyRequest{
+			params := &types.QueryAllPrevSortKeyRequest{
 				Pagination: pageReq,
 			}
 
-			res, err := queryClient.LastSortKeyAll(cmd.Context(), params)
+			res, err := queryClient.PrevSortKeyAll(cmd.Context(), params)
 			if err != nil {
 				return err
 			}
@@ -44,10 +44,10 @@ func CmdListLastSortKey() *cobra.Command {
 	return cmd
 }
 
-func CmdShowLastSortKey() *cobra.Command {
+func CmdShowPrevSortKey() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-last-sort-key [contract]",
-		Short: "shows a last-sort-key",
+		Use:   "show-prev-dort-key [contract]",
+		Short: "shows a prev-dort-key",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -59,11 +59,11 @@ func CmdShowLastSortKey() *cobra.Command {
 
 			argContract := args[0]
 
-			params := &types.QueryGetLastSortKeyRequest{
+			params := &types.QueryGetPrevSortKeyRequest{
 				Contract: argContract,
 			}
 
-			res, err := queryClient.LastSortKey(cmd.Context(), params)
+			res, err := queryClient.PrevSortKey(cmd.Context(), params)
 			if err != nil {
 				return err
 			}

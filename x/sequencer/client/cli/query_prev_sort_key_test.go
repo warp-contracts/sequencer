@@ -21,7 +21,7 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func networkWithLastSortKeyObjects(t *testing.T, n int) (*network.Network, []types.LastSortKey) {
+func networkWithPrevSortKeyObjects(t *testing.T, n int) (*network.Network, []types.PrevSortKey) {
 	t.Helper()
 	cfg := network.DefaultConfig()
 	state := types.GenesisState{}
@@ -34,21 +34,21 @@ func networkWithLastSortKeyObjects(t *testing.T, n int) (*network.Network, []typ
 	state.LastArweaveBlock = lastArweaveBlock
 
 	for i := 0; i < n; i++ {
-		lastSortKey := types.LastSortKey{
+		prevSortKey := types.PrevSortKey{
 			Contract: strconv.Itoa(i),
 		}
-		nullify.Fill(&lastSortKey)
-		state.LastSortKeyList = append(state.LastSortKeyList, lastSortKey)
+		nullify.Fill(&prevSortKey)
+		state.PrevSortKeyList = append(state.PrevSortKeyList, prevSortKey)
 	}
 	
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf
-	return network.New(t, cfg), state.LastSortKeyList
+	return network.New(t, cfg), state.PrevSortKeyList
 }
 
-func TestShowLastSortKey(t *testing.T) {
-	net, objs := networkWithLastSortKeyObjects(t, 2)
+func TestShowPrevSortKey(t *testing.T) {
+	net, objs := networkWithPrevSortKeyObjects(t, 2)
 
 	ctx := net.Validators[0].ClientCtx
 	common := []string{
@@ -60,7 +60,7 @@ func TestShowLastSortKey(t *testing.T) {
 
 		args []string
 		err  error
-		obj  types.LastSortKey
+		obj  types.PrevSortKey
 	}{
 		{
 			desc:       "found",
@@ -83,27 +83,27 @@ func TestShowLastSortKey(t *testing.T) {
 				tc.idContract,
 			}
 			args = append(args, tc.args...)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowLastSortKey(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdShowPrevSortKey(), args)
 			if tc.err != nil {
 				stat, ok := status.FromError(tc.err)
 				require.True(t, ok)
 				require.ErrorIs(t, stat.Err(), tc.err)
 			} else {
 				require.NoError(t, err)
-				var resp types.QueryGetLastSortKeyResponse
+				var resp types.QueryGetPrevSortKeyResponse
 				require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-				require.NotNil(t, resp.LastSortKey)
+				require.NotNil(t, resp.PrevSortKey)
 				require.Equal(t,
 					nullify.Fill(&tc.obj),
-					nullify.Fill(&resp.LastSortKey),
+					nullify.Fill(&resp.PrevSortKey),
 				)
 			}
 		})
 	}
 }
 
-func TestListLastSortKey(t *testing.T) {
-	net, objs := networkWithLastSortKeyObjects(t, 5)
+func TestListPrevSortKey(t *testing.T) {
+	net, objs := networkWithPrevSortKeyObjects(t, 5)
 
 	ctx := net.Validators[0].ClientCtx
 	request := func(next []byte, offset, limit uint64, total bool) []string {
@@ -125,14 +125,14 @@ func TestListLastSortKey(t *testing.T) {
 		step := 2
 		for i := 0; i < len(objs); i += step {
 			args := request(nil, uint64(i), uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLastSortKey(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListPrevSortKey(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLastSortKeyResponse
+			var resp types.QueryAllPrevSortKeyResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LastSortKey), step)
+			require.LessOrEqual(t, len(resp.PrevSortKey), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LastSortKey),
+				nullify.Fill(resp.PrevSortKey),
 			)
 		}
 	})
@@ -141,29 +141,29 @@ func TestListLastSortKey(t *testing.T) {
 		var next []byte
 		for i := 0; i < len(objs); i += step {
 			args := request(next, 0, uint64(step), false)
-			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLastSortKey(), args)
+			out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListPrevSortKey(), args)
 			require.NoError(t, err)
-			var resp types.QueryAllLastSortKeyResponse
+			var resp types.QueryAllPrevSortKeyResponse
 			require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
-			require.LessOrEqual(t, len(resp.LastSortKey), step)
+			require.LessOrEqual(t, len(resp.PrevSortKey), step)
 			require.Subset(t,
 				nullify.Fill(objs),
-				nullify.Fill(resp.LastSortKey),
+				nullify.Fill(resp.PrevSortKey),
 			)
 			next = resp.Pagination.NextKey
 		}
 	})
 	t.Run("Total", func(t *testing.T) {
 		args := request(nil, 0, uint64(len(objs)), true)
-		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListLastSortKey(), args)
+		out, err := clitestutil.ExecTestCLICmd(ctx, cli.CmdListPrevSortKey(), args)
 		require.NoError(t, err)
-		var resp types.QueryAllLastSortKeyResponse
+		var resp types.QueryAllPrevSortKeyResponse
 		require.NoError(t, net.Config.Codec.UnmarshalJSON(out.Bytes(), &resp))
 		require.NoError(t, err)
 		require.Equal(t, len(objs), int(resp.Pagination.Total))
 		require.ElementsMatch(t,
 			nullify.Fill(objs),
-			nullify.Fill(resp.LastSortKey),
+			nullify.Fill(resp.PrevSortKey),
 		)
 	})
 }

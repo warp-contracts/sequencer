@@ -3,7 +3,7 @@ package sequencer.sequencer;
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
-message LastSortKey {
+message PrevSortKey {
   string contract = 1; 
   string sortKey = 2; 
   

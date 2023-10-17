@@ -32,8 +32,8 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 	// For logging
 	now := time.Now()
 
-	// Helpert struct for assigning last sort keys
-	lastSortKeys := newLastSortKeys(h.keeper, ctx)
+	// Helpert struct for assigning prev sort keys
+	prevSortKeys := newPrevSortKeys(h.keeper, ctx)
 
 	var (
 		// How much space do transactions occupy, there's a limit
@@ -61,7 +61,7 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 		result = make([][]byte, 0, len(req.Txs)+1)
 
 		// There's a new Arweave block, add it as the first tx in sequencer's block
-		arweaveBlockTx := h.createArweaveTx(ctx, nextArweaveBlock, lastSortKeys)
+		arweaveBlockTx := h.createArweaveTx(ctx, nextArweaveBlock, prevSortKeys)
 		result = append(result, arweaveBlockTx)
 		size += protoTxSize(arweaveBlockTx)
 		if size > req.MaxTxBytes {
@@ -74,7 +74,7 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 	// Add transactions that waited in the mempool
 	for i := range req.Txs {
 		// Fill in helper data
-		txBytes := h.prepareDataItem(ctx.BlockHeader().LastBlockId.Hash, req.Txs[i], sortKey, lastSortKeys)
+		txBytes := h.prepareDataItem(ctx.BlockHeader().LastBlockId.Hash, req.Txs[i], sortKey, prevSortKeys)
 
 		txSize := protoTxSize(txBytes)
 		if size+txSize > req.MaxTxBytes {
@@ -96,10 +96,10 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 }
 
 // Creates a transaction with an Arweave block
-func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlock *types.NextArweaveBlock, lastSortKeys *LastSortKeys) []byte {
+func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlock *types.NextArweaveBlock, prevSortKeys *PrevSortKeys) []byte {
 	msg := &types.MsgArweaveBlock{
 		BlockInfo:    nextArweaveBlock.BlockInfo,
-		Transactions: prepareTransactions(nextArweaveBlock.Transactions, lastSortKeys),
+		Transactions: prepareTransactions(nextArweaveBlock.Transactions, prevSortKeys),
 	}
 
 	txBuilder := h.txConfig.NewTxBuilder()
@@ -116,22 +116,22 @@ func (h *prepareProposalHandler) createArweaveTx(ctx sdk.Context, nextArweaveBlo
 	return bz
 }
 
-// Sets the LastSortKey and random values for transactions from the Arweave block
-func prepareTransactions(txs []*types.ArweaveTransaction, lastSortKeys *LastSortKeys) []*types.ArweaveTransactionWithInfo {
+// Sets the PrevSortKey and random values for transactions from the Arweave block
+func prepareTransactions(txs []*types.ArweaveTransaction, prevSortKeys *PrevSortKeys) []*types.ArweaveTransactionWithInfo {
 	result := make([]*types.ArweaveTransactionWithInfo, len(txs))
 	for i, tx := range txs {
 		result[i] = &types.ArweaveTransactionWithInfo{
 			Transaction: tx,
-			LastSortKey: lastSortKeys.getAndStoreLastSortKey(tx.Contract, tx.SortKey),
+			PrevSortKey: prevSortKeys.getAndStorePrevSortKey(tx.Contract, tx.SortKey),
 			Random:      generateRandomL1(tx.SortKey),
 		}
 	}
 	return result
 }
 
-// Sets 'SortKey', 'LastSortKey' and random value if the transaction is an L2 interaction.
+// Sets 'SortKey', 'PrevSortKey' and random value if the transaction is an L2 interaction.
 // Returns the original transaction otherwise.
-func (h *prepareProposalHandler) prepareDataItem(sequencerBlockHash []byte, txBytes []byte, sortKey *SortKey, lastSortKeys *LastSortKeys) []byte {
+func (h *prepareProposalHandler) prepareDataItem(sequencerBlockHash []byte, txBytes []byte, sortKey *SortKey, prevSortKeys *PrevSortKeys) []byte {
 	// decode tx
 	tx, err := h.txConfig.TxDecoder()(txBytes)
 	if err != nil {
@@ -148,12 +148,12 @@ func (h *prepareProposalHandler) prepareDataItem(sequencerBlockHash []byte, txBy
 
 	dataItem.SortKey = sortKey.GetNextValue()
 
-	// Set last sort key
+	// Set prev sort key
 	contract, err := dataItem.GetContractFromTags()
 	if err != nil {
 		panic(err)
 	}
-	dataItem.LastSortKey = lastSortKeys.getAndStoreLastSortKey(contract, dataItem.SortKey)
+	dataItem.PrevSortKey = prevSortKeys.getAndStorePrevSortKey(contract, dataItem.SortKey)
 
 	// Set random value
 	dataItem.Random = generateRandomL2(sequencerBlockHash, dataItem.SortKey)

@@ -3,7 +3,7 @@ package sequencer.sequencer;
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
-// Store basic information about L1 interaction needed for calculating sort_key and last_sort_key.
+// Store basic information about L1 interaction needed for calculating sort_key and prev_sort_key.
 message ArweaveTransaction {
   string id = 1;
   string contract = 2;

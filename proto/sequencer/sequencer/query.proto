@@ -7,7 +7,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "sequencer/sequencer/params.proto";
 import "sequencer/sequencer/last_arweave_block.proto";
-import "sequencer/sequencer/last_sort_key.proto";
+import "sequencer/sequencer/prev_sort_key.proto";
 
 option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
@@ -26,13 +26,13 @@ service Query {
   
   }
   
-  // Queries a list of LastSortKey items.
-  rpc LastSortKey    (QueryGetLastSortKeyRequest) returns (QueryGetLastSortKeyResponse) {
-    option (google.api.http).get = "/warp-contracts/sequencer/sequencer/last_sort_key/{contract}";
+  // Queries a list of PrevSortKey items.
+  rpc PrevSortKey    (QueryGetPrevSortKeyRequest) returns (QueryGetPrevSortKeyResponse) {
+    option (google.api.http).get = "/warp-contracts/sequencer/sequencer/prev_sort_key/{contract}";
   
   }
-  rpc LastSortKeyAll (QueryAllLastSortKeyRequest) returns (QueryAllLastSortKeyResponse) {
-    option (google.api.http).get = "/warp-contracts/sequencer/sequencer/last_sort_key";
+  rpc PrevSortKeyAll (QueryAllPrevSortKeyRequest) returns (QueryAllPrevSortKeyResponse) {
+    option (google.api.http).get = "/warp-contracts/sequencer/sequencer/prev_sort_key";
   
   }
 }
@@ -52,20 +52,20 @@ message QueryGetLastArweaveBlockResponse {
   LastArweaveBlock LastArweaveBlock = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryGetLastSortKeyRequest {
+message QueryGetPrevSortKeyRequest {
   string contract = 1;
 }
 
-message QueryGetLastSortKeyResponse {
-  LastSortKey lastSortKey = 1 [(gogoproto.nullable) = false];
+message QueryGetPrevSortKeyResponse {
+  PrevSortKey prevSortKey = 1 [(gogoproto.nullable) = false];
 }
 
-message QueryAllLastSortKeyRequest {
+message QueryAllPrevSortKeyRequest {
   cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-message QueryAllLastSortKeyResponse {
-  repeated LastSortKey                            lastSortKey = 1 [(gogoproto.nullable) = false];
+message QueryAllPrevSortKeyResponse {
+  repeated PrevSortKey                            prevSortKey = 1 [(gogoproto.nullable) = false];
            cosmos.base.query.v1beta1.PageResponse pagination  = 2;
 }
 
