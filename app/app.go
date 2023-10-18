@@ -9,6 +9,7 @@ import (
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
 	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
+	"cosmossdk.io/errors"
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
@@ -27,7 +28,6 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -640,11 +640,11 @@ func New(
 	// initialize BaseApp
 	anteHandler, err := sequencerante.NewAnteHandler(
 		sequencerante.HandlerOptions{
-			AccountKeeper:     app.AccountKeeper,
-			BankKeeper:        app.BankKeeper,
-			FeegrantKeeper:    app.FeeGrantKeeper,
-			SignModeHandler:   encodingConfig.TxConfig.SignModeHandler(),
-			SigGasConsumer:    sequencerante.SigVerificationGasConsumer,
+			AccountKeeper:   app.AccountKeeper,
+			BankKeeper:      app.BankKeeper,
+			FeegrantKeeper:  app.FeeGrantKeeper,
+			SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:  sequencerante.SigVerificationGasConsumer,
 		},
 	)
 	if err != nil {
@@ -865,7 +865,9 @@ func (app *App) CheckTx(req abci.RequestCheckTx) abci.ResponseCheckTx {
 			return res
 		}
 	}
-	return app.BaseApp.CheckTx(req)
+	res := app.BaseApp.CheckTx(req)
+	app.logInvalidDataItemAfterRecheck(req, res)
+	return res
 }
 
 func (app *App) checkDataItemAlreadyInBlock(txBytes []byte) (bool, abci.ResponseCheckTx) {
@@ -883,4 +885,24 @@ func (app *App) checkDataItemAlreadyInBlock(txBytes []byte) (bool, abci.Response
 		return false, sdkerrors.ResponseCheckTxWithEvents(err, 0, 0, nil, app.Trace())
 	}
 	return true, abci.ResponseCheckTx{}
+}
+
+func (app *App) logInvalidDataItemAfterRecheck(req abci.RequestCheckTx, res abci.ResponseCheckTx) {
+	if req.Type != abci.CheckTxType_Recheck || res.Code == abci.CodeTypeOK {
+		return
+	}
+	
+	tx, err := app.txConfig.TxDecoder()(req.Tx)
+	if err != nil {
+		return
+	}
+
+	dataItem, err := sequencerante.GetL2Interaction(tx)
+	if dataItem == nil || err != nil {
+		return
+	}
+
+	app.Logger().
+		With("info", dataItem.GetInfo()).
+		Info("Data item is no longer valid")
 }

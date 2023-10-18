@@ -104,6 +104,6 @@ func (msg *MsgDataItem) GetInfo() DataItemInfo {
 	return DataItemInfo{
 		DataItemId: msg.DataItem.Id.Base64(),
 		Nonce:      nonce,
-		Sender:     msg.GetSigners()[0].String(),
+		Sender:     msg.GetCreator().String(),
 	}
 }
