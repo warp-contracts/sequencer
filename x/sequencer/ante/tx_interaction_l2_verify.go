@@ -78,7 +78,7 @@ func (ditd *DataItemTxDecorator) verifyTxWithDataItem(ctx sdk.Context, tx sdk.Tx
 			// The data item is only validated before being inserted into the mempool 
 			// and during the block validation in the `processProposalHandler`.
 			if err = dataItem.Verify(); err != nil {
-				return
+				return errors.Wrap(types.ErrDataItemVerification, err.Error())
 			}
 		}
 	}
