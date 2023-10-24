@@ -1,11 +1,11 @@
 package api
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/gorilla/mux"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
@@ -46,14 +46,20 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if response.Code != 0 {
-		jsonResponse, err := json.Marshal(response)
-		if err != nil {
-			InternalServerError(w, err, "response encoding error")
-		} else {
-			InternalServerErrorString(w, string(jsonResponse), "broadcast response with non-zero code")
-		}
+		ErrorWithStatus(w, response, "broadcast response with non-zero code", responseCodeToStatus(response.Code))
 		return
 	}
 
 	OkResponse(w, msg.GetInfo())
+}
+
+func responseCodeToStatus(responseCode uint32) int {
+	switch responseCode {
+	case sdkerrors.ErrWrongSequence.ABCICode():
+		return http.StatusConflict
+	case sdkerrors.ErrMempoolIsFull.ABCICode():
+		return http.StatusServiceUnavailable
+	default:
+		return http.StatusBadRequest
+	}
 }

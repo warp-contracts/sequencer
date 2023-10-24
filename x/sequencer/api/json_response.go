@@ -11,22 +11,20 @@ type httpStatus struct {
 	Text string `json:"text"`
 }
 
-type httpJsonError struct {
+type httpJsonError[T any] struct {
 	ErrorType    string     `json:"type"`
-	ErrorMessage string     `json:"message"`
+	ErrorMessage T          `json:"message"`
 	Status       httpStatus `json:"status"`
 }
 
 // Writes a bad request error in the form of JSON to the HTTP response
 func BadRequestError(w http.ResponseWriter, err error, errorType string) {
-	jsonError := createJsonError(err.Error(), errorType, http.StatusBadRequest)
-	writeError(w, jsonError)
+	ErrorWithStatus(w, err.Error(), errorType, http.StatusBadRequest)
 }
 
 // Writes a internal server error in the form of JSON to the HTTP response (takes an error as a string)
-func InternalServerErrorString(w http.ResponseWriter, err string, errorType string) {
-	jsonError := createJsonError(err, errorType, http.StatusInternalServerError)
-	writeError(w, jsonError)
+func InternalServerErrorString(w http.ResponseWriter, message string, errorType string) {
+	ErrorWithStatus(w, message, errorType, http.StatusInternalServerError)
 }
 
 // Writes a internal server error in the form of JSON to the HTTP response
@@ -36,22 +34,26 @@ func InternalServerError(w http.ResponseWriter, err error, errorType string) {
 
 // Returns a JSON response with a 404 status
 func NotFoundResponse(w http.ResponseWriter, message string) {
-	jsonError := createJsonError(message, "not found", http.StatusNotFound)
+	ErrorWithStatus(w, message, "not found", http.StatusNotFound)
+}
+
+func ErrorWithStatus[T any](w http.ResponseWriter, message T, errorType string, statusCode int) {
+	jsonError := createJsonError(message, errorType, statusCode)
 	writeError(w, jsonError)
 }
 
-func createJsonError(err string, errorType string, code int) httpJsonError {
-	return httpJsonError{
+func createJsonError[T any](errorMessage T, errorType string, statusCode int) httpJsonError[T] {
+	return httpJsonError[T]{
 		ErrorType:    errorType,
-		ErrorMessage: err,
+		ErrorMessage: errorMessage,
 		Status: httpStatus{
-			Code: code,
-			Text: http.StatusText(code),
+			Code: statusCode,
+			Text: http.StatusText(statusCode),
 		},
 	}
 }
 
-func writeError(w http.ResponseWriter, jsonError httpJsonError) {
+func writeError[T any](w http.ResponseWriter, jsonError httpJsonError[T]) {
 	setHeaders(w)
 	w.WriteHeader(jsonError.Status.Code)
 	if err := json.NewEncoder(w).Encode(jsonError); err != nil {
