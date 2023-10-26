@@ -794,7 +794,7 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	// Register the route for sending data items
 	sequencerapi.RegisterDataItemAPIRoute(clientCtx, apiSvr.Router)
 	// Register the route for retrieving nonce
-	sequencerapi.RegisterNonceAPIRoute(clientCtx, apiSvr.Router)
+	sequencerapi.RegisterNonceAPIRoute(app, apiSvr.Router)
 	// Register the route for retrieving tx by sender and nonce
 	sequencerapi.RegisterTxBySenderNonceAPIRoute(clientCtx, apiSvr.Router)
 	// Register the route for retrieving tx by data item id
@@ -854,4 +854,12 @@ func (app *App) Close() (err error) {
 	app.ArweaveBlocksController.StopWait()
 	app.BlockValidator.StopWait()
 	return nil
+}
+
+func (app *App) GetAccount(address sdk.AccAddress) (authtypes.AccountI, error) {
+	ctx, err := app.CreateQueryContext(app.LastBlockHeight(), false)
+	if err != nil {
+		return nil, err
+	}
+	return app.AccountKeeper.GetAccount(ctx, address), nil
 }

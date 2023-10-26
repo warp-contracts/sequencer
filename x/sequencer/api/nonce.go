@@ -3,22 +3,27 @@ package api
 import (
 	"encoding/base64"
 	"encoding/json"
-	"github.com/go-playground/validator/v10"
-	"github.com/gorilla/mux"
 	"net/http"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/go-playground/validator/v10"
+	"github.com/gorilla/mux"
+
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
 )
 
+type AccountProvider interface {
+	GetAccount(address sdk.AccAddress) (authtypes.AccountI, error)
+}
+
 type nonceHandler struct {
-	ctx      client.Context
-	validate *validator.Validate
+	accountProvider AccountProvider
+	validate        *validator.Validate
 }
 
 type NonceRequest struct {
@@ -33,8 +38,8 @@ type NonceResponse struct {
 
 // The endpoint that returns the account address and nonce for the given fields of the DataItem:
 // owner (in Base64URL format) and signature type.
-func RegisterNonceAPIRoute(clientCtx client.Context, router *mux.Router) {
-	router.Handle("/api/v1/nonce", nonceHandler{ctx: clientCtx, validate: validator.New()}).Methods("POST")
+func RegisterNonceAPIRoute(accountProvider AccountProvider, router *mux.Router) {
+	router.Handle("/api/v1/nonce", nonceHandler{accountProvider: accountProvider, validate: validator.New()}).Methods("POST")
 }
 
 func (h nonceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -57,7 +62,17 @@ func (h nonceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := getAddressWithNonce(h.ctx, publicKey)
+	address := sdk.AccAddress(publicKey.Address())
+	account, err := h.accountProvider.GetAccount(address)
+	if err != nil {
+		InternalServerError(w, err, "query nonce error")
+		return
+	}
+
+	response := NonceResponse{Address: address.String()}
+	if account != nil {
+		response.Nonce = account.GetSequence()
+	}
 	OkResponse(w, response)
 }
 
@@ -69,19 +84,4 @@ func getPublicKey(request NonceRequest) (key cryptotypes.PubKey, err error) {
 
 	signatureType := bundlr.SignatureType(request.SignatureType)
 	return types.GetPublicKey(signatureType, ownerBytes)
-}
-
-func getAddressWithNonce(ctx client.Context, key cryptotypes.PubKey) NonceResponse {
-	address := sdk.AccAddress(key.Address())
-	response := NonceResponse{Address: address.String()}
-
-	acc, err := ctx.AccountRetriever.GetAccount(ctx, address)
-	if acc == nil || err != nil {
-		// account does not exist
-		response.Nonce = 0
-	} else {
-		response.Nonce = acc.GetSequence()
-	}
-
-	return response
 }
