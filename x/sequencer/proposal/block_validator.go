@@ -22,10 +22,11 @@ type Block struct {
 type BlockValidator struct {
 	*task.Task
 
-	keeper     *keeper.Keeper
-	controller controller.ArweaveBlocksController
-	input      chan *Block
-	output     chan error
+	keeper                        *keeper.Keeper
+	controller                    controller.ArweaveBlocksController
+	input                         chan *Block
+	output                        chan *InvalidTxError
+	consecutiveArweaveBlockErrors int
 }
 
 func NewBlockValidator(keeper *keeper.Keeper, controller controller.ArweaveBlocksController) *BlockValidator {
@@ -33,7 +34,7 @@ func NewBlockValidator(keeper *keeper.Keeper, controller controller.ArweaveBlock
 	validator.keeper = keeper
 	validator.controller = controller
 	validator.input = make(chan *Block)
-	validator.output = make(chan error)
+	validator.output = make(chan *InvalidTxError)
 
 	validator.Task = task.NewTask(nil, "block-validator").
 		WithSubtaskFunc(validator.run).
@@ -120,9 +121,26 @@ func (v *BlockValidator) ValidateBlock(block *Block) error {
 	case <-block.ctx.Done():
 		return nil
 	case err := <-v.output:
-		// in case of a closed channel, err will be nil
-		return err
+		return v.handleInvalidTxError(err)
 	}
+}
+
+func (v *BlockValidator) handleInvalidTxError(err *InvalidTxError) error {
+	if err == nil {
+		v.consecutiveArweaveBlockErrors = 0
+		return nil
+	}
+
+	if err.errorType == INVALID_ARWEAVE {
+		v.consecutiveArweaveBlockErrors++
+		if v.consecutiveArweaveBlockErrors > 10 {
+			v.consecutiveArweaveBlockErrors = 0
+			v.Log.Warn("Controller restart due to too many consecutive Arweave block errors")
+			v.controller.Restart()
+		}
+	}
+
+	return err.err
 }
 
 func (v *BlockValidator) StopWait() {

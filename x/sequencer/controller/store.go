@@ -65,7 +65,7 @@ func (store *Store) processPayload(payload *listener.Payload) {
 			Timestamp: uint64(payload.BlockTimestamp),
 			Hash:      payload.BlockHash.Base64(),
 		},
-		Transactions: transactions(payload),
+		Transactions: store.transactions(payload),
 	}
 
 	store.mtx.Lock()
@@ -74,17 +74,26 @@ func (store *Store) processPayload(payload *listener.Payload) {
 	store.mtx.Unlock()
 }
 
-func transactions(payload *listener.Payload) []*types.ArweaveTransaction {
+func (store *Store) transactions(payload *listener.Payload) []*types.ArweaveTransaction {
 	txs := make([]*types.ArweaveTransaction, 0, len(payload.Transactions))
 	for _, tx := range payload.Transactions {
-		contract := getContractFromTag(tx)
-		if contract != "" {
-			txs = append(txs, &types.ArweaveTransaction{
-				Id:       tx.ID.Base64(),
-				Contract: contract,
-				SortKey:  warp.CreateSortKey(tx.ID, payload.BlockHeight, payload.BlockHash),
-			})
+		err := warp.ValidateTags(tx.Tags)
+		if err != nil {
+			store.Log.WithError(err).WithField("tx_id", tx.ID).Warn("Ignored interaction with invalid tags")
+			continue
 		}
+
+		contract := getContractFromTag(tx)
+		if len(contract) == 0 {
+			store.Log.WithField("tx_id", tx.ID).Warn("Ignored interaction without a contract tag")
+			continue
+		}
+
+		txs = append(txs, &types.ArweaveTransaction{
+			Id:       tx.ID.Base64(),
+			Contract: contract,
+			SortKey:  warp.CreateSortKey(tx.ID, payload.BlockHeight, payload.BlockHash),
+		})
 	}
 	// sort transactions by sort key
 	sort.Slice(txs, func(i, j int) bool {

@@ -17,7 +17,6 @@ import (
 	"github.com/warp-contracts/syncer/src/utils/monitoring"
 	monitor_syncer "github.com/warp-contracts/syncer/src/utils/monitoring/syncer"
 	"github.com/warp-contracts/syncer/src/utils/task"
-	"github.com/warp-contracts/syncer/src/utils/warp"
 )
 
 // Controller for fetching Arweave blocks to add them to the sequencer blockchain or validate blocks added by the Proposer.
@@ -25,17 +24,21 @@ type ArweaveBlocksController interface {
 	// Sets the last block height accepted by the sequencer network
 	SetLastAcceptedBlock(*types.ArweaveBlockInfo)
 
+	// Returns the fetched Arweave block with the given height
+	GetNextArweaveBlock(height uint64) *types.NextArweaveBlock
+
 	// Gracefully stops the controller, waits for all tasks to finish
 	StopWait()
 
-	// Returns the fetched Arweave block with the given height
-	GetNextArweaveBlock(height uint64) *types.NextArweaveBlock
+	// Restarts the controller by fetching Arweave blocks again, starting from the last accepted block
+	Restart()
 }
 
 type SyncerController struct {
 	*task.Task
 
 	config *config.Config
+	watchdog *task.Watchdog
 
 	// Runtime state
 	mtx                       sync.Mutex
@@ -78,8 +81,7 @@ func NewController(log log.Logger, configPath string) (out ArweaveBlocksControll
 		self.mtx.Lock()
 		defer self.mtx.Unlock()
 
-		client := arweave.NewClient(self.Ctx, self.config).
-			WithTagValidator(warp.ValidateTag)
+		client := arweave.NewClient(self.Ctx, self.config)
 
 		networkMonitor := listener.NewNetworkMonitor(self.config).
 			WithClient(client).
@@ -117,7 +119,7 @@ func NewController(log log.Logger, configPath string) (out ArweaveBlocksControll
 			WithSubtask(self.store.Task)
 	}
 
-	watchdog := task.NewWatchdog(self.config).
+	self.watchdog = task.NewWatchdog(self.config).
 		WithTask(watched).
 		WithIsOK(30*time.Second, func() bool {
 			isOK := monitor.IsOK()
@@ -131,7 +133,7 @@ func NewController(log log.Logger, configPath string) (out ArweaveBlocksControll
 	self.Task = self.Task.
 		WithSubtask(server.Task).
 		WithSubtask(monitor.Task).
-		WithConditionalSubtask(self.config.Syncer.Enabled, watchdog.Task)
+		WithConditionalSubtask(self.config.Syncer.Enabled, self.watchdog.Task)
 
 	// Starts all the tasks, but downloading new block will be blocked until lastAcceptedArweaveHeight is set
 	err = self.Start()
@@ -153,14 +155,6 @@ func (self *SyncerController) GetNextArweaveBlock(height uint64) *types.NextArwe
 		return nil
 	}
 	return self.store.GetNextArweaveBlock(height)
-}
-
-func (self *SyncerController) StopWait() {
-	if self == nil {
-		return
-	}
-
-	self.StopWait()
 }
 
 func (self *SyncerController) SetLastAcceptedBlock(block *types.ArweaveBlockInfo) {
@@ -186,4 +180,22 @@ func (self *SyncerController) SetLastAcceptedBlock(block *types.ArweaveBlockInfo
 	}
 	self.lastAcceptedArweaveHash = hash
 	self.blockDownloader.SetPreviousBlock(self.lastAcceptedArweaveHeight, self.lastAcceptedArweaveHash)
+}
+
+func (self *SyncerController) StopWait() {
+	if self == nil {
+		return
+	}
+
+	self.StopWait()
+}
+
+func (self *SyncerController) Restart() {
+	if self == nil || self.watchdog == nil {
+		return
+	}
+	err := self.watchdog.Restart()
+	if err != nil {
+		self.Log.WithError(err).Warn("Issue with watched task restart")
+	}
 }

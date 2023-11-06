@@ -8,11 +8,11 @@ type validationResult struct {
 	// has the result been sent to the channel?
 	sent   bool
 	// the channel to which the validation result is sent
-	output chan error
+	output chan *InvalidTxError
 	mtx    sync.RWMutex
 }
 
-func newValidationResult(output chan error) *validationResult {
+func newValidationResult(output chan *InvalidTxError) *validationResult {
 	return &validationResult{
 		sent:   false,
 		output: output,
@@ -26,7 +26,7 @@ func (vr *validationResult) isNotSent() bool {
 	return !vr.sent
 }
 
-func (vr *validationResult) sendFirstError(err error) {
+func (vr *validationResult) sendFirstError(err *InvalidTxError) {
 	if err != nil {
 		vr.mtx.Lock()
 		defer vr.mtx.Unlock()
