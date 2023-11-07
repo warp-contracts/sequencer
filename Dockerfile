@@ -23,6 +23,7 @@ RUN make build
 
 # Minimal output image
 FROM alpine:3.18
+RUN apk add --update jq
 
 # Cosmovisor setup
 RUN mkdir -p /root/cosmovisor/genesis/bin
