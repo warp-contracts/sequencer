@@ -21,6 +21,7 @@ type TxValidator struct {
 	prevSortKeys         *PrevSortKeys
 }
 
+
 func newTxValidator(ctx sdk.Context, keeper *keeper.Keeper, controller controller.ArweaveBlocksController) *TxValidator {
 	lastArweaveBlock := keeper.MustGetLastArweaveBlock(ctx)
 	nextArweaveBlock := controller.GetNextArweaveBlock(lastArweaveBlock.ArweaveBlock.Height + 1)
@@ -29,16 +30,22 @@ func newTxValidator(ctx sdk.Context, keeper *keeper.Keeper, controller controlle
 	return &TxValidator{ctx.BlockHeader(), &lastArweaveBlock, nextArweaveBlock, sortKey, prevSortKeys}
 }
 
-func (tv *TxValidator) validateSequentially(txIndex int, tx sdk.Tx) error {
+func (tv *TxValidator) validateSequentially(txIndex int, tx sdk.Tx) *InvalidTxError {
 	if err := tv.validateSequentiallyArweaveBlock(txIndex, tx); err != nil {
-		return err
+		return InvalidArweaveError(err)
 	}
-	return tv.validateSequentiallyDataItem(txIndex, tx)
+	if err := tv.validateSequentiallyDataItem(txIndex, tx); err != nil {
+		return InvalidDataItemError(err)
+	}
+	return nil
 }
 
-func (tv *TxValidator) validateInParallel(txIndex int, tx sdk.Tx) error {
+func (tv *TxValidator) validateInParallel(txIndex int, tx sdk.Tx) *InvalidTxError {
 	if err := tv.validateInParallelArweaveBlock(txIndex, tx); err != nil {
-		return err
+		return InvalidArweaveError(err)
 	}
-	return tv.validateInParallelDataItem(txIndex, tx)
+	if err := tv.validateInParallelDataItem(txIndex, tx); err != nil {
+		return InvalidDataItemError(err)
+	}
+	return nil
 }

@@ -18,6 +18,9 @@ func (mock ArweaveBlocksControllerMock) GetNextArweaveBlock(height uint64) *type
 func (mock ArweaveBlocksControllerMock) StopWait() {
 }
 
+func (mock ArweaveBlocksControllerMock) Restart() {
+}
+
 func MockArweaveBlocksController(blockInfo *types.ArweaveBlockInfo) ArweaveBlocksController {
 	if blockInfo == nil {
 		return ArweaveBlocksControllerMock{}
