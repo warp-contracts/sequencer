@@ -45,9 +45,7 @@ setupSequencer() {
     fi
 
     if [ ! -L "$SEQUENCER_HOME/config/prev_sort_keys.json" ]; then
-        ln -s "$SEQUENCER_HOME/data/prev_sort_keys.json" "$SEQUENCER_HOME/config/prev_sort_keys.json"
-    else 
-        tail "$SEQUENCER_HOME/config/prev_sort_keys.json"
+        ln -s "/genesis/prev_sort_keys.json" "$SEQUENCER_HOME/config/prev_sort_keys.json"
     fi
 }
 
