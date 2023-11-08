@@ -31,6 +31,7 @@ RUN mkdir -p /root/cosmovisor/genesis/bin
 # Cosmos setup
 RUN mkdir -p /root/.sequencer/data
 RUN echo '{"height":"0","round":0,"step":0}' > /root/.sequencer/data/priv_validator_state.json
+COPY network/prod/prev_sort_keys.json /root/.sequencer/data/prev_sort_keys.json
 
 # Executables
 COPY --from=sequencer /go/bin/cosmovisor /usr/local/bin/cosmovisor

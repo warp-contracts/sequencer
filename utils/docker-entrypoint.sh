@@ -43,6 +43,10 @@ setupSequencer() {
         mkdir -p $SEQUENCER_HOME/data
         echo '{"height":"0","round":0,"step":0}' > $SEQUENCER_HOME/data/priv_validator_state.json
     fi
+
+    if [ ! -e "$SEQUENCER_HOME/config/prev_sort_keys.json" ]; then
+        ln -s "$SEQUENCER_HOME/data/prev_sort_keys.json" "$SEQUENCER_HOME/config/prev_sort_keys.json"
+    fi
 }
 
 run() {
