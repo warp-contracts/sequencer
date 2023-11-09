@@ -77,12 +77,6 @@ func (store *Store) processPayload(payload *listener.Payload) {
 func (store *Store) transactions(payload *listener.Payload) []*types.ArweaveTransaction {
 	txs := make([]*types.ArweaveTransaction, 0, len(payload.Transactions))
 	for _, tx := range payload.Transactions {
-		err := warp.ValidateTags(tx.Tags)
-		if err != nil {
-			store.Log.WithError(err).WithField("tx_id", tx.ID.Base64()).Warn("Ignored interaction with invalid tags")
-			continue
-		}
-
 		contract := getContractFromTag(tx)
 		if len(contract) == 0 {
 			store.Log.WithField("tx_id", tx.ID.Base64()).Warn("Ignored interaction without a contract tag")

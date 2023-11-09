@@ -3,6 +3,7 @@ package sequencer
 import (
 	"encoding/json"
 	"os"
+	"path"
 	"path/filepath"
 
 	"github.com/cometbft/cometbft/libs/log"
@@ -19,14 +20,15 @@ const (
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.
-func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, configPath string) {
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, homePath string) {
+	genesisPath := path.Join(homePath, "genesis")
 	// Set LastArweaveBlock
 	var lastArweaveBlock *types.LastArweaveBlock
 	var err error
 	if genState.LastArweaveBlock != nil {
 		lastArweaveBlock = genState.LastArweaveBlock
 	} else {
-		lastArweaveBlock, err = readLastArweaveBlockFromFile(ctx.Logger(), configPath)
+		lastArweaveBlock, err = readLastArweaveBlockFromFile(ctx.Logger(), genesisPath)
 		if err != nil {
 			panic(err)
 		}
@@ -36,7 +38,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, 
 	// Set all the prevSortKey
 	var prevSortKeys []types.PrevSortKey
 	if len(genState.PrevSortKeyList) == 0 {
-		prevSortKeys = readPrevSortKeysFromFile(ctx.Logger(), configPath)
+		prevSortKeys = readPrevSortKeysFromFile(ctx.Logger(), genesisPath)
 	} else {
 		prevSortKeys = genState.GetPrevSortKeyList()
 	}
@@ -48,8 +50,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, 
 	k.SetParams(ctx, genState.Params)
 }
 
-func readLastArweaveBlockFromFile(logger log.Logger, configPath string) (*types.LastArweaveBlock, error) {
-	filePath := filepath.Join(configPath, LAST_ARWEAVE_BLOCK_FILE)
+func readLastArweaveBlockFromFile(logger log.Logger, genesisPath string) (*types.LastArweaveBlock, error) {
+	filePath := filepath.Join(genesisPath, LAST_ARWEAVE_BLOCK_FILE)
 	jsonFile, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
@@ -67,8 +69,8 @@ func readLastArweaveBlockFromFile(logger log.Logger, configPath string) (*types.
 	}, nil
 }
 
-func readPrevSortKeysFromFile(logger log.Logger, configPath string) []types.PrevSortKey {
-	filePath := filepath.Join(configPath, PREV_SORT_KEYS_FILE)
+func readPrevSortKeysFromFile(logger log.Logger, genesisPath string) []types.PrevSortKey {
+	filePath := filepath.Join(genesisPath, PREV_SORT_KEYS_FILE)
 	var keys []types.PrevSortKey
 
 	jsonFile, err := os.ReadFile(filePath)

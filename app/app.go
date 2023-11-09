@@ -256,7 +256,6 @@ func New(
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 	txConfig := encodingConfig.TxConfig
-	configPath := filepath.Join(homePath, "config")
 
 	bApp := baseapp.NewBaseApp(
 		Name,
@@ -457,7 +456,7 @@ func New(
 	)
 
 	if appOpts.Get("test") == nil {
-		app.ArweaveBlocksController, err = controller.NewController(logger, configPath)
+		app.ArweaveBlocksController, err = controller.NewController(logger, homePath)
 		if err != nil {
 			panic(err)
 		}
@@ -469,7 +468,7 @@ func New(
 		}
 	}
 	app.BlockInteractions = sequencerante.NewBlockInteractions()
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, configPath, app.BlockInteractions)
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, homePath, app.BlockInteractions)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
