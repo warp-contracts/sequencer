@@ -87,7 +87,7 @@ func NewController(log log.Logger, homePath string) (out ArweaveBlocksController
 			WithClient(client).
 			WithMonitor(monitor).
 			WithInterval(self.config.NetworkMonitor.Period).
-			WithRequiredConfirmationBlocks(self.config.NetworkMonitor.RequiredConfirmationBlocks)
+			WithRequiredConfirmationBlocks(20)
 
 		self.blockDownloader = listener.NewBlockDownloader(self.config).
 			WithClient(client).
