@@ -26,6 +26,6 @@ genesis:
     sequencer:
       lastArweaveBlock:
         arweaveBlock:
-          height: 1294015
-          timestamp: 1698900001
+          height: 1297115
+          timestamp: 1699304084
         sequencerBlockHeight: 0
