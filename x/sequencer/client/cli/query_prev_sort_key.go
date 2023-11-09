@@ -10,8 +10,8 @@ import (
 
 func CmdListPrevSortKey() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "list-prev-dort-key",
-		Short: "list all prev-dort-key",
+		Use:   "list-prev-sort-key",
+		Short: "list all prev-sort-key",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -46,8 +46,8 @@ func CmdListPrevSortKey() *cobra.Command {
 
 func CmdShowPrevSortKey() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "show-prev-dort-key [contract]",
-		Short: "shows a prev-dort-key",
+		Use:   "show-prev-sort-key [contract]",
+		Short: "shows a prev-sort-key",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx, err := client.GetClientQueryContext(cmd)

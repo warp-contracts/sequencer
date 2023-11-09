@@ -49,12 +49,12 @@ type SyncerController struct {
 	store           *Store
 }
 
-func NewController(log log.Logger, configPath string) (out ArweaveBlocksController, err error) {
+func NewController(log log.Logger, homePath string) (out ArweaveBlocksController, err error) {
 	self := new(SyncerController)
 	InitLogger(log, logrus.InfoLevel.String())
 
 	// Load configuration from path, env or defaults
-	filepath := path.Join(configPath, "syncer.json")
+	filepath := path.Join(homePath, "config/syncer.json")
 	if _, err := os.Stat(filepath); err != nil {
 		// Empty file path loads default config
 		filepath = ""
