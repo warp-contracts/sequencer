@@ -10,7 +10,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-// It validates the transaction and provides two methods for validation: 
+// It validates the transaction and provides two methods for validation:
 // - sequential - in the order of transactions in the block
 // - parallel - independently of the validation of other transactions
 type TxValidator struct {
@@ -21,13 +21,19 @@ type TxValidator struct {
 	prevSortKeys         *PrevSortKeys
 }
 
-
 func newTxValidator(ctx sdk.Context, keeper *keeper.Keeper, controller controller.ArweaveBlocksController) *TxValidator {
 	lastArweaveBlock := keeper.MustGetLastArweaveBlock(ctx)
 	nextArweaveBlock := controller.GetNextArweaveBlock(lastArweaveBlock.ArweaveBlock.Height + 1)
 	sortKey := newSortKey(lastArweaveBlock.ArweaveBlock.Height, ctx.BlockHeight())
 	prevSortKeys := newPrevSortKeys(keeper, ctx)
 	return &TxValidator{ctx.BlockHeader(), &lastArweaveBlock, nextArweaveBlock, sortKey, prevSortKeys}
+}
+
+func (tv *TxValidator) verifyNoTransactions() *InvalidTxError {
+	if err := tv.checkArweaveBlockIsNotMissing(); err != nil {
+		return InvalidArweaveError(err)
+	}
+	return nil
 }
 
 func (tv *TxValidator) validateSequentially(txIndex int, tx sdk.Tx) *InvalidTxError {

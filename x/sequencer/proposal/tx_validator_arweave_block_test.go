@@ -194,18 +194,11 @@ func TestArweaveBlockIsNotMissingGenesis(t *testing.T) {
 	validator := mockValidator(t, nil, test.ArweaveBlock().BlockInfo, nil)
 	validator.sequencerBlockHeader.Height = 0
 
-	err := validator.checkArweaveBlockIsNotMissing(0)
+	err := validator.checkArweaveBlockIsNotMissing()
 
 	require.NoError(t, err)
 }
 
-func TestArweaveBlockIsNotMissingNotFirst(t *testing.T) {
-	validator := mockValidator(t, nil, nil, nil)
-
-	err := validator.checkArweaveBlockIsNotMissing(1)
-
-	require.NoError(t, err)
-}
 
 func TestArweaveBlockIsNotMissingNoNext(t *testing.T) {
 	block := test.ArweaveBlock()
@@ -213,7 +206,7 @@ func TestArweaveBlockIsNotMissingNoNext(t *testing.T) {
 		ArweaveBlock: block.BlockInfo,
 	}, nil, nil)
 
-	err := validator.checkArweaveBlockIsNotMissing(0)
+	err := validator.checkArweaveBlockIsNotMissing()
 
 	require.NoError(t, err)
 }
@@ -225,7 +218,7 @@ func TestArweaveBlockIsNotMissing(t *testing.T) {
 		ArweaveBlock: blockInfo,
 	}, blockInfo, nil)
 
-	err := validator.checkArweaveBlockIsNotMissing(0)
+	err := validator.checkArweaveBlockIsNotMissing()
 
 	require.NoError(t, err)
 }
@@ -236,7 +229,7 @@ func TestArweaveBlockIsMissing(t *testing.T) {
 		ArweaveBlock: blockInfo,
 	}, blockInfo, nil)
 
-	err := validator.checkArweaveBlockIsNotMissing(0)
+	err := validator.checkArweaveBlockIsNotMissing()
 
 	require.ErrorIs(t, err, types.ErrArweaveBlockMissing)
 }

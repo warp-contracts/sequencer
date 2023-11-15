@@ -54,22 +54,30 @@ func (v *BlockValidator) run() error {
 		case <-v.Ctx.Done():
 			return nil
 		case block := <-v.input:
-			if len(block.txs) == 0 {
-				v.output <- nil
-				continue
-			}
-
 			txValidator := newTxValidator(block.ctx, v.keeper, v.controller)
 			result := newValidationResult(v.output)
-			wg := &sync.WaitGroup{}
-			wg.Add(1 + len(block.txs)) // one sequential and for each transaction
 
-			v.validateSequentially(txValidator, block.txs, result, wg)
-			v.validateInParallel(txValidator, block.txs, result, wg)
+			if len(block.txs) == 0 {
+				v.validateEmptyBlock(txValidator, result)
+			} else {
+				wg := &sync.WaitGroup{}
+				wg.Add(1 + len(block.txs)) // one sequential and for each transaction
 
-			wg.Wait()
+				v.validateSequentially(txValidator, block.txs, result, wg)
+				v.validateInParallel(txValidator, block.txs, result, wg)
+
+				wg.Wait()
+			}
+
 			result.sendIfNoError()
 		}
+	}
+}
+
+func (v *BlockValidator) validateEmptyBlock(txValidator *TxValidator, result *validationResult) {
+	err := txValidator.verifyNoTransactions()
+	if err != nil {
+		result.sendFirstError(err)
 	}
 }
 

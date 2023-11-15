@@ -56,7 +56,10 @@ func (tv *TxValidator) validateInParallelArweaveBlock(txIndex int, tx sdk.Tx) er
 		return tv.validateArweaveBlockMsg(arweaveBlock)
 	}
 
-	return tv.checkArweaveBlockIsNotMissing(txIndex)
+	if (txIndex == 0) {
+		return tv.checkArweaveBlockIsNotMissing()
+	}
+	return nil
 }
 
 func (tv *TxValidator) validateIndex(txIndex int) error {
@@ -182,8 +185,8 @@ func (tv *TxValidator) checkTransactions(block *types.MsgArweaveBlock, expectedT
 	return nil
 }
 
-func (tv *TxValidator) checkArweaveBlockIsNotMissing(txIndex int) error {
-	if txIndex > 0 || tv.sequencerBlockHeader.Height == 0 {
+func (tv *TxValidator) checkArweaveBlockIsNotMissing() error {
+	if tv.sequencerBlockHeader.Height == 0 {
 		return nil
 	}
 
