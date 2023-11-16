@@ -56,7 +56,7 @@ func (tv *TxValidator) validateInParallelArweaveBlock(txIndex int, tx sdk.Tx) er
 		return tv.validateArweaveBlockMsg(arweaveBlock)
 	}
 
-	if (txIndex == 0) {
+	if txIndex == 0 {
 		return tv.checkArweaveBlockIsNotMissing()
 	}
 	return nil
@@ -98,10 +98,10 @@ func (tv *TxValidator) validateArweaveBlockMsg(msg *types.MsgArweaveBlock) error
 }
 
 func (tv *TxValidator) checkBlockIsOldEnough(newBlockInfo *types.ArweaveBlockInfo) error {
-	arweaveBlockTimestamp := time.Unix(int64(newBlockInfo.Timestamp), 0)
-	sequencerBlockTimestamp := tv.sequencerBlockHeader.Time
+	if tv.sequencerBlockHeader.Height > 1 && !types.IsArweaveBlockOldEnough(tv.sequencerBlockHeader, newBlockInfo) {
+		arweaveBlockTimestamp := time.Unix(int64(newBlockInfo.Timestamp), 0)
+		sequencerBlockTimestamp := tv.sequencerBlockHeader.Time
 
-	if !types.IsArweaveBlockOldEnough(tv.sequencerBlockHeader, newBlockInfo) {
 		return errors.Wrapf(types.ErrArweaveBlockNotOldEnough,
 			"Arweave block should be one hour older than the sequencer block, Arweave block timestamp: %s, sequencer block timestamp: %s",
 			arweaveBlockTimestamp.UTC().Format(time.DateTime), sequencerBlockTimestamp.UTC().Format(time.DateTime))

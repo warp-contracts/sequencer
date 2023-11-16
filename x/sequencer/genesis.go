@@ -15,22 +15,101 @@ import (
 )
 
 const (
-	LAST_ARWEAVE_BLOCK_FILE = "last_arweave_block.json"
-	PREV_SORT_KEYS_FILE     = "prev_sort_keys.json"
+	ARWEAVE_BLOCK_FILE  = "arweave_block.json"
+	PREV_SORT_KEYS_FILE = "prev_sort_keys.json"
 )
 
-// InitGenesis initializes the module's state from a provided genesis state.
-func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, homePath string) {
+// Loads the genesis state from configuration files
+type GenesisLoader interface {
+	LoadArweaveBlock() *types.GenesisArweaveBlock
+	LoadPrevSortKeys() []types.PrevSortKey
+}
+
+type GenesisConfigFileLoader struct {
+	logger      log.Logger
+	genesisPath string
+}
+
+func NewGenesisLoader(logger log.Logger, homePath string) GenesisLoader {
 	genesisPath := path.Join(homePath, "genesis")
+	return &GenesisConfigFileLoader{
+		logger,
+		genesisPath,
+	}
+}
+
+func (loader *GenesisConfigFileLoader) LoadArweaveBlock() *types.GenesisArweaveBlock {
+	filePath := filepath.Join(loader.genesisPath, ARWEAVE_BLOCK_FILE)
+	jsonFile, err := os.ReadFile(filePath)
+	if err != nil {
+		loader.
+			logger.
+			With("err", err).
+			With("file", filePath).
+			Info("Unable to retrieve arweave block from the file")
+		return nil
+	}
+
+	var block types.GenesisArweaveBlock
+	err = json.Unmarshal(jsonFile, &block)
+	if err != nil {
+		loader.
+			logger.
+			With("err", err).
+			With("file", filePath).
+			Info("Unable to unmarshal arweave block from the file")
+		return nil
+	}
+
+	return &block
+}
+
+func (loader *GenesisConfigFileLoader) LoadPrevSortKeys() []types.PrevSortKey {
+	filePath := filepath.Join(loader.genesisPath, PREV_SORT_KEYS_FILE)
+	var keys []types.PrevSortKey
+
+	jsonFile, err := os.ReadFile(filePath)
+	if err != nil {
+		loader.
+			logger.
+			With("err", err).
+			With("file", filePath).
+			Info("Unable to retrieve prev sort keys from the file")
+		return keys
+	}
+
+	err = json.Unmarshal(jsonFile, &keys)
+	if err != nil {
+		loader.
+			logger.
+			With("err", err).
+			With("file", filePath).
+			Info("Unable to unmarshal prev sort keys from the file")
+		return keys
+	}
+
+	loader.
+		logger.
+		With("number of keys", len(keys)).
+		With("file", filePath).
+		Info("Prev sort keys loaded from the file")
+	return keys
+}
+
+// InitGenesis initializes the module's state from a provided genesis state.
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, loader GenesisLoader) {
 	// Set LastArweaveBlock
 	var lastArweaveBlock *types.LastArweaveBlock
-	var err error
 	if genState.LastArweaveBlock != nil {
 		lastArweaveBlock = genState.LastArweaveBlock
 	} else {
-		lastArweaveBlock, err = readLastArweaveBlockFromFile(ctx.Logger(), genesisPath)
-		if err != nil {
-			panic(err)
+		block := loader.LoadArweaveBlock()
+		if block == nil {
+			panic("A sequencer blockchain cannot launch without a genesis Arweave block")
+		}
+		lastArweaveBlock = &types.LastArweaveBlock{
+			ArweaveBlock:         block.LastArweaveBlock,
+			SequencerBlockHeight: 0,
 		}
 	}
 	k.SetLastArweaveBlock(ctx, *lastArweaveBlock)
@@ -38,7 +117,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, 
 	// Set all the prevSortKey
 	var prevSortKeys []types.PrevSortKey
 	if len(genState.PrevSortKeyList) == 0 {
-		prevSortKeys = readPrevSortKeysFromFile(ctx.Logger(), genesisPath)
+		prevSortKeys = loader.LoadPrevSortKeys()
 	} else {
 		prevSortKeys = genState.GetPrevSortKeyList()
 	}
@@ -48,54 +127,6 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState, 
 
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
-}
-
-func readLastArweaveBlockFromFile(logger log.Logger, genesisPath string) (*types.LastArweaveBlock, error) {
-	filePath := filepath.Join(genesisPath, LAST_ARWEAVE_BLOCK_FILE)
-	jsonFile, err := os.ReadFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	var blockInfo types.ArweaveBlockInfo
-	err = json.Unmarshal(jsonFile, &blockInfo)
-	if err != nil {
-		return nil, err
-	}
-
-	return &types.LastArweaveBlock{
-		ArweaveBlock:         &blockInfo,
-		SequencerBlockHeight: 0,
-	}, nil
-}
-
-func readPrevSortKeysFromFile(logger log.Logger, genesisPath string) []types.PrevSortKey {
-	filePath := filepath.Join(genesisPath, PREV_SORT_KEYS_FILE)
-	var keys []types.PrevSortKey
-
-	jsonFile, err := os.ReadFile(filePath)
-	if err != nil {
-		logger.
-			With("err", err).
-			With("file", filePath).
-			Info("Unable to retrieve prev sort keys from the file")
-		return keys
-	}
-
-	err = json.Unmarshal(jsonFile, &keys)
-	if err != nil {
-		logger.
-			With("err", err).
-			With("file", filePath).
-			Info("Unable to unmarshal prev sort keys from the file")
-		return keys
-	}
-
-	logger.
-		With("number of keys", len(keys)).
-		With("file", filePath).
-		Info("Prev sort keys loaded from the file")
-	return keys
 }
 
 // ExportGenesis returns the module's exported genesis
