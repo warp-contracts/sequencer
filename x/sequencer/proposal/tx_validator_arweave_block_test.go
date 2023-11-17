@@ -12,6 +12,16 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
+type genesisLoaderMock struct{}
+
+func (mock *genesisLoaderMock) LoadArweaveBlock() *types.GenesisArweaveBlock {
+	return nil
+}
+
+func (mock *genesisLoaderMock) LoadPrevSortKeys() []types.PrevSortKey {
+	return []types.PrevSortKey{}
+}
+
 func mockValidator(t *testing.T, lastBlock *types.LastArweaveBlock, nextBlock *types.ArweaveBlockInfo, prevSortKey *types.PrevSortKey) *TxValidator {
 	keeper, ctx := keepertest.SequencerKeeper(t)
 
@@ -30,8 +40,9 @@ func mockValidator(t *testing.T, lastBlock *types.LastArweaveBlock, nextBlock *t
 	blockHeader.Height = 123
 
 	controller := controller.MockArweaveBlocksController(nextBlock)
+	provider := NewArweaveBlockProvider(keeper, controller, &genesisLoaderMock{})
 
-	return newTxValidator(ctx.WithBlockHeader(blockHeader), keeper, controller)
+	return newTxValidator(ctx.WithBlockHeader(blockHeader), provider)
 }
 
 func TestValidatePrevSortKeysMismatch(t *testing.T) {

@@ -5,9 +5,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/warp-contracts/sequencer/x/sequencer/controller"
-	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
-
 	"github.com/warp-contracts/syncer/src/utils/task"
 )
 
@@ -22,17 +19,15 @@ type Block struct {
 type BlockValidator struct {
 	*task.Task
 
-	keeper                        *keeper.Keeper
-	controller                    controller.ArweaveBlocksController
+	provider                      *ArweaveBlockProvider
 	input                         chan *Block
 	output                        chan *InvalidTxError
 	consecutiveArweaveBlockErrors int
 }
 
-func NewBlockValidator(keeper *keeper.Keeper, controller controller.ArweaveBlocksController) *BlockValidator {
+func NewBlockValidator(provider *ArweaveBlockProvider) *BlockValidator {
 	validator := new(BlockValidator)
-	validator.keeper = keeper
-	validator.controller = controller
+	validator.provider = provider
 	validator.input = make(chan *Block)
 	validator.output = make(chan *InvalidTxError)
 
@@ -54,7 +49,7 @@ func (v *BlockValidator) run() error {
 		case <-v.Ctx.Done():
 			return nil
 		case block := <-v.input:
-			txValidator := newTxValidator(block.ctx, v.keeper, v.controller)
+			txValidator := newTxValidator(block.ctx, v.provider)
 			result := newValidationResult(v.output)
 
 			if len(block.txs) == 0 {
@@ -144,7 +139,7 @@ func (v *BlockValidator) handleInvalidTxError(err *InvalidTxError) error {
 		if v.consecutiveArweaveBlockErrors > 10 {
 			v.consecutiveArweaveBlockErrors = 0
 			v.Log.Warn("Controller restart due to too many consecutive Arweave block errors")
-			v.controller.Restart()
+			v.provider.controller.Restart()
 		}
 	}
 

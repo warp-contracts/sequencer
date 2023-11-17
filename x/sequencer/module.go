@@ -101,7 +101,7 @@ type AppModule struct {
 	accountKeeper           types.AccountKeeper
 	bankKeeper              types.BankKeeper
 	arweaveBlocksController controller.ArweaveBlocksController
-	homePath                string
+	genesisLoader           GenesisLoader
 	blockInteractions       *ante.BlockInteractions
 }
 
@@ -111,7 +111,7 @@ func NewAppModule(
 	accountKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	arweaveBlocksController controller.ArweaveBlocksController,
-	homePath string,
+	genesisLoader GenesisLoader,
 	blockInteractions *ante.BlockInteractions,
 ) AppModule {
 	return AppModule{
@@ -120,7 +120,7 @@ func NewAppModule(
 		accountKeeper:           accountKeeper,
 		bankKeeper:              bankKeeper,
 		arweaveBlocksController: arweaveBlocksController,
-		homePath:                homePath,
+		genesisLoader:           genesisLoader,
 		blockInteractions:       blockInteractions,
 	}
 }
@@ -140,7 +140,7 @@ func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.Ra
 	// Initialize global index to index in genesis state
 	cdc.MustUnmarshalJSON(gs, &genState)
 
-	InitGenesis(ctx, am.keeper, genState, am.homePath)
+	InitGenesis(ctx, am.keeper, genState, am.genesisLoader)
 
 	return []abci.ValidatorUpdate{}
 }
@@ -171,11 +171,6 @@ func (am AppModule) startOrUpdateArweaveBlocksController(ctx sdk.Context) {
 	if am.arweaveBlocksController == nil {
 		return
 	}
-	lastArweaveBlock, found := am.keeper.GetLastArweaveBlock(ctx)
-
-	if !found {
-		panic("Last Arweave Block is not set when the BeginBlock method is called, and should be set when the blockchain is started")
-	}
-
+	lastArweaveBlock := am.keeper.MustGetLastArweaveBlock(ctx)
 	am.arweaveBlocksController.SetLastAcceptedBlock(lastArweaveBlock.ArweaveBlock)
 }

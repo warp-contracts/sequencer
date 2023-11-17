@@ -27,7 +27,7 @@ func TestGenesis(t *testing.T) {
 	}
 
 	k, ctx := keepertest.SequencerKeeper(t)
-	sequencer.InitGenesis(ctx, *k, genesisState, "")
+	sequencer.InitGenesis(ctx, *k, genesisState, nil)
 	got := sequencer.ExportGenesis(ctx, *k)
 	require.NotNil(t, got)
 

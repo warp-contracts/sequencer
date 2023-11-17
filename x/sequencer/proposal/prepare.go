@@ -11,19 +11,16 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/ante"
-	"github.com/warp-contracts/sequencer/x/sequencer/controller"
-	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 type prepareProposalHandler struct {
-	keeper            *keeper.Keeper
-	arweaveController controller.ArweaveBlocksController
-	txConfig          client.TxConfig
+	provider *ArweaveBlockProvider
+	txConfig client.TxConfig
 }
 
-func NewPrepareProposalHandler(keeper *keeper.Keeper, arweaveController controller.ArweaveBlocksController, txConfig client.TxConfig) sdk.PrepareProposalHandler {
-	handler := &prepareProposalHandler{keeper, arweaveController, txConfig}
+func NewPrepareProposalHandler(provider *ArweaveBlockProvider, txConfig client.TxConfig) sdk.PrepareProposalHandler {
+	handler := &prepareProposalHandler{provider, txConfig}
 	return handler.prepare
 }
 
@@ -33,7 +30,7 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 	now := time.Now()
 
 	// Helpert struct for assigning prev sort keys
-	prevSortKeys := newPrevSortKeys(h.keeper, ctx)
+	prevSortKeys := newPrevSortKeys(h.provider.keeper, ctx)
 
 	var (
 		// How much space do transactions occupy, there's a limit
@@ -46,16 +43,14 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 		result [][]byte
 	)
 
+	firstBlock := req.Height == 1
 	// Get the last block that is stored in the blockchain
-	lastBlock := h.keeper.MustGetLastArweaveBlock(ctx)
+	lastBlock := h.provider.getLastArweaveBlock(ctx, firstBlock)
 	// Try getting the next Arweave block, it may not be there or it may be too fresh to use
-	nextArweaveBlock := h.arweaveController.GetNextArweaveBlock(lastBlock.ArweaveBlock.Height + 1)
-	if nextArweaveBlock == nil ||
-		!types.IsArweaveBlockOldEnough(ctx.BlockHeader(), nextArweaveBlock.BlockInfo) {
-		// Sort keys are generated for the last arweave block that is already in the blockchain
-		sortKey = newSortKey(lastBlock.ArweaveBlock.Height, ctx.BlockHeight())
-		result = make([][]byte, 0, len(req.Txs))
-	} else {
+	nextArweaveBlock := h.provider.getNextArweaveBlock(lastBlock.ArweaveBlock.Height+1, firstBlock)
+
+	if nextArweaveBlock != nil &&
+		(firstBlock || types.IsArweaveBlockOldEnough(ctx.BlockHeader(), nextArweaveBlock.BlockInfo)) {
 		// Sort keys are generated for the new block
 		sortKey = newSortKey(lastBlock.ArweaveBlock.Height+1, ctx.BlockHeight())
 		result = make([][]byte, 0, len(req.Txs)+1)
@@ -68,7 +63,10 @@ func (h *prepareProposalHandler) prepare(ctx sdk.Context, req abci.RequestPrepar
 			panic(fmt.Errorf("MaxTxBytes limit (%d) is too small! It is smaller than the size of the Arweave block (%d)",
 				req.MaxTxBytes, size))
 		}
-
+	} else {
+		// Sort keys are generated for the last arweave block that is already in the blockchain
+		sortKey = newSortKey(lastBlock.ArweaveBlock.Height, ctx.BlockHeight())
+		result = make([][]byte, 0, len(req.Txs))
 	}
 
 	// Add transactions that waited in the mempool

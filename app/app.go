@@ -224,6 +224,7 @@ type App struct {
 
 	// Tasks
 	ArweaveBlocksController controller.ArweaveBlocksController
+	ArweaveBlockProvider    *sequencerproposal.ArweaveBlockProvider
 	BlockValidator          *sequencerproposal.BlockValidator
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
@@ -455,20 +456,22 @@ func New(
 		app.GetSubspace(sequencermoduletypes.ModuleName),
 	)
 
+	genesisLoader := sequencermodule.NewGenesisLoader(logger, homePath)
 	if appOpts.Get("test") == nil {
 		app.ArweaveBlocksController, err = controller.NewController(logger, homePath)
 		if err != nil {
 			panic(err)
 		}
 
-		app.BlockValidator = sequencerproposal.NewBlockValidator(&app.SequencerKeeper, app.ArweaveBlocksController)
+		app.ArweaveBlockProvider = sequencerproposal.NewArweaveBlockProvider(&app.SequencerKeeper, app.ArweaveBlocksController, genesisLoader)
+		app.BlockValidator = sequencerproposal.NewBlockValidator(app.ArweaveBlockProvider)
 		err := app.BlockValidator.Start()
 		if err != nil {
 			panic(err)
 		}
 	}
 	app.BlockInteractions = sequencerante.NewBlockInteractions()
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, homePath, app.BlockInteractions)
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, genesisLoader, app.BlockInteractions)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
@@ -652,7 +655,7 @@ func New(
 	app.SetInitChainer(app.InitChainer)
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
-	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(&app.SequencerKeeper, app.ArweaveBlocksController, app.txConfig))
+	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(app.ArweaveBlockProvider, app.txConfig))
 	app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, app.BlockValidator, app.Logger()))
 
 	if loadLatest {
