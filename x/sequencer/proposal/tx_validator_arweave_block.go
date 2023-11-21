@@ -103,7 +103,7 @@ func (tv *TxValidator) checkBlockIsOldEnough(newBlockInfo *types.ArweaveBlockInf
 		sequencerBlockTimestamp := tv.sequencerBlockHeader.Time
 
 		return errors.Wrapf(types.ErrArweaveBlockNotOldEnough,
-			"Arweave block should be one hour older than the sequencer block, Arweave block timestamp: %s, sequencer block timestamp: %s",
+			"Arweave block should be correspondingly older than the sequencer block, Arweave block timestamp: %s, sequencer block timestamp: %s",
 			arweaveBlockTimestamp.UTC().Format(time.DateTime), sequencerBlockTimestamp.UTC().Format(time.DateTime))
 	}
 	return nil

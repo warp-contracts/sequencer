@@ -37,7 +37,7 @@ type ArweaveBlocksController interface {
 type SyncerController struct {
 	*task.Task
 
-	config *config.Config
+	config   *config.Config
 	watchdog *task.Watchdog
 
 	// Runtime state
@@ -87,7 +87,7 @@ func NewController(log log.Logger, homePath string) (out ArweaveBlocksController
 			WithClient(client).
 			WithMonitor(monitor).
 			WithInterval(self.config.NetworkMonitor.Period).
-			WithRequiredConfirmationBlocks(20)
+			WithRequiredConfirmationBlocks(types.ARWEAVE_BLOCK_CONFIRMATIONS)
 
 		self.blockDownloader = listener.NewBlockDownloader(self.config).
 			WithClient(client).

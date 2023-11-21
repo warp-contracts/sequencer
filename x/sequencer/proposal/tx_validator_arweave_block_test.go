@@ -115,7 +115,7 @@ func TestValidateArweaveBlockMsg(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestValidateArweaveBlockMsgWithoutHoursDelay(t *testing.T) {
+func TestValidateArweaveBlockMsgNotOldEnough(t *testing.T) {
 	validator := mockValidator(t, nil, nil, nil)
 
 	block := &types.MsgArweaveBlock{
