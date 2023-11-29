@@ -31,8 +31,9 @@ RUN mkdir -p /root/cosmovisor/genesis/bin
 # Cosmos setup
 RUN mkdir -p /root/.sequencer/data
 RUN echo '{"height":"0","round":0,"step":0}' > /root/.sequencer/data/priv_validator_state.json
-COPY genesis/prev_sort_keys.json /root/.sequencer/genesis/prev_sort_keys.json
-COPY genesis/arweave_block.json /root/.sequencer/genesis/arweave_block.json
+ # TODO copying from the directory for a given environment
+COPY network/local/genesis/prev_sort_keys.json /root/.sequencer/genesis/prev_sort_keys.json
+COPY network/local/genesis/arweave_block.json /root/.sequencer/genesis/arweave_block.json
 
 # Executables
 COPY --from=sequencer /go/bin/cosmovisor /usr/local/bin/cosmovisor
