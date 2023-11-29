@@ -19,11 +19,13 @@ COPY cmd cmd
 COPY testutil testutil
 COPY .git .git
 
-RUN make build
+RUN git branch
+RUN make build-all-updates
 
 # Minimal output image
 FROM alpine:3.18
 RUN apk add --update jq
+ARG ENV=dev
 
 # Cosmovisor setup
 RUN mkdir -p /root/cosmovisor/genesis/bin
@@ -31,13 +33,13 @@ RUN mkdir -p /root/cosmovisor/genesis/bin
 # Cosmos setup
 RUN mkdir -p /root/.sequencer/data
 RUN echo '{"height":"0","round":0,"step":0}' > /root/.sequencer/data/priv_validator_state.json
- # TODO copying from the directory for a given environment
-COPY network/local/genesis/prev_sort_keys.json /root/.sequencer/genesis/prev_sort_keys.json
-COPY network/local/genesis/arweave_block.json /root/.sequencer/genesis/arweave_block.json
+
+COPY network/${ENV}/genesis/prev_sort_keys.json /root/.sequencer/genesis/prev_sort_keys.json
+COPY network/${ENV}/genesis/arweave_block.json /root/.sequencer/genesis/arweave_block.json
 
 # Executables
 COPY --from=sequencer /go/bin/cosmovisor /usr/local/bin/cosmovisor
-COPY --from=sequencer /app/bin/sequencer /root/cosmovisor/genesis/bin/sequencer
+COPY --from=sequencer /app/bin/ /root/cosmovisor/
 COPY utils/docker-entrypoint.sh /app/docker-entrypoint.sh
 
 # Configs are small, so we can just copy them

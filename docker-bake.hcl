@@ -3,15 +3,14 @@ variable "TAG" {
 }
 
 group "default" {
-  targets = ["sequencer-release"]
+  targets = ["sequencer"]
 }
 
-target "sequencer-dev" {
+target "sequencer" {
+  args = {
+    ENV = "devnet"
+  }
   dockerfile = "Dockerfile"
-  tags = ["docker.io/warpredstone/sequencer:${TAG}", "docker.io/warpredstone/sequencer:latest"]
-}
-
-target "sequencer-release" {
-  inherits = ["sequencer-dev"]
   platforms = ["linux/amd64"]
+  tags = ["docker.io/warpredstone/sequencer:${TAG}"]
 }

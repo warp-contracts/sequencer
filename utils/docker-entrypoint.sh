@@ -29,7 +29,7 @@ setupCosmovisor() {
     export DAEMON_NAME="sequencer"
     export DAEMON_ALLOW_DOWNLOAD_BINARIES="false"
     export DAEMON_RESTART_AFTER_UPGRADE="true"
-    export DAEMON_POLL_INTERVAL="1s"
+    export DAEMON_POLL_INTERVAL="1h"
 
     mkdir -p $DAEMON_HOME/data
 
