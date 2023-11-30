@@ -5,10 +5,17 @@ BIN      = $(GOPATH)/bin
 BASE     = $(GOPATH)/cmd/sequencerd
 PATH    := bin:$(PATH)
 GO       = go
-VERSION ?= $(shell git describe --tags --always --match=v* 2> /dev/null || \
-			cat $(CURDIR)/.version 2> /dev/null || echo v0)
+VERSION ?= $(shell git describe --tags --always --match=v* 2> /dev/null || cat $(CURDIR)/.version 2> /dev/null || echo v0)
 DATE    ?= $(shell date +%FT%T%z)
-ENV	    ?= devnet
+
+
+# Build variables
+ENV	         ?= devnet
+FROM_VERSION ?= v0.0.70
+
+# Tools
+VERSION_REGEX := ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$
+IS_VERSION_SEMVER := $(shell echo ${VERSION} | egrep "${tag_regex}")
 
 export GOPATH
 
@@ -68,19 +75,37 @@ build-race:  | $(BASE); $(info $(M) building executable…) @
 		-tags release \
 		-o bin/$(PACKAGE) main.go
 
+.PHONY: build-optimized
+build-optimized:  | $(BASE); $(info $(M) building executable…) @
+	cd $(BASE)
+	$(GO) build -tags release -ldflags "-s -w" -o bin/$(PACKAGE) cmd/sequencerd/main.go && \
+ 	upx -q --best --lzma bin/$(PACKAGE)
+
 .PHONY: test
 test:
 	$(GO) test ./...
 
 .PHONY: docker-build
 docker-build: all | ; $(info $(M) building docker container) @ 
-	DOCKER_BUILDKIT=0 TAG=$(VERSION)-$(ENV) docker buildx bake -f docker-bake.hcl --set sequencer.args.ENV=$(ENV) --progress=plain
-    # docker build --no-cache --build-arg="ENV=$(ENV)" -t "warpredstone/sequencer:$(VERSION)-$(ENV)" .
+	ifeq (IS_VERSION_SEMVER,)
+		$(error Version has to be semver, have you released a new version?)
+	endif
+	DOCKER_BUILDKIT=0 VERSION=$(VERSION) FROM_VERSION=$(FROM_VERSION) ENV=$(ENV) \
+	docker buildx bake \
+	-f docker-bake.hcl \
+	# --no-cache \
+    --progress=plain \
+	--load
+
 
 .PHONY: docker-push
 docker-push: all | ; $(info $(M) pushing docker container) @ 
 	docker login
-	DOCKER_BUILDKIT=0 TAG=$(VERSION) docker buildx bake -f docker-bake.hcl --push
+	ifeq (IS_VERSION_SEMVER,)
+		$(error Version has to be semver, have you released a new version?)
+	endif
+	DOCKER_BUILDKIT=0 VERSION=$(VERSION) FROM_VERSION=$(FROM_VERSION) ENV=$(ENV) \
+	docker buildx bake -f docker-bake.hcl --progress=plain --push
 
 
 .PHONY: docker-run
@@ -90,7 +115,7 @@ docker-run: docker-build | ; $(info $(M) running docker container) @
 B = git checkout $1 -b _build-$1 && \
  cd $(BASE) && \
  $(GO) build -tags release -ldflags "-s -w" -o bin/upgrades/$1/bin/$(PACKAGE) cmd/sequencerd/main.go && \
- upx --best --lzma bin/upgrades/$1/bin/$(PACKAGE) && \
+ upx -q --best --lzma bin/upgrades/$1/bin/$(PACKAGE) && \
  git checkout main ; \
  git branch -d _build-$1
 
@@ -98,5 +123,4 @@ B = git checkout $1 -b _build-$1 && \
 build-all-updates: | ; $(info $(M) build every major update) @ 
 	$(call B,v0.0.70)
 	@mv bin/upgrades/v0.0.70 bin/genesis
-	$(call B,v0.0.70)
 

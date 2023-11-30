@@ -1,16 +1,22 @@
-variable "TAG" {
-  default = "dev"
+variable "ENV" {
+  default = "devnet"
 }
 
-group "default" {
-  targets = ["sequencer"]
+variable "VERSION" {
+  default = "devnet"
 }
 
-target "sequencer" {
+variable "FROM_VERSION" {
+  default = "devnet"
+}
+
+target "default" {
   args = {
-    ENV = "devnet"
+    ENV="${ENV}"
+    VERSION="${VERSION}"
+    FROM_VERSION="${FROM_VERSION}"
   }
   dockerfile = "Dockerfile"
   platforms = ["linux/amd64"]
-  tags = ["docker.io/warpredstone/sequencer:${TAG}"]
+  tags = ["docker.io/warpredstone/sequencer:${VERSION}-${ENV}"]
 }

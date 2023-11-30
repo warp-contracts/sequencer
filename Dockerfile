@@ -1,7 +1,14 @@
+ARG VERSION=testversion
+ARG FROM_VERSION=testfromversion
+ARG ENV=dev
+
+# Use binaries from previous image
+FROM warpredstone/sequencer:${FROM_VERSION}-${ENV} as previous
+
 # Build the sequencer binary
-FROM golang:1.21-alpine3.18 as sequencer
+FROM golang:1.21-alpine3.18 as current
 LABEL stage=sequencer-builder
-RUN apk add --update make build-base curl git
+RUN apk add --update make build-base curl git upx
 
 RUN go install cosmossdk.io/tools/cosmovisor/cmd/cosmovisor@latest
 
@@ -19,13 +26,14 @@ COPY cmd cmd
 COPY testutil testutil
 COPY .git .git
 
-RUN git branch
-RUN make build-all-updates
-
+RUN make build-optimized
+ 
 # Minimal output image
 FROM alpine:3.18
-RUN apk add --update jq
+ARG VERSION=testversion
 ARG ENV=dev
+
+RUN apk add --update jq
 
 # Cosmovisor setup
 RUN mkdir -p /root/cosmovisor/genesis/bin
@@ -34,15 +42,15 @@ RUN mkdir -p /root/cosmovisor/genesis/bin
 RUN mkdir -p /root/.sequencer/data
 RUN echo '{"height":"0","round":0,"step":0}' > /root/.sequencer/data/priv_validator_state.json
 
+# Genesis setup
 COPY network/${ENV}/genesis/prev_sort_keys.json /root/.sequencer/genesis/prev_sort_keys.json
 COPY network/${ENV}/genesis/arweave_block.json /root/.sequencer/genesis/arweave_block.json
 
 # Executables
-COPY --from=sequencer /go/bin/cosmovisor /usr/local/bin/cosmovisor
-COPY --from=sequencer /app/bin/ /root/cosmovisor/
-COPY utils/docker-entrypoint.sh /app/docker-entrypoint.sh
+COPY --from=previous /root/cosmovisor/ /root/cosmovisor/
+COPY --from=current  /go/bin/cosmovisor /usr/local/bin/cosmovisor
+COPY --from=current  /app/bin/sequencer /root/cosmovisor/upgrades/${VERSION}/bin/sequencer
 
-# Configs are small, so we can just copy them
-COPY network network
+COPY utils/docker-entrypoint.sh /app/docker-entrypoint.sh
 
 ENTRYPOINT [ "/app/docker-entrypoint.sh" ]
