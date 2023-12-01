@@ -6,6 +6,7 @@ BASE     = $(GOPATH)/cmd/sequencerd
 PATH    := bin:$(PATH)
 GO       = go
 VERSION ?= $(shell git describe --tags --always --match=v* 2> /dev/null || cat $(CURDIR)/.version 2> /dev/null || echo v0)
+COMMIT  ?= $(shell git rev-parse HEAD | tr -d '\n')
 DATE    ?= $(shell date +%FT%T%z)
 
 
@@ -78,7 +79,13 @@ build-race:  | $(BASE); $(info $(M) building executable…) @
 .PHONY: build-optimized
 build-optimized:  | $(BASE); $(info $(M) building executable…) @
 	cd $(BASE)
-	$(GO) build -tags release -ldflags "-s -w" -o bin/$(PACKAGE) cmd/sequencerd/main.go && \
+	$(GO) build -tags release -ldflags "-s -w \
+	-X github.com/cosmos/cosmos-sdk/version.Name=WarpSequencer \
+	-X github.com/cosmos/cosmos-sdk/version.AppName=sequencerd \
+	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+	-X github.com/cosmos/cosmos-sdk/version.BuildTags=env=$(ENV),build_time=$(DATE)" \
+	-o bin/$(PACKAGE) cmd/sequencerd/main.go && \
  	upx -q --best --lzma bin/$(PACKAGE)
 
 .PHONY: test
