@@ -4,7 +4,7 @@ package sequencer.sequencer;
 
 import "gogoproto/gogo.proto";
 import "sequencer/sequencer/params.proto";
-import "sequencer/sequencer/Ōarweave_block_info.proto";
+import "sequencer/sequencer/arweave_block_info.proto";
 import "sequencer/sequencer/last_arweave_block.proto";
 import "sequencer/sequencer/next_arweave_block.proto";
 import "sequencer/sequencer/prev_sort_key.proto";
