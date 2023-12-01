@@ -14,7 +14,7 @@ ENV	         ?= devnet
 FROM_VERSION ?= v0.0.70
 
 # Tools
-VERSION_REGEX := ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$
+VERSION_REGEX     := ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$
 IS_VERSION_SEMVER := $(shell echo ${VERSION} | egrep "${tag_regex}")
 
 export GOPATH
@@ -87,23 +87,19 @@ test:
 
 .PHONY: docker-build
 docker-build: all | ; $(info $(M) building docker container) @ 
-	ifeq (IS_VERSION_SEMVER,)
-		$(error Version has to be semver, have you released a new version?)
-	endif
+ifeq (IS_VERSION_SEMVER,)
+	$(error Version has to be semver, have you released a new version? Version is $(VERSION))
+endif
 	DOCKER_BUILDKIT=0 VERSION=$(VERSION) FROM_VERSION=$(FROM_VERSION) ENV=$(ENV) \
-	docker buildx bake \
-	-f docker-bake.hcl \
-	# --no-cache \
-    --progress=plain \
-	--load
+	docker buildx bake 	-f docker-bake.hcl 	--load
 
 
 .PHONY: docker-push
 docker-push: all | ; $(info $(M) pushing docker container) @ 
+ifeq (IS_VERSION_SEMVER,)
+	$(error Version has to be semver, have you released a new version? Version is $(VERSION))
+endif
 	docker login
-	ifeq (IS_VERSION_SEMVER,)
-		$(error Version has to be semver, have you released a new version?)
-	endif
 	DOCKER_BUILDKIT=0 VERSION=$(VERSION) FROM_VERSION=$(FROM_VERSION) ENV=$(ENV) \
 	docker buildx bake -f docker-bake.hcl --progress=plain --push
 
