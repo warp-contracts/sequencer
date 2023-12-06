@@ -15,6 +15,7 @@ assert() {
 
 configure() {
     # Predefined paths
+    export SEQUENCER_HOME="/root/.sequencer"
     export PATH=$PATH:/root/.sequencer/cosmovisor/genesis/bin
 
     # Colors
