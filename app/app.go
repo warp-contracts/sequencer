@@ -654,6 +654,10 @@ func New(
 	app.SetPrepareProposal(sequencerproposal.NewPrepareProposalHandler(app.ArweaveBlockProvider, app.txConfig))
 	app.SetProcessProposal(sequencerproposal.NewProcessProposalHandler(app.txConfig, app.BlockValidator, app.Logger()))
 
+	// setupUpgradeHandlers should be called before `LoadLatestVersion()`
+	// because StoreLoad is sealed after that
+	app.setupUpgradeHandlers()
+
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
 			tmos.Exit(err.Error())
