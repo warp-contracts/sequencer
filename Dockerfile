@@ -51,6 +51,7 @@ COPY --from=previous /root/cosmovisor/ /root/.sequencer/cosmovisor/
 COPY --from=current  /go/bin/cosmovisor /usr/local/bin/cosmovisor
 COPY --from=current  /app/bin/sequencer /root/.sequencer/cosmovisor/upgrades/${VERSION}/bin/sequencer
 
+COPY utils/preupgrade.sh /root/.sequencer/cosmovisor/preupgrade.sh
 COPY utils/docker-entrypoint.sh /app/docker-entrypoint.sh
 
 ENTRYPOINT [ "/app/docker-entrypoint.sh" ]
