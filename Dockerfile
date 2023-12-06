@@ -47,9 +47,9 @@ COPY network/${ENV}/genesis/prev_sort_keys.json /root/.sequencer/genesis/prev_so
 COPY network/${ENV}/genesis/arweave_block.json /root/.sequencer/genesis/arweave_block.json
 
 # Executables
-COPY --from=previous /root/cosmovisor/ /root/cosmovisor/
+COPY --from=previous /root/cosmovisor/ /root/.sequencer/cosmovisor/
 COPY --from=current  /go/bin/cosmovisor /usr/local/bin/cosmovisor
-COPY --from=current  /app/bin/sequencer /root/cosmovisor/upgrades/${VERSION}/bin/sequencer
+COPY --from=current  /app/bin/sequencer /root/.sequencer/cosmovisor/upgrades/${VERSION}/bin/sequencer
 
 COPY utils/docker-entrypoint.sh /app/docker-entrypoint.sh
 

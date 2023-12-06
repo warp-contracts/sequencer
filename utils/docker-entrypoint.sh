@@ -15,8 +15,7 @@ assert() {
 
 configure() {
     # Predefined paths
-    SEQUENCER_HOME="/root/.sequencer"
-    export PATH=$PATH:/root/cosmovisor/genesis/bin
+    export PATH=$PATH:/root/.sequencer/cosmovisor/genesis/bin
 
     # Colors
     RED='\033[0;31m'
@@ -41,9 +40,9 @@ setupCosmovisor() {
 }
 
 setupSequencer() {
-    if [ ! -f "$SEQUENCER_HOME/data/priv_validator_state.json" ]; then
-        mkdir -p $SEQUENCER_HOME/data
-        echo '{"height":"0","round":0,"step":0}' > $SEQUENCER_HOME/data/priv_validator_state.json
+    if [ ! -f "$DAEMON_HOME/data/priv_validator_state.json" ]; then
+        mkdir -p $DAEMON_HOME/data
+        echo '{"height":"0","round":0,"step":0}' > $DAEMON_HOME/data/priv_validator_state.json
     fi
 }
 
