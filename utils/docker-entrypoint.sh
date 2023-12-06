@@ -25,7 +25,7 @@ configure() {
 
 setupCosmovisor() {
     # Cosmovisor
-    export DAEMON_HOME="/root"
+    export DAEMON_HOME="/root/.sequencer"
     export DAEMON_NAME="sequencer"
     export DAEMON_ALLOW_DOWNLOAD_BINARIES=false
     export DAEMON_RESTART_AFTER_UPGRADE=true
