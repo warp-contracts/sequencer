@@ -20,3 +20,13 @@ target "default" {
   platforms = ["linux/amd64"]
   tags = ["docker.io/warpredstone/sequencer:${VERSION}-${ENV}"]
 }
+
+target "genesis" {
+  args = {
+    ENV="${ENV}"
+    VERSION="${VERSION}"
+  }
+  dockerfile = "Dockerfile.genesis"
+  platforms = ["linux/amd64"]
+  tags = ["docker.io/warpredstone/sequencer:${VERSION}-${ENV}"]
+}
