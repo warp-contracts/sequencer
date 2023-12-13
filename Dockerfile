@@ -31,7 +31,7 @@ RUN make build-optimized
 # Minimal output image
 FROM alpine:3.18
 ARG VERSION=testversion
-ARG ENV=dev
+ARG ENV=testenv
 
 RUN apk add --update jq
 

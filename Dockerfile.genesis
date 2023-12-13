@@ -1,5 +1,5 @@
 ARG VERSION=testversion
-ARG ENV=dev
+ARG ENV=testenv
 
 # Build the sequencer binary
 FROM golang:1.21-alpine3.18 as current
@@ -27,7 +27,7 @@ RUN make build-optimized
 # Minimal output image
 FROM alpine:3.18
 ARG VERSION=testversion
-ARG ENV=dev
+ARG ENV=testenv
 
 RUN apk add --update jq
 
