@@ -71,6 +71,10 @@ func (store *Store) processPayload(payload *listener.Payload) {
 	store.mtx.Lock()
 	// TODO add saving to database
 	store.blocks.PushBack(&block)
+	store.Log.
+		WithField("queue_size", store.blocks.Len()).
+		WithField("height", block.BlockInfo.Height).
+		Info("Arweave block added to the local queue")
 	store.mtx.Unlock()
 }
 
@@ -122,7 +126,16 @@ func (store *Store) RemoveNextArweaveBlocksUpToHeight(height uint64) {
 	store.mtx.Lock()
 	defer store.mtx.Unlock()
 
-	for store.blocks.Len() > 0 && store.blocks.Front().BlockInfo.Height <= height {
-		store.blocks.PopFront()
+	for store.blocks.Len() > 0 {
+		block := store.blocks.Front()
+		if block.BlockInfo.Height <= height {
+			store.blocks.PopFront()
+			store.Log.
+				WithField("queue_size", store.blocks.Len()).
+				WithField("height", block.BlockInfo.Height).
+				Info("Arweave block removed from the local queue")
+		} else {
+			break
+		}
 	}
 }
