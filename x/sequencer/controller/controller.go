@@ -161,6 +161,10 @@ func (self *SyncerController) SetLastAcceptedBlock(block *types.ArweaveBlockInfo
 	if !self.isRunning() {
 		return
 	}
+
+	self.Log.Debug("-> SetLastAcceptedBlock")
+	defer self.Log.Debug("<- SetLastAcceptedBlock")
+
 	self.mtx.Lock()
 	defer self.mtx.Unlock()
 
@@ -187,13 +191,17 @@ func (self *SyncerController) StopWait() {
 		return
 	}
 
-	self.StopWait()
+	self.Log.Info("Stpping arweave syncer")
+
+	self.Task.StopWait()
 }
 
 func (self *SyncerController) Restart() {
 	if self == nil || self.watchdog == nil {
 		return
 	}
+	self.Log.Warn("Restarting arweave syncer")
+
 	err := self.watchdog.Restart()
 	if err != nil {
 		self.Log.WithError(err).Warn("Issue with watched task restart")
