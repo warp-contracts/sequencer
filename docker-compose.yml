@@ -3,7 +3,13 @@ version: "3"
 services:
   sequencer-node-0:
     container_name: sequencer-0
-    image: "warpredstone/sequencer:latest"
+    image: "warpredstone/sequencer:local"
+    build:
+      context: .
+      dockerfile: Dockerfile.genesis
+      args:
+        ENV: devnet
+        VERSION: ${VERSION}
     profiles:
       - sequencer
     environment:
@@ -35,7 +41,13 @@ services:
 
   sequencer-node-1:
     container_name: sequencer-1
-    image: "warpredstone/sequencer:latest"
+    image: "warpredstone/sequencer:local"
+    build:
+      context: .
+      dockerfile: Dockerfile.genesis
+      args:
+        ENV: devnet
+        VERSION: ${VERSION}
     profiles:
       - sequencer
     environment:
@@ -67,7 +79,13 @@ services:
 
   sequencer-node-2:
     container_name: sequencer-2
-    image: "warpredstone/sequencer:latest"
+    image: "warpredstone/sequencer:local"
+    build:
+      context: .
+      dockerfile: Dockerfile.genesis
+      args:
+        ENV: devnet
+        VERSION: ${VERSION}
     profiles:
       - sequencer
     environment:

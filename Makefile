@@ -120,7 +120,8 @@ endif
 	docker buildx bake genesis -f docker-bake.hcl --progress=plain --push
 
 .PHONY: docker-run
-docker-run: docker-build | ; $(info $(M) running docker container) @ 
+docker-run:  | ; $(info $(M) running docker container) @ 
+	docker compose --profile sequencer build
 	docker compose --profile sequencer up 
 
 B = git checkout $1 -b _build-$1 && \
