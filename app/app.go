@@ -460,7 +460,7 @@ func New(
 		}
 
 		app.ArweaveBlockProvider = sequencerproposal.NewArweaveBlockProvider(&app.SequencerKeeper, app.ArweaveBlocksController, genesisLoader)
-		app.BlockValidator = sequencerproposal.NewBlockValidator(app.ArweaveBlockProvider)
+		app.BlockValidator = sequencerproposal.NewBlockValidator(app.ArweaveBlockProvider, app.Logger())
 		err := app.BlockValidator.Start()
 		if err != nil {
 			panic(err)

@@ -50,7 +50,7 @@ db_backend = "goleveldb"
 db_dir = "data"
 
 # Output level for logging, including package level options
-log_level = "info"
+log_level = "sequencer:debug,block-validator:debug,arweave:debug,*:info"
 
 # Output format: 'plain' (colored text) or 'json'
 log_format = "plain"

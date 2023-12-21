@@ -191,7 +191,7 @@ func (self *SyncerController) StopWait() {
 		return
 	}
 
-	self.Log.Info("Stpping arweave syncer")
+	self.Log.Info("Stoping arweave syncer")
 
 	self.Task.StopWait()
 }

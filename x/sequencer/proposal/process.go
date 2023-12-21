@@ -22,7 +22,7 @@ var (
 )
 
 func NewProcessProposalHandler(txConfig client.TxConfig, blockValidator *BlockValidator, logger log.Logger) sdk.ProcessProposalHandler {
-	handler := &processProposalHandler{txConfig, logger, blockValidator}
+	handler := &processProposalHandler{txConfig, logger.With("module", "block-validator"), blockValidator}
 	return handler.process
 }
 
@@ -40,7 +40,7 @@ func (h *processProposalHandler) process(ctx sdk.Context, req abci.RequestProces
 		return rejectResponse
 	}
 
-	ctx.Logger().
+	h.logger.
 		With("height", req.Height).
 		With("number of txs", len(req.Txs)).
 		With("proposer", sdk.ConsAddress(req.ProposerAddress).String()).
