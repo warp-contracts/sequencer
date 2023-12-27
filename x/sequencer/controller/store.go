@@ -116,8 +116,8 @@ func getContractFromTag(tx *syncer_arweave.Transaction) string {
 }
 
 func (self *Store) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
-	self.Log.Debug("-> SetLastAcceptedBlock")
-	defer self.Log.Debug("<- SetLastAcceptedBlock")
+	self.Log.Debug("-> GetNextArweaveBlock")
+	defer self.Log.Debug("<- GetNextArweaveBlock")
 
 	self.mtx.RLock()
 	defer self.mtx.RUnlock()
@@ -132,8 +132,8 @@ func (self *Store) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
 }
 
 func (self *Store) RemoveNextArweaveBlocksUpToHeight(height uint64) {
-	self.Log.Debug("-> SetLastAcceptedBlock")
-	defer self.Log.Debug("<- SetLastAcceptedBlock")
+	self.Log.Debug("-> RemoveNextArweaveBlocksUpToHeight")
+	defer self.Log.Debug("<- RemoveNextArweaveBlocksUpToHeight")
 
 	self.mtx.Lock()
 	defer self.mtx.Unlock()
