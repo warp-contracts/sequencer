@@ -101,6 +101,7 @@ import (
 	limitermodule "github.com/warp-contracts/sequencer/x/limiter"
 	limitermodulekeeper "github.com/warp-contracts/sequencer/x/limiter/keeper"
 	limitermoduletypes "github.com/warp-contracts/sequencer/x/limiter/types"
+
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/warp-contracts/sequencer/app/params"
@@ -451,11 +452,20 @@ func New(
 		),
 	)
 
+	app.LimiterKeeper = *limitermodulekeeper.NewKeeper(
+		appCodec,
+		keys[limitermoduletypes.StoreKey],
+		keys[limitermoduletypes.MemStoreKey],
+		app.GetSubspace(limitermoduletypes.ModuleName),
+	)
+	limiterModule := limitermodule.NewAppModule(appCodec, app.LimiterKeeper, app.AccountKeeper, app.BankKeeper)
+
 	app.SequencerKeeper = *sequencermodulekeeper.NewKeeper(
 		appCodec,
 		keys[sequencermoduletypes.StoreKey],
 		keys[sequencermoduletypes.MemStoreKey],
 		app.GetSubspace(sequencermoduletypes.ModuleName),
+		app.LimiterKeeper,
 	)
 
 	genesisLoader := sequencermodule.NewGenesisLoader(logger, homePath)
@@ -474,14 +484,6 @@ func New(
 	}
 	app.BlockInteractions = sequencerante.NewBlockInteractions()
 	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, genesisLoader, app.BlockInteractions)
-
-	app.LimiterKeeper = *limitermodulekeeper.NewKeeper(
-		appCodec,
-		keys[limitermoduletypes.StoreKey],
-		keys[limitermoduletypes.MemStoreKey],
-		app.GetSubspace(limitermoduletypes.ModuleName),
-	)
-	limiterModule := limitermodule.NewAppModule(appCodec, app.LimiterKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
