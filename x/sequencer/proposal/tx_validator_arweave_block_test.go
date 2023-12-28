@@ -210,7 +210,6 @@ func TestArweaveBlockIsNotMissingGenesis(t *testing.T) {
 	require.NoError(t, err)
 }
 
-
 func TestArweaveBlockIsNotMissingNoNext(t *testing.T) {
 	block := test.ArweaveBlock()
 	validator := mockValidator(t, &types.LastArweaveBlock{

@@ -6,7 +6,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 )
 
-// Allows calculating the value of PrevSortKey. 
+// Allows calculating the value of PrevSortKey.
 // It get the current values from the store, and for calculating/validation, it keeps new values in memory.
 type PrevSortKeys struct {
 	keeper       *keeper.Keeper

@@ -98,6 +98,9 @@ import (
 	sequencerproposal "github.com/warp-contracts/sequencer/x/sequencer/proposal"
 	sequencermoduletypes "github.com/warp-contracts/sequencer/x/sequencer/types"
 
+	limitermodule "github.com/warp-contracts/sequencer/x/limiter"
+	limitermodulekeeper "github.com/warp-contracts/sequencer/x/limiter/keeper"
+	limitermoduletypes "github.com/warp-contracts/sequencer/x/limiter/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/warp-contracts/sequencer/app/params"
@@ -152,6 +155,7 @@ var (
 		vesting.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		sequencermodule.AppModuleBasic{},
+		limitermodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -223,6 +227,7 @@ type App struct {
 	ArweaveBlockProvider    *sequencerproposal.ArweaveBlockProvider
 	BlockValidator          *sequencerproposal.BlockValidator
 
+	LimiterKeeper limitermodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -272,6 +277,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, upgradetypes.StoreKey,
 		feegrant.StoreKey, evidencetypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
 		consensusparamtypes.StoreKey, sequencermoduletypes.StoreKey,
+		limitermoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -469,6 +475,14 @@ func New(
 	app.BlockInteractions = sequencerante.NewBlockInteractions()
 	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, genesisLoader, app.BlockInteractions)
 
+	app.LimiterKeeper = *limitermodulekeeper.NewKeeper(
+		appCodec,
+		keys[limitermoduletypes.StoreKey],
+		keys[limitermoduletypes.MemStoreKey],
+		app.GetSubspace(limitermoduletypes.ModuleName),
+	)
+	limiterModule := limitermodule.NewAppModule(appCodec, app.LimiterKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	/**** IBC Routing ****/
@@ -521,6 +535,7 @@ func New(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		sequencerModule,
+		limiterModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -551,6 +566,7 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		sequencermoduletypes.ModuleName,
+		limitermoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -574,6 +590,7 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		sequencermoduletypes.ModuleName,
+		limitermoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -602,6 +619,7 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		sequencermoduletypes.ModuleName,
+		limitermoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -836,6 +854,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable()) //nolint:staticcheck
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(sequencermoduletypes.ModuleName)
+	paramsKeeper.Subspace(limitermoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

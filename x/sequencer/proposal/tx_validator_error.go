@@ -1,13 +1,14 @@
 package proposal
 
 type InvalidTxErrorType int
+
 const (
 	INVALID_ARWEAVE InvalidTxErrorType = iota
-	INVALID_DATA_ITEM 
+	INVALID_DATA_ITEM
 )
 
 type InvalidTxError struct {
-	err error
+	err       error
 	errorType InvalidTxErrorType
 }
 

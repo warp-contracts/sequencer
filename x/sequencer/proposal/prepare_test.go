@@ -27,7 +27,7 @@ func TestProtoTxSize(t *testing.T) {
 	require.NoError(t, err2)
 	require.NoError(t, err3)
 
-	data := types.Data {
+	data := types.Data{
 		Txs: [][]byte{tx1, tx2, tx3},
 	}
 	protoSize := int64(data.Size())

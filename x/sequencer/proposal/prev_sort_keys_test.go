@@ -21,7 +21,7 @@ func TestGetPrevSortKeyKeyInStore(t *testing.T) {
 	k, ctx := keepertest.SequencerKeeper(t)
 	k.SetPrevSortKey(ctx, types.PrevSortKey{
 		Contract: "abc",
-		SortKey: "123",
+		SortKey:  "123",
 	})
 	prevSortKeys := newPrevSortKeys(k, ctx)
 
@@ -45,7 +45,7 @@ func TestGetPrevSortKeyKeyInMemoryAndStore(t *testing.T) {
 	k, ctx := keepertest.SequencerKeeper(t)
 	k.SetPrevSortKey(ctx, types.PrevSortKey{
 		Contract: "abc",
-		SortKey: "123",
+		SortKey:  "123",
 	})
 	prevSortKeys := newPrevSortKeys(k, ctx)
 

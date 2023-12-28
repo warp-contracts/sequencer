@@ -6,7 +6,7 @@ import "sync"
 // The sending occurs when the first error appears, or nil is sent at the end.
 type validationResult struct {
 	// has the result been sent to the channel?
-	sent   bool
+	sent bool
 	// the channel to which the validation result is sent
 	output chan *InvalidTxError
 	mtx    sync.RWMutex

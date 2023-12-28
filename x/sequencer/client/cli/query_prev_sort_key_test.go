@@ -40,7 +40,7 @@ func networkWithPrevSortKeyObjects(t *testing.T, n int) (*network.Network, []typ
 		nullify.Fill(&prevSortKey)
 		state.PrevSortKeyList = append(state.PrevSortKeyList, prevSortKey)
 	}
-	
+
 	buf, err := cfg.Codec.MarshalJSON(&state)
 	require.NoError(t, err)
 	cfg.GenesisState[types.ModuleName] = buf

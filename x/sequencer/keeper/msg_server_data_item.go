@@ -13,7 +13,7 @@ func (k *msgServer) DataItem(goCtx context.Context, msg *types.MsgDataItem) (*ty
 	if err := k.setContractPrevSortKey(ctx, msg); err != nil {
 		return nil, err
 	}
-	
+
 	k.blockInteractions.Add(msg)
 
 	return &types.MsgDataItemResponse{}, nil

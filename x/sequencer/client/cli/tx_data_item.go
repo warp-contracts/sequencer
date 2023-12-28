@@ -174,7 +174,7 @@ func createMsgDataItem(clientCtx client.Context, cmd *cobra.Command) (msg *types
 
 // Returns the sequence for the account or 0 if the account does not exist
 func getAccountSequence(clientCtx client.Context, msg *types.MsgDataItem, signer bundlr.Signer, nonceArg int64) (uint64, error) {
-	if nonceArg >=0 {
+	if nonceArg >= 0 {
 		return uint64(nonceArg), nil
 	}
 
