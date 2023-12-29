@@ -457,6 +457,8 @@ func New(
 		keys[limitermoduletypes.StoreKey],
 		keys[limitermoduletypes.MemStoreKey],
 		app.GetSubspace(limitermoduletypes.ModuleName),
+		1,  /* Number of limiters, indexed from 0 */
+		30, /* Number of blocks to keep in the cache */
 	)
 	limiterModule := limitermodule.NewAppModule(appCodec, app.LimiterKeeper, app.AccountKeeper, app.BankKeeper)
 

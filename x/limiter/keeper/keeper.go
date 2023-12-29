@@ -18,6 +18,22 @@ type (
 		storeKey   storetypes.StoreKey
 		memKey     storetypes.StoreKey
 		paramstore paramtypes.Subspace
+
+		// Current cache  heights
+		start  int64
+		finish int64
+
+		// Last block height of the first block in the cache, used for the fill-in pahse
+		lastInitHeight int64
+
+		// Block height of the last block in the cache, used for getting the right kvstore
+		currentBlockHeight int64
+
+		// Number of blocks to keep in the cache
+		numCachedBlocks int64
+
+		// Cache of the limits
+		cache []map[string]int64
 	}
 )
 
@@ -26,7 +42,10 @@ func NewKeeper(
 	storeKey,
 	memKey storetypes.StoreKey,
 	ps paramtypes.Subspace,
-
+	//  Number of limiters, indexed from 0
+	limiterCount int,
+	// Number of blocks to keep in the cache
+	numCachedBlocks int64,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -34,10 +53,13 @@ func NewKeeper(
 	}
 
 	return &Keeper{
-		cdc:        cdc,
-		storeKey:   storeKey,
-		memKey:     memKey,
-		paramstore: ps,
+		cdc:             cdc,
+		storeKey:        storeKey,
+		memKey:          memKey,
+		paramstore:      ps,
+		cache:           make([]map[string]int64, limiterCount),
+		lastInitHeight:  -1,
+		numCachedBlocks: numCachedBlocks,
 	}
 }
 
