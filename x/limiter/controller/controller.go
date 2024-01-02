@@ -13,14 +13,14 @@ type Controller struct {
 	Cache *Cache
 }
 
-func NewController(log log.Logger, homePath string) (self *Controller, err error) {
+func NewController(log log.Logger, numLimiters int) (self *Controller, err error) {
 	self = new(Controller)
 	InitLogger(log, logrus.InfoLevel.String())
 
 	// Setup the tasks
 	self.Task = task.NewTask(nil, "limiter-controller")
 
-	self.Cache = NewCache()
+	self.Cache = NewCache(numLimiters)
 
 	self.Task = self.Task.
 		WithSubtask(self.Cache.Task)

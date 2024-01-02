@@ -9,6 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
+	"github.com/warp-contracts/sequencer/x/limiter/controller"
 	"github.com/warp-contracts/sequencer/x/limiter/types"
 )
 
@@ -34,6 +35,9 @@ type (
 
 		// Cache of the limits
 		cache []map[string]int64
+
+		// Controller
+		controller *controller.Controller
 	}
 )
 
@@ -43,7 +47,7 @@ func NewKeeper(
 	memKey storetypes.StoreKey,
 	ps paramtypes.Subspace,
 	//  Number of limiters, indexed from 0
-	limiterCount int,
+	numLimiters int,
 	// Number of blocks to keep in the cache
 	numCachedBlocks int64,
 ) *Keeper {
@@ -52,15 +56,26 @@ func NewKeeper(
 		ps = ps.WithKeyTable(types.ParamKeyTable())
 	}
 
+	// Setup async tasks
+	ctrl, err := controller.NewController(log.NewNopLogger(), numLimiters)
+	if err != nil {
+		panic(err)
+	}
+
 	return &Keeper{
 		cdc:             cdc,
 		storeKey:        storeKey,
 		memKey:          memKey,
 		paramstore:      ps,
-		cache:           make([]map[string]int64, limiterCount),
+		cache:           make([]map[string]int64, numLimiters),
 		lastInitHeight:  -1,
 		numCachedBlocks: numCachedBlocks,
+		controller:      ctrl,
 	}
+}
+
+func (k Keeper) StopWait() {
+	k.controller.StopWait()
 }
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {

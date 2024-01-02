@@ -878,6 +878,7 @@ func (app *App) ModuleManager() *module.Manager {
 func (app *App) Close() (err error) {
 	app.ArweaveBlocksController.StopWait()
 	app.BlockValidator.StopWait()
+	app.LimiterKeeper.StopWait()
 	return nil
 }
 

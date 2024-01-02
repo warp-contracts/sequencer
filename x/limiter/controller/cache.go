@@ -10,16 +10,18 @@ import (
 type Cache struct {
 	*task.Task
 
+	// Queue of messages to be processed
 	input chan any
 
 	cache []map[string]int64
 	mtx   sync.RWMutex
 }
 
-func NewCache() (self *Cache) {
+func NewCache(numLimiters int) (self *Cache) {
 	self = new(Cache)
 
 	self.input = make(chan any, 1000)
+	self.cache = make([]map[string]int64, numLimiters)
 
 	self.Task = task.NewTask(nil, "limiter-cache").
 		WithSubtaskFunc(self.run).
@@ -74,7 +76,8 @@ func (self *Cache) getAllMessages(m any) error {
 		case m = <-self.input:
 			continue
 		default:
-			// Prevents blocking. There are no more msgs in the channel
+			// Prevents blocking.
+			// There are no more msgs in the channel, break the loop
 			break
 		}
 	}
