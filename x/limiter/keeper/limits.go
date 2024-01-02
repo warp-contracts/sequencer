@@ -14,7 +14,7 @@ func (k *Keeper) getStore(ctx sdk.Context, blockHeight int64, limiterIndex int) 
 }
 
 func (k *Keeper) GetCount(ctx sdk.Context, limiterIndex int, key []byte) int64 {
-	return k.cache[limiterIndex][string(key)]
+	return k.controller.Cache.GetCount(limiterIndex, string(key))
 }
 
 func (k *Keeper) SetCurrentBlockHeight(ctx sdk.Context, blockHeight int64) {
@@ -39,11 +39,13 @@ func (k *Keeper) Inc(ctx sdk.Context, limiterIndex int, key []byte) {
 	store := k.getStore(ctx, k.currentBlockHeight, limiterIndex)
 	value := store.Get(key)
 	if value == nil {
+		// Initial value
 		store.Set(key, []byte("1"))
+		k.controller.Cache.Set(limiterIndex, string(key), 1)
 		return
 	}
 
-	// Parse value
+	// Parse existing value
 	i, err := strconv.ParseInt(string(value), 10, 64)
 	if err != nil {
 		panic(err)
@@ -54,7 +56,7 @@ func (k *Keeper) Inc(ctx sdk.Context, limiterIndex int, key []byte) {
 	store.Set(key, []byte(strconv.FormatInt(i, 10)))
 
 	// Update cached counters
-	k.cache[limiterIndex][string(key)] += 1
+	k.controller.Cache.Set(limiterIndex, string(key), i)
 }
 
 /*
@@ -85,31 +87,22 @@ func (k *Keeper) Clean(ctx sdk.Context, newFinish int64 /* new finish block heig
 	for h := k.start; h < newStart; h++ {
 
 		// Iterate over all limiter kinds
-		for limiterIdx := range k.cache {
+		for limiterIdx := 0; limiterIdx < k.numLimiters; limiterIdx++ {
 			store := k.getStore(ctx, h, limiterIdx)
 			iter := store.Iterator(nil, nil)
 			defer iter.Close()
 			for ; iter.Valid(); iter.Next() {
-				store.Delete(iter.Key())
-
 				// Parse value
 				i, err := strconv.ParseInt(string(iter.Value()), 10, 64)
 				if err != nil {
 					panic(err)
 				}
 
-				// Update cached counters
-				value, ok := k.cache[limiterIdx][string(iter.Key())]
-				if !ok {
-					continue
-				}
+				// Subtract value from the cached counter
+				k.controller.Cache.Subtract(limiterIdx, string(iter.Key()), i)
 
-				value -= i
-				if value <= 0 {
-					delete(k.cache[limiterIdx], string(iter.Key()))
-				} else {
-					k.cache[limiterIdx][string(iter.Key())] = value
-				}
+				// Cleanup the kvstore
+				store.Delete(iter.Key())
 			}
 		}
 	}

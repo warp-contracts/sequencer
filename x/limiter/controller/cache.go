@@ -39,18 +39,18 @@ func (self *Cache) GetCount(limiterIndex int, key string) int64 {
 	return self.cache[limiterIndex][key]
 }
 
-// Try to increment the counter, but do not block if the channel is full
-func (self *Cache) Increment(limiterIndex int, key string) {
+// Try to set the counter, but do not block if the channel is full
+// Worse case this operation is skipped, but the cache will be updated upon the next try
+func (self *Cache) Set(limiterIndex int, key string, value int64) {
 	select {
-	case self.input <- &MsgIncrement{LimiterIndex: limiterIndex, Key: key}:
+	case self.input <- &MsgSet{LimiterIndex: limiterIndex, Key: key}:
 	default:
 	}
 }
 
-// Try to increment the counter, but do not block if the channel is full
-func (self *Cache) Delete(limiterIndex int, key string) {
+func (self *Cache) Subtract(limiterIndex int, key string, value int64) {
 	select {
-	case self.input <- &MsgIncrement{LimiterIndex: limiterIndex, Key: key}:
+	case self.input <- &MsgSubtract{LimiterIndex: limiterIndex, Key: key, Value: value}:
 	case <-self.Ctx.Done():
 	}
 }
@@ -62,10 +62,15 @@ func (self *Cache) getAllMessages(m any) error {
 
 	for {
 		switch msg := m.(type) {
-		case *MsgIncrement:
-			self.cache[msg.LimiterIndex][string(msg.Key)] += 1
-		case *MsgDelete:
-			delete(self.cache[msg.LimiterIndex], string(msg.Key))
+		case *MsgSet:
+			self.cache[msg.LimiterIndex][string(msg.Key)] = msg.Value
+		case *MsgSubtract:
+			newValue := self.cache[msg.LimiterIndex][string(msg.Key)] - msg.Value
+			if newValue <= 0 {
+				delete(self.cache[msg.LimiterIndex], string(msg.Key))
+			} else {
+				self.cache[msg.LimiterIndex][string(msg.Key)] = newValue
+			}
 		default:
 			return fmt.Errorf("unknown message type: %T", msg)
 		}

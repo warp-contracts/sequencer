@@ -33,8 +33,8 @@ type (
 		// Number of blocks to keep in the cache
 		numCachedBlocks int64
 
-		// Cache of the limits
-		cache []map[string]int64
+		// Number of limiters, indexed from 0
+		numLimiters int
 
 		// Controller
 		controller *controller.Controller
@@ -67,8 +67,8 @@ func NewKeeper(
 		storeKey:        storeKey,
 		memKey:          memKey,
 		paramstore:      ps,
-		cache:           make([]map[string]int64, numLimiters),
 		lastInitHeight:  -1,
+		numLimiters:     numLimiters,
 		numCachedBlocks: numCachedBlocks,
 		controller:      ctrl,
 	}

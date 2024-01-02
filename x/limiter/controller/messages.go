@@ -1,15 +1,13 @@
 package controller
 
-type MsgIncrement struct {
-	// Limiter index
+type MsgSet struct {
 	LimiterIndex int
-	// Key
-	Key string
+	Key          string
+	Value        int64
 }
 
-type MsgDelete struct {
-	// Limiter index
+type MsgSubtract struct {
 	LimiterIndex int
-	// Key
-	Key string
+	Key          string
+	Value        int64
 }
