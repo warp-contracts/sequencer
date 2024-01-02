@@ -3,10 +3,9 @@ package proposal
 import (
 	"sync"
 
-	"github.com/cometbft/cometbft/libs/log"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	"github.com/warp-contracts/syncer/src/utils/task"
 )
 
@@ -21,19 +20,18 @@ type Block struct {
 type BlockValidator struct {
 	*task.Task
 
-	logger                        log.Logger
-	provider                      *ArweaveBlockProvider
-	input                         chan *Block
-	output                        chan *InvalidTxError
-	consecutiveArweaveBlockErrors int
+	provider             *ArweaveBlockProvider
+	input                chan *Block
+	output               chan *InvalidTxError
+	arweaveErrorsCounter *controller.ArweaveBlockErrorsCounter
 }
 
-func NewBlockValidator(provider *ArweaveBlockProvider, logger log.Logger) *BlockValidator {
+func NewBlockValidator(provider *ArweaveBlockProvider, arweaveErrorsCounter *controller.ArweaveBlockErrorsCounter) *BlockValidator {
 	validator := new(BlockValidator)
 	validator.provider = provider
 	validator.input = make(chan *Block)
 	validator.output = make(chan *InvalidTxError)
-	validator.logger = logger.With("module", "block-validator")
+	validator.arweaveErrorsCounter = arweaveErrorsCounter
 
 	validator.Task = task.NewTask(nil, "block-validator").
 		WithSubtaskFunc(validator.run).
@@ -112,11 +110,6 @@ func (v *BlockValidator) ValidateBlock(block *Block) error {
 		return nil
 	}
 
-	v.logger.
-		With("height", block.ctx.BlockHeight()).
-		With("timestamp", block.ctx.BlockTime()).
-		Debug("Validate block")
-
 	// sending the block to the input channel (with checking whether the task is not stopped)
 	select {
 	case <-v.Ctx.Done():
@@ -133,29 +126,14 @@ func (v *BlockValidator) ValidateBlock(block *Block) error {
 	case <-block.ctx.Done():
 		return nil
 	case err := <-v.output:
-		return v.handleInvalidTxError(err)
-	}
-}
-
-func (v *BlockValidator) handleInvalidTxError(err *InvalidTxError) error {
-	if err == nil {
-		v.consecutiveArweaveBlockErrors = 0
-		return nil
-	}
-
-	if err.errorType == INVALID_ARWEAVE {
-		v.consecutiveArweaveBlockErrors++
-		v.logger.
-			With("consecutive_errors", v.consecutiveArweaveBlockErrors).
-			Debug("Invalid Arweave block error")
-		if v.consecutiveArweaveBlockErrors > 10 {
-			v.consecutiveArweaveBlockErrors = 0
-			v.logger.Error("Controller restart due to too many consecutive Arweave block errors")
-			v.provider.controller.Restart()
+		if err == nil {
+			return nil
 		}
+		if err.errorType == INVALID_ARWEAVE {
+			v.arweaveErrorsCounter.Error(block.ctx)
+		}
+		return err.err
 	}
-
-	return err.err
 }
 
 func (v *BlockValidator) StopWait() {
