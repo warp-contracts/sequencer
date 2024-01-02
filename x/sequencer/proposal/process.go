@@ -36,7 +36,11 @@ func (h *processProposalHandler) process(ctx sdk.Context, req abci.RequestProces
 	}
 
 	if err := h.blockValidator.ValidateBlock(block); err != nil {
-		h.logger.Info("Rejected proposal: invalid block", "err", err)
+		h.logger.
+			With("err", err).
+			With("height", req.Height).
+			With("proposer", sdk.ConsAddress(req.ProposerAddress).String()).
+			Info("Rejected proposal: invalid block")
 		return rejectResponse
 	}
 

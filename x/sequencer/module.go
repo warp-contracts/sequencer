@@ -103,6 +103,7 @@ type AppModule struct {
 	arweaveBlocksController controller.ArweaveBlocksController
 	genesisLoader           GenesisLoader
 	blockInteractions       *ante.BlockInteractions
+	arweaveErrorsCounter    *controller.ArweaveBlockErrorsCounter
 }
 
 func NewAppModule(
@@ -113,6 +114,7 @@ func NewAppModule(
 	arweaveBlocksController controller.ArweaveBlocksController,
 	genesisLoader GenesisLoader,
 	blockInteractions *ante.BlockInteractions,
+	arweaveErrorsCounter *controller.ArweaveBlockErrorsCounter,
 ) AppModule {
 	return AppModule{
 		AppModuleBasic:          NewAppModuleBasic(cdc),
@@ -122,6 +124,7 @@ func NewAppModule(
 		arweaveBlocksController: arweaveBlocksController,
 		genesisLoader:           genesisLoader,
 		blockInteractions:       blockInteractions,
+		arweaveErrorsCounter:    arweaveErrorsCounter,
 	}
 }
 
@@ -157,6 +160,9 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 	am.blockInteractions.NewBlock()
+	if am.arweaveErrorsCounter != nil {
+		am.arweaveErrorsCounter.Reset()
+	}
 }
 
 // EndBlock contains the logic that is automatically triggered at the end of each block

@@ -219,9 +219,10 @@ type App struct {
 	SequencerKeeper       sequencermodulekeeper.Keeper
 
 	// Tasks
-	ArweaveBlocksController controller.ArweaveBlocksController
-	ArweaveBlockProvider    *sequencerproposal.ArweaveBlockProvider
-	BlockValidator          *sequencerproposal.BlockValidator
+	ArweaveBlocksController   controller.ArweaveBlocksController
+	ArweaveBlockProvider      *sequencerproposal.ArweaveBlockProvider
+	ArweaveBlockErrorsCounter *controller.ArweaveBlockErrorsCounter
+	BlockValidator            *sequencerproposal.BlockValidator
 
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
@@ -460,14 +461,15 @@ func New(
 		}
 
 		app.ArweaveBlockProvider = sequencerproposal.NewArweaveBlockProvider(&app.SequencerKeeper, app.ArweaveBlocksController, genesisLoader)
-		app.BlockValidator = sequencerproposal.NewBlockValidator(app.ArweaveBlockProvider, app.Logger())
+		app.ArweaveBlockErrorsCounter = controller.NewArweaveBlockErrorsCounter(app.ArweaveBlocksController, &app.SequencerKeeper, app.Logger())
+		app.BlockValidator = sequencerproposal.NewBlockValidator(app.ArweaveBlockProvider, app.ArweaveBlockErrorsCounter)
 		err := app.BlockValidator.Start()
 		if err != nil {
 			panic(err)
 		}
 	}
 	app.BlockInteractions = sequencerante.NewBlockInteractions()
-	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, genesisLoader, app.BlockInteractions)
+	sequencerModule := sequencermodule.NewAppModule(appCodec, app.SequencerKeeper, app.AccountKeeper, app.BankKeeper, app.ArweaveBlocksController, genesisLoader, app.BlockInteractions, app.ArweaveBlockErrorsCounter)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
