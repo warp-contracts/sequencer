@@ -13,7 +13,7 @@ func (k *Keeper) getStore(ctx sdk.Context, blockHeight int64, limiterIndex int) 
 	return prefix.NewStore(prefix.NewStore(ctx.KVStore(k.storeKey), []byte(strconv.FormatInt(blockHeight, 10))), []byte(strconv.FormatInt(int64(limiterIndex), 10)))
 }
 
-func (k *Keeper) GetCount(ctx sdk.Context, limiterIndex int, key []byte) int64 {
+func (k *Keeper) GetCount(limiterIndex int, key []byte) int64 {
 	return k.controller.Cache.GetCount(limiterIndex, string(key))
 }
 

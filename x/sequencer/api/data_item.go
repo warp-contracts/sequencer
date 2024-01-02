@@ -7,17 +7,20 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/gorilla/mux"
+	limitermodulekeeper "github.com/warp-contracts/sequencer/x/limiter/keeper"
+	"github.com/warp-contracts/sequencer/x/sequencer"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 type dataItemHandler struct {
-	ctx client.Context
+	ctx           client.Context
+	limiterKeeper *limitermodulekeeper.Keeper
 }
 
 // The endpoint that accepts the DataItems as described in AND-104
 // wraps it with a Cosmos transaction and broadcasts it to the network.
-func RegisterDataItemAPIRoute(clientCtx client.Context, router *mux.Router) {
-	router.Handle("/api/v1/data-item", dataItemHandler{ctx: clientCtx}).Methods("POST")
+func RegisterDataItemAPIRoute(clientCtx client.Context, router *mux.Router, limiterKeeper *limitermodulekeeper.Keeper) {
+	router.Handle("/api/v1/data-item", dataItemHandler{ctx: clientCtx, limiterKeeper: limiterKeeper}).Methods("POST")
 }
 
 func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -27,6 +30,18 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := msg.DataItem.UnmarshalFromReader(r.Body)
 	if err != nil {
 		BadRequestError(w, err, "parse data item error")
+		return
+	}
+
+	// Check if there isn't too many requests for this contract
+	contractId, err := msg.GetContractFromTags()
+	if err != nil {
+		BadRequestError(w, err, "parse contract id error")
+		return
+	}
+
+	if h.limiterKeeper.GetCount(sequencer.LIMITER_CONTRACT_ID, []byte(contractId)) > sequencer.LIMITER_CONTRACT_ID_MAX_REQUESTS {
+		TooManyRequestsError(w, err, "parse contract id error")
 		return
 	}
 

@@ -222,13 +222,13 @@ type App struct {
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	SequencerKeeper       sequencermodulekeeper.Keeper
+	LimiterKeeper         limitermodulekeeper.Keeper
 
 	// Tasks
 	ArweaveBlocksController controller.ArweaveBlocksController
 	ArweaveBlockProvider    *sequencerproposal.ArweaveBlockProvider
 	BlockValidator          *sequencerproposal.BlockValidator
 
-	LimiterKeeper limitermodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -816,7 +816,7 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
 
 	// Register the route for sending data items
-	sequencerapi.RegisterDataItemAPIRoute(clientCtx, apiSvr.Router)
+	sequencerapi.RegisterDataItemAPIRoute(clientCtx, apiSvr.Router, &app.LimiterKeeper)
 	// Register the route for retrieving nonce
 	sequencerapi.RegisterNonceAPIRoute(app, apiSvr.Router)
 	// Register the route for retrieving tx by sender and nonce
