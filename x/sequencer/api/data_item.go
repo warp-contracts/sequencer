@@ -3,6 +3,8 @@ package api
 import (
 	"net/http"
 
+	mapset "github.com/deckarep/golang-set/v2"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -13,14 +15,19 @@ import (
 )
 
 type dataItemHandler struct {
-	ctx           client.Context
-	limiterKeeper *limitermodulekeeper.Keeper
+	ctx            client.Context
+	limiterKeeper  *limitermodulekeeper.Keeper
+	ownerWhitelist mapset.Set[string]
 }
 
 // The endpoint that accepts the DataItems as described in AND-104
 // wraps it with a Cosmos transaction and broadcasts it to the network.
-func RegisterDataItemAPIRoute(clientCtx client.Context, router *mux.Router, limiterKeeper *limitermodulekeeper.Keeper) {
-	router.Handle("/api/v1/data-item", dataItemHandler{ctx: clientCtx, limiterKeeper: limiterKeeper}).Methods("POST")
+func RegisterDataItemAPIRoute(clientCtx client.Context, router *mux.Router, limiterKeeper *limitermodulekeeper.Keeper, ownerWhitelist mapset.Set[string]) {
+	router.Handle("/api/v1/data-item", dataItemHandler{
+		ctx:            clientCtx,
+		limiterKeeper:  limiterKeeper,
+		ownerWhitelist: ownerWhitelist,
+	}).Methods("POST")
 }
 
 func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -40,7 +47,9 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if h.limiterKeeper.GetCount(sequencer.LIMITER_CONTRACT_ID, []byte(contractId)) > sequencer.LIMITER_CONTRACT_ID_MAX_REQUESTS {
+	// Rate limiting
+	if !h.ownerWhitelist.Contains(msg.DataItem.Owner.Base64()) &&
+		h.limiterKeeper.GetCount(sequencer.LIMITER_CONTRACT_ID, []byte(contractId)) > sequencer.LIMITER_CONTRACT_ID_MAX_REQUESTS {
 		TooManyRequestsError(w, err, "parse contract id error")
 		return
 	}

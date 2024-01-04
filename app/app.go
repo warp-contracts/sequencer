@@ -102,6 +102,7 @@ import (
 	limitermodulekeeper "github.com/warp-contracts/sequencer/x/limiter/keeper"
 	limitermoduletypes "github.com/warp-contracts/sequencer/x/limiter/types"
 
+	appconfig "github.com/warp-contracts/sequencer/app/config"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/warp-contracts/sequencer/app/params"
@@ -239,6 +240,9 @@ type App struct {
 	configurator module.Configurator
 
 	BlockInteractions *sequencerante.BlockInteractions
+
+	// Custom app configuration
+	Config *appconfig.Config
 }
 
 // New returns a reference to an initialized blockchain app
@@ -294,6 +298,12 @@ func New(
 		keys:              keys,
 		tkeys:             tkeys,
 		memKeys:           memKeys,
+	}
+
+	// Custom App configuration
+	app.Config, err = appconfig.Load(homePath + "/config.json")
+	if err != nil {
+		panic(err)
 	}
 
 	app.ParamsKeeper = initParamsKeeper(
@@ -457,8 +467,8 @@ func New(
 		keys[limitermoduletypes.StoreKey],
 		keys[limitermoduletypes.MemStoreKey],
 		app.GetSubspace(limitermoduletypes.ModuleName),
-		1,  /* Number of limiters, indexed from 0 */
-		30, /* Number of blocks to keep in the cache */
+		1, /* Number of limiters, indexed from 0 */
+		int64(app.Config.RateLimiter.NumberOfMonitoredBlocks), /* Number of blocks to keep in the cache */
 	)
 	limiterModule := limitermodule.NewAppModule(appCodec, app.LimiterKeeper, app.AccountKeeper, app.BankKeeper)
 
@@ -816,7 +826,7 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
 
 	// Register the route for sending data items
-	sequencerapi.RegisterDataItemAPIRoute(clientCtx, apiSvr.Router, &app.LimiterKeeper)
+	sequencerapi.RegisterDataItemAPIRoute(clientCtx, apiSvr.Router, &app.LimiterKeeper, app.Config.RateLimiter.WhiteListArweaveWalletOwners)
 	// Register the route for retrieving nonce
 	sequencerapi.RegisterNonceAPIRoute(app, apiSvr.Router)
 	// Register the route for retrieving tx by sender and nonce
