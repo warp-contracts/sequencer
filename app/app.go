@@ -301,7 +301,7 @@ func New(
 	}
 
 	// Custom App configuration
-	app.Config, err = appconfig.Load(homePath + "/config.json")
+	app.Config, err = appconfig.Load("" /*homePath + "/config.json"*/)
 	if err != nil {
 		panic(err)
 	}
