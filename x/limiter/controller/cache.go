@@ -22,6 +22,9 @@ func NewCache(numLimiters int) (self *Cache) {
 
 	self.input = make(chan any, 1000)
 	self.cache = make([]map[string]int64, numLimiters)
+	for i := 0; i < len(self.cache); i++ {
+		self.cache[i] = make(map[string]int64)
+	}
 
 	self.Task = task.NewTask(nil, "limiter-cache").
 		WithSubtaskFunc(self.run).

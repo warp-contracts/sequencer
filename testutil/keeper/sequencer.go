@@ -13,6 +13,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/stretchr/testify/require"
+	limitertypes "github.com/warp-contracts/sequencer/x/limiter/types"
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
@@ -23,14 +24,14 @@ func SequencerKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 
 	db := tmdb.NewMemDB()
 	stateStore := store.NewCommitMultiStore(db)
+	limiterKeeper := LimiterKeeperForSequencer(stateStore)
 	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
 	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
 	require.NoError(t, stateStore.LoadLatestVersion())
 
 	registry := codectypes.NewInterfaceRegistry()
 	cdc := codec.NewProtoCodec(registry)
-
-	limiterKeeper, _ := LimiterKeeper(t)
+	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 	paramsSubspace := typesparams.NewSubspace(cdc,
 		types.Amino,
@@ -46,10 +47,9 @@ func SequencerKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 		*limiterKeeper,
 	)
 
-	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
-
 	// Initialize params
 	k.SetParams(ctx, types.DefaultParams())
+	limiterKeeper.SetParams(ctx, limitertypes.DefaultParams())
 
 	return k, ctx
 }

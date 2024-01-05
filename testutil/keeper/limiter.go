@@ -17,6 +17,35 @@ import (
 	"github.com/warp-contracts/sequencer/x/limiter/types"
 )
 
+func LimiterKeeperForSequencer(stateStore storetypes.CommitMultiStore) *keeper.Keeper {
+	storeKey := sdk.NewKVStoreKey(types.StoreKey)
+	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
+
+	db := tmdb.NewMemDB()
+	stateStore.MountStoreWithDB(storeKey, storetypes.StoreTypeIAVL, db)
+	stateStore.MountStoreWithDB(memStoreKey, storetypes.StoreTypeMemory, nil)
+
+	registry := codectypes.NewInterfaceRegistry()
+	cdc := codec.NewProtoCodec(registry)
+
+	paramsSubspace := typesparams.NewSubspace(cdc,
+		types.Amino,
+		storeKey,
+		memStoreKey,
+		"LimiterParams",
+	)
+	k := keeper.NewKeeper(
+		cdc,
+		storeKey,
+		memStoreKey,
+		paramsSubspace,
+		1,
+		10,
+	)
+
+	return k
+}
+
 func LimiterKeeper(t testing.TB) (*keeper.Keeper, sdk.Context) {
 	storeKey := sdk.NewKVStoreKey(types.StoreKey)
 	memStoreKey := storetypes.NewMemoryStoreKey(types.MemStoreKey)
