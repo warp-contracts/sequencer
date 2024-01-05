@@ -12,7 +12,7 @@ func (k *msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlo
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	k.setLastArweaveBlockInfo(ctx, msg)
-	k.setContractPrevSortKeys(ctx, msg)
+	k.processTransactions(ctx, msg)
 
 	return &types.MsgArweaveBlockResponse{}, nil
 }
@@ -27,12 +27,16 @@ func (k *msgServer) setLastArweaveBlockInfo(ctx sdk.Context, msg *types.MsgArwea
 	k.SetLastArweaveBlock(ctx, lastArweaveBlock)
 }
 
-func (k *msgServer) setContractPrevSortKeys(ctx sdk.Context, msg *types.MsgArweaveBlock) {
+func (k *msgServer) processTransactions(ctx sdk.Context, msg *types.MsgArweaveBlock) {
 	for _, tx := range msg.Transactions {
+		// Set the prevSortKey
 		prevSortKey := types.PrevSortKey{
 			Contract: tx.Transaction.Contract,
 			SortKey:  tx.Transaction.SortKey,
 		}
 		k.SetPrevSortKey(ctx, prevSortKey)
+
+		// Increment the limiter counter that corresponds to the contract
+		k.limiterKeeper.Inc(ctx, 0, []byte(tx.Transaction.Contract))
 	}
 }

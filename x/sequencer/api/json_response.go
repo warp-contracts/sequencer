@@ -22,6 +22,11 @@ func BadRequestError(w http.ResponseWriter, err error, errorType string) {
 	ErrorWithStatus(w, err.Error(), errorType, http.StatusBadRequest)
 }
 
+// Writes a bad request error in the form of JSON to the HTTP response
+func TooManyRequestsError(w http.ResponseWriter, err error, errorType string) {
+	ErrorWithStatus(w, err.Error(), errorType, http.StatusTooManyRequests)
+}
+
 // Writes a internal server error in the form of JSON to the HTTP response (takes an error as a string)
 func InternalServerErrorString(w http.ResponseWriter, message string, errorType string) {
 	ErrorWithStatus(w, message, errorType, http.StatusInternalServerError)

@@ -1,0 +1,12 @@
+syntax = "proto3";
+package sequencer.limiter;
+
+import "gogoproto/gogo.proto";
+import "sequencer/limiter/params.proto";
+
+option go_package = "github.com/warp-contracts/sequencer/x/limiter/types";
+
+// GenesisState defines the limiter module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+}

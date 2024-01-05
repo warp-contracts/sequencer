@@ -11,8 +11,8 @@ import (
 	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
 
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
-	"github.com/warp-contracts/syncer/src/utils/warp"
 	"github.com/warp-contracts/syncer/src/utils/smartweave"
+	"github.com/warp-contracts/syncer/src/utils/warp"
 )
 
 const TypeMsgDataItem = "data_item"

@@ -98,6 +98,11 @@ import (
 	sequencerproposal "github.com/warp-contracts/sequencer/x/sequencer/proposal"
 	sequencermoduletypes "github.com/warp-contracts/sequencer/x/sequencer/types"
 
+	limitermodule "github.com/warp-contracts/sequencer/x/limiter"
+	limitermodulekeeper "github.com/warp-contracts/sequencer/x/limiter/keeper"
+	limitermoduletypes "github.com/warp-contracts/sequencer/x/limiter/types"
+
+	appconfig "github.com/warp-contracts/sequencer/app/config"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 
 	appparams "github.com/warp-contracts/sequencer/app/params"
@@ -152,6 +157,7 @@ var (
 		vesting.AppModuleBasic{},
 		consensus.AppModuleBasic{},
 		sequencermodule.AppModuleBasic{},
+		limitermodule.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -217,6 +223,7 @@ type App struct {
 	GroupKeeper           groupkeeper.Keeper
 	ConsensusParamsKeeper consensusparamkeeper.Keeper
 	SequencerKeeper       sequencermodulekeeper.Keeper
+	LimiterKeeper         limitermodulekeeper.Keeper
 
 	// Tasks
 	ArweaveBlocksController   controller.ArweaveBlocksController
@@ -234,6 +241,9 @@ type App struct {
 	configurator module.Configurator
 
 	BlockInteractions *sequencerante.BlockInteractions
+
+	// Custom app configuration
+	Config *appconfig.Config
 }
 
 // New returns a reference to an initialized blockchain app
@@ -273,6 +283,7 @@ func New(
 		govtypes.StoreKey, paramstypes.StoreKey, upgradetypes.StoreKey,
 		feegrant.StoreKey, evidencetypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
 		consensusparamtypes.StoreKey, sequencermoduletypes.StoreKey,
+		limitermoduletypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -288,6 +299,12 @@ func New(
 		keys:              keys,
 		tkeys:             tkeys,
 		memKeys:           memKeys,
+	}
+
+	// Custom App configuration
+	app.Config, err = appconfig.Load("" /*homePath + "/config.json"*/)
+	if err != nil {
+		panic(err)
 	}
 
 	app.ParamsKeeper = initParamsKeeper(
@@ -446,11 +463,22 @@ func New(
 		),
 	)
 
+	app.LimiterKeeper = *limitermodulekeeper.NewKeeper(
+		appCodec,
+		keys[limitermoduletypes.StoreKey],
+		keys[limitermoduletypes.MemStoreKey],
+		app.GetSubspace(limitermoduletypes.ModuleName),
+		1, /* Number of limiters, indexed from 0 */
+		int64(app.Config.RateLimiter.NumberOfMonitoredBlocks), /* Number of blocks to keep in the cache */
+	)
+	limiterModule := limitermodule.NewAppModule(appCodec, app.LimiterKeeper, app.AccountKeeper, app.BankKeeper)
+
 	app.SequencerKeeper = *sequencermodulekeeper.NewKeeper(
 		appCodec,
 		keys[sequencermoduletypes.StoreKey],
 		keys[sequencermoduletypes.MemStoreKey],
 		app.GetSubspace(sequencermoduletypes.ModuleName),
+		app.LimiterKeeper,
 	)
 
 	genesisLoader := sequencermodule.NewGenesisLoader(logger, homePath)
@@ -523,6 +551,7 @@ func New(
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		sequencerModule,
+		limiterModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)), // always be last to make sure that it checks for all invariants and not only part of them
@@ -553,6 +582,7 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		sequencermoduletypes.ModuleName,
+		limitermoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -576,6 +606,7 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		sequencermoduletypes.ModuleName,
+		limitermoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -604,6 +635,7 @@ func New(
 		vestingtypes.ModuleName,
 		consensusparamtypes.ModuleName,
 		sequencermoduletypes.ModuleName,
+		limitermoduletypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	}
 	app.mm.SetOrderInitGenesis(genesisModuleOrder...)
@@ -796,7 +828,7 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
 
 	// Register the route for sending data items
-	sequencerapi.RegisterDataItemAPIRoute(clientCtx, apiSvr.Router)
+	sequencerapi.RegisterDataItemAPIRoute(clientCtx, apiSvr.Router, &app.LimiterKeeper, app.Config.RateLimiter.WhiteListArweaveWalletOwners)
 	// Register the route for retrieving nonce
 	sequencerapi.RegisterNonceAPIRoute(app, apiSvr.Router)
 	// Register the route for retrieving tx by sender and nonce
@@ -838,6 +870,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable()) //nolint:staticcheck
 	paramsKeeper.Subspace(crisistypes.ModuleName)
 	paramsKeeper.Subspace(sequencermoduletypes.ModuleName)
+	paramsKeeper.Subspace(limitermoduletypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
@@ -857,6 +890,7 @@ func (app *App) ModuleManager() *module.Manager {
 func (app *App) Close() (err error) {
 	app.ArweaveBlocksController.StopWait()
 	app.BlockValidator.StopWait()
+	app.LimiterKeeper.StopWait()
 	return nil
 }
 

@@ -1,0 +1,7 @@
+syntax = "proto3";
+package sequencer.limiter;
+
+option go_package = "github.com/warp-contracts/sequencer/x/limiter/types";
+
+// Msg defines the Msg service.
+service Msg {}

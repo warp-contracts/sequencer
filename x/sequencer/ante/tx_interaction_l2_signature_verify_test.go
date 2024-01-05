@@ -55,7 +55,7 @@ var singleSignatureData = &signing.SingleSignatureData{
 }
 
 func createNonceTag(nonce int) bundlr.Tag {
-	return bundlr.Tag{Name: "Sequencer-Nonce", Value:  strconv.Itoa(nonce)}
+	return bundlr.Tag{Name: "Sequencer-Nonce", Value: strconv.Itoa(nonce)}
 }
 
 func createEmptyArweaveSignature(dataItem types.MsgDataItem, sequence uint64) signing.SignatureV2 {

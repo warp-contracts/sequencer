@@ -2,7 +2,7 @@ package types
 
 import (
 	"fmt"
-// this line is used by starport scaffolding # genesis/types/import
+	// this line is used by starport scaffolding # genesis/types/import
 )
 
 // DefaultIndex is the default global index
