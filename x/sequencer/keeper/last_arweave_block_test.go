@@ -1,9 +1,9 @@
 package keeper_test
 
 import (
+	"context"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
 	keepertest "github.com/warp-contracts/sequencer/testutil/keeper"
@@ -12,7 +12,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func createTestLastArweaveBlock(keeper *keeper.Keeper, ctx sdk.Context) types.LastArweaveBlock {
+func createTestLastArweaveBlock(keeper keeper.Keeper, ctx context.Context) types.LastArweaveBlock {
 	item := types.LastArweaveBlock{}
 	keeper.SetLastArweaveBlock(ctx, item)
 	return item

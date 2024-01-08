@@ -47,10 +47,8 @@ func (h txBySenderNonceHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	events := []string{
-		fmt.Sprintf("%s.%s='%s/%d'", sdk.EventTypeTx, sdk.AttributeKeyAccountSequence, request.Sender, request.Nonce),
-	}
-	txs, err := tx.QueryTxsByEvents(h.ctx, events, query.DefaultPage, query.DefaultLimit, "")
+	eventQuery := fmt.Sprintf("%s.%s='%s/%d'", sdk.EventTypeTx, sdk.AttributeKeyAccountSequence, request.Sender, request.Nonce)
+	txs, err := tx.QueryTxsByEvents(h.ctx, query.DefaultPage, query.DefaultLimit, eventQuery, "")
 	if err != nil {
 		InternalServerError(w, err, "query txs error")
 		return

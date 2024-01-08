@@ -10,6 +10,7 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
+	"github.com/warp-contracts/sequencer/x/sequencer/module"
 )
 
 type genesisLoaderMock struct{}
@@ -40,7 +41,7 @@ func mockValidator(t *testing.T, lastBlock *types.LastArweaveBlock, nextBlock *t
 	blockHeader.Height = 123
 
 	controller := controller.MockArweaveBlocksController(nextBlock)
-	provider := NewArweaveBlockProvider(keeper, controller, &genesisLoaderMock{})
+	provider := sequencer.NewArweaveBlockProvider(&keeper, controller, &genesisLoaderMock{})
 
 	return newTxValidator(ctx.WithBlockHeader(blockHeader), provider)
 }

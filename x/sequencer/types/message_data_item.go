@@ -1,8 +1,13 @@
 package types
 
 import (
-	"cosmossdk.io/errors"
 	"strconv"
+
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
+
+	"cosmossdk.io/errors"
+	"cosmossdk.io/x/tx/signing"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -11,21 +16,11 @@ import (
 	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
 
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
-	"github.com/warp-contracts/syncer/src/utils/warp"
 	"github.com/warp-contracts/syncer/src/utils/smartweave"
+	"github.com/warp-contracts/syncer/src/utils/warp"
 )
 
-const TypeMsgDataItem = "data_item"
-
 var _ sdk.Msg = &MsgDataItem{}
-
-func (msg *MsgDataItem) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgDataItem) Type() string {
-	return TypeMsgDataItem
-}
 
 func (msg *MsgDataItem) GetCreator() sdk.AccAddress {
 	pubKey, err := msg.GetPublicKey()
@@ -33,15 +28,6 @@ func (msg *MsgDataItem) GetCreator() sdk.AccAddress {
 		panic(err)
 	}
 	return sdk.AccAddress(pubKey.Address())
-}
-
-func (msg *MsgDataItem) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.GetCreator()}
-}
-
-func (msg *MsgDataItem) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
 }
 
 func (msg *MsgDataItem) ValidateBasic() (err error) {
@@ -105,5 +91,14 @@ func (msg *MsgDataItem) GetInfo() DataItemInfo {
 		DataItemId: msg.DataItem.Id.Base64(),
 		Nonce:      nonce,
 		Sender:     msg.GetCreator().String(),
+	}
+}
+
+func ProvideMsgDataItemGetSingers() signing.CustomGetSigner {
+	return signing.CustomGetSigner{
+		MsgType: protoreflect.FullName("sequencer.sequencer.MsgDataItem"),
+		Fn: func(msg proto.Message) ([][]byte, error) {
+			return [][]byte{{0x0}}, nil
+		},
 	}
 }

@@ -1,11 +1,13 @@
 package proposal
 
 import (
+	"fmt"
 	"sync"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/controller"
+	sequencer "github.com/warp-contracts/sequencer/x/sequencer/module"
 	"github.com/warp-contracts/syncer/src/utils/task"
 )
 
@@ -20,13 +22,13 @@ type Block struct {
 type BlockValidator struct {
 	*task.Task
 
-	provider             *ArweaveBlockProvider
+	provider             *sequencer.ArweaveBlockProvider
 	input                chan *Block
 	output               chan *InvalidTxError
 	arweaveErrorsCounter *controller.ArweaveBlockErrorsCounter
 }
 
-func NewBlockValidator(provider *ArweaveBlockProvider, arweaveErrorsCounter *controller.ArweaveBlockErrorsCounter) *BlockValidator {
+func NewBlockValidator(provider *sequencer.ArweaveBlockProvider, arweaveErrorsCounter *controller.ArweaveBlockErrorsCounter) *BlockValidator {
 	validator := new(BlockValidator)
 	validator.provider = provider
 	validator.input = make(chan *Block)
@@ -54,7 +56,11 @@ func (v *BlockValidator) run() error {
 			txValidator := newTxValidator(block.ctx, v.provider)
 			result := newValidationResult(v.output)
 
+			fmt.Println("Validate input")
+			fmt.Println(result)
+
 			if len(block.txs) == 0 {
+				fmt.Println("Validate empty")
 				v.validateEmptyBlock(txValidator, result)
 			} else {
 				wg := &sync.WaitGroup{}
@@ -66,6 +72,7 @@ func (v *BlockValidator) run() error {
 				wg.Wait()
 			}
 
+			fmt.Println("sendIfNoError")
 			result.sendIfNoError()
 		}
 	}
@@ -109,6 +116,8 @@ func (v *BlockValidator) ValidateBlock(block *Block) error {
 	if v == nil {
 		return nil
 	}
+
+	fmt.Println("Validate block")
 
 	// sending the block to the input channel (with checking whether the task is not stopped)
 	select {

@@ -1,21 +1,22 @@
 package controller
 
 import (
-	"math"
 	"os"
 	"path"
 	"sync"
-	"time"
 
-	"github.com/cometbft/cometbft/libs/log"
 	"github.com/sirupsen/logrus"
+
+	"cosmossdk.io/log"
+
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	"github.com/warp-contracts/syncer/src/utils/arweave"
 	"github.com/warp-contracts/syncer/src/utils/config"
 	"github.com/warp-contracts/syncer/src/utils/listener"
-	"github.com/warp-contracts/syncer/src/utils/monitoring"
-	monitor_syncer "github.com/warp-contracts/syncer/src/utils/monitoring/syncer"
+
+	// "github.com/warp-contracts/syncer/src/utils/monitoring"
+	// monitor_syncer "github.com/warp-contracts/syncer/src/utils/monitoring/syncer"
 	"github.com/warp-contracts/syncer/src/utils/task"
 )
 
@@ -49,7 +50,10 @@ type SyncerController struct {
 	store           *Store
 }
 
-func NewController(log log.Logger, homePath string) (out ArweaveBlocksController, err error) {
+var homePath string
+
+// TODO szynek
+func NewController(log log.Logger) ArweaveBlocksController {
 	self := new(SyncerController)
 	InitLogger(log, logrus.InfoLevel.String())
 
@@ -60,90 +64,95 @@ func NewController(log log.Logger, homePath string) (out ArweaveBlocksController
 		filepath = ""
 	}
 
-	self.config, err = config.Load(filepath)
-	if err != nil {
-		return
-	}
+	// var err error
+	// self.config, err = config.Load(filepath)
+	self.config = new(config.Config)
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	// Setup the tasks
 	self.Task = task.NewTask(self.config, "controller")
 
-	// Monitoring and performance metrics
-	monitor := monitor_syncer.NewMonitor().
-		WithMaxHistorySize(30)
+	// // Monitoring and performance metrics
+	// monitor := monitor_syncer.NewMonitor().
+	// 	WithMaxHistorySize(30)
 
-	server := monitoring.NewServer(self.config).
-		WithMonitor(monitor)
+	// server := monitoring.NewServer(self.config).
+	// 	WithMonitor(monitor)
 
-	// Function that creates the watched task
-	// This can be called multiple times to setup syncing when something got stuck
-	watched := func() *task.Task {
-		self.mtx.Lock()
-		defer self.mtx.Unlock()
+	// // Function that creates the watched task
+	// // This can be called multiple times to setup syncing when something got stuck
+	// watched := func() *task.Task {
+	// 	self.mtx.Lock()
+	// 	defer self.mtx.Unlock()
 
-		client := arweave.NewClient(self.Ctx, self.config)
+	// 	client := arweave.NewClient(self.Ctx, self.config)
 
-		networkMonitor := listener.NewNetworkMonitor(self.config).
-			WithClient(client).
-			WithMonitor(monitor).
-			WithInterval(self.config.NetworkMonitor.Period).
-			WithRequiredConfirmationBlocks(types.ARWEAVE_BLOCK_CONFIRMATIONS)
+	// 	networkMonitor := listener.NewNetworkMonitor(self.config).
+	// 		WithClient(client).
+	// 		WithMonitor(monitor).
+	// 		WithInterval(self.config.NetworkMonitor.Period).
+	// 		WithRequiredConfirmationBlocks(types.ARWEAVE_BLOCK_CONFIRMATIONS)
 
-		self.blockDownloader = listener.NewBlockDownloader(self.config).
-			WithClient(client).
-			WithInputChannel(networkMonitor.Output).
-			WithMonitor(monitor).
-			WithBackoff(0, self.config.Syncer.TransactionMaxInterval)
+	// 	self.blockDownloader = listener.NewBlockDownloader(self.config).
+	// 		WithClient(client).
+	// 		WithInputChannel(networkMonitor.Output).
+	// 		WithMonitor(monitor).
+	// 		WithBackoff(0, self.config.Syncer.TransactionMaxInterval)
 
-		if self.lastAcceptedArweaveHeight > 0 {
-			// This is a restart from the watchdog so set the start height
-			// Otherwise it will be set later
-			self.blockDownloader.WithHeightRange(self.lastAcceptedArweaveHeight, math.MaxUint64)
-		}
+	// 	if self.lastAcceptedArweaveHeight > 0 {
+	// 		// This is a restart from the watchdog so set the start height
+	// 		// Otherwise it will be set later
+	// 		self.blockDownloader.WithHeightRange(self.lastAcceptedArweaveHeight, math.MaxUint64)
+	// 	}
 
-		transactionDownloader := listener.NewTransactionDownloader(self.config).
-			WithClient(client).
-			WithInputChannel(self.blockDownloader.Output).
-			WithMonitor(monitor).
-			WithBackoff(0, self.config.Syncer.TransactionMaxInterval).
-			WithFilterInteractions()
+	// 	transactionDownloader := listener.NewTransactionDownloader(self.config).
+	// 		WithClient(client).
+	// 		WithInputChannel(self.blockDownloader.Output).
+	// 		WithMonitor(monitor).
+	// 		WithBackoff(0, self.config.Syncer.TransactionMaxInterval).
+	// 		WithFilterInteractions()
 
-		self.store = NewStore(self.config).
-			WithInputChannel(transactionDownloader.Output).
-			WithMonitor(monitor)
+	// 	self.store = NewStore(self.config).
+	// 		WithInputChannel(transactionDownloader.Output).
+	// 		WithMonitor(monitor)
 
-		return task.NewTask(self.config, "watched").
-			WithSubtask(networkMonitor.Task).
-			WithSubtask(self.blockDownloader.Task).
-			WithSubtask(transactionDownloader.Task).
-			WithSubtask(self.store.Task)
-	}
+	// 	return task.NewTask(self.config, "watched").
+	// 		WithSubtask(networkMonitor.Task).
+	// 		WithSubtask(self.blockDownloader.Task).
+	// 		WithSubtask(transactionDownloader.Task).
+	// 		WithSubtask(self.store.Task)
+	// }
 
-	self.watchdog = task.NewWatchdog(self.config).
-		WithTask(watched).
-		WithIsOK(30*time.Second, func() bool {
-			isOK := monitor.IsOK()
-			if !isOK {
-				monitor.Clear()
-				monitor.GetReport().Run.Errors.NumWatchdogRestarts.Inc()
-			}
-			return isOK
-		})
+	// self.watchdog = task.NewWatchdog(self.config).
+	// 	WithTask(watched).
+	// 	WithIsOK(30*time.Second, func() bool {
+	// 		isOK := monitor.IsOK()
+	// 		if !isOK {
+	// 			monitor.Clear()
+	// 			monitor.GetReport().Run.Errors.NumWatchdogRestarts.Inc()
+	// 		}
+	// 		return isOK
+	// 	})
 
-	self.Task = self.Task.
-		WithSubtask(server.Task).
-		WithSubtask(monitor.Task).
-		WithConditionalSubtask(self.config.Syncer.Enabled, self.watchdog.Task)
+	// self.Task = self.Task.
+	// 	WithSubtask(server.Task).
+	// 	WithSubtask(monitor.Task).
+	// 	WithConditionalSubtask(self.config.Syncer.Enabled, self.watchdog.Task)
 
 	// Starts all the tasks, but downloading new block will be blocked until lastAcceptedArweaveHeight is set
-	err = self.Start()
-	if err != nil {
-		return
-	}
+	// err = self.Start()
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	out = self
+	return self
+}
 
-	return
+func ProvideController(defaultHomeNode string) func(log log.Logger) ArweaveBlocksController {
+	homePath = defaultHomeNode
+	return NewController
 }
 
 func (self *SyncerController) isRunning() bool {

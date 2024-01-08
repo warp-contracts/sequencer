@@ -3,23 +3,22 @@ package keeper
 import (
 	"context"
 
-	"github.com/cosmos/cosmos-sdk/store/prefix"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"cosmossdk.io/store/prefix"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func (k Keeper) PrevSortKeyAll(goCtx context.Context, req *types.QueryAllPrevSortKeyRequest) (*types.QueryAllPrevSortKeyResponse, error) {
+func (k Keeper) PrevSortKeyAll(ctx context.Context, req *types.QueryAllPrevSortKeyRequest) (*types.QueryAllPrevSortKeyResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	var prevSortKeys []types.PrevSortKey
-	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	store := ctx.KVStore(k.storeKey)
+	store := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
 	prevSortKeyStore := prefix.NewStore(store, types.KeyPrefix(types.PrevSortKeyKeyPrefix))
 
 	pageRes, err := query.Paginate(prevSortKeyStore, req.Pagination, func(key []byte, value []byte) error {
@@ -39,11 +38,10 @@ func (k Keeper) PrevSortKeyAll(goCtx context.Context, req *types.QueryAllPrevSor
 	return &types.QueryAllPrevSortKeyResponse{PrevSortKey: prevSortKeys, Pagination: pageRes}, nil
 }
 
-func (k Keeper) PrevSortKey(goCtx context.Context, req *types.QueryGetPrevSortKeyRequest) (*types.QueryGetPrevSortKeyResponse, error) {
+func (k Keeper) PrevSortKey(ctx context.Context, req *types.QueryGetPrevSortKeyRequest) (*types.QueryGetPrevSortKeyResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
-	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	val, found := k.GetPrevSortKey(
 		ctx,

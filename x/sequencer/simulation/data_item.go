@@ -18,6 +18,6 @@ func SimulateMsgDataItem(
 	return func(r *rand.Rand, app *baseapp.BaseApp, ctx sdk.Context, accs []simtypes.Account, chainID string,
 	) (simtypes.OperationMsg, []simtypes.FutureOperation, error) {
 		msg := &types.MsgDataItem{}
-		return simtypes.NoOpMsg(types.ModuleName, msg.Type(), "DataItem simulation not implemented"), nil, nil
+		return simtypes.NoOpMsg(types.ModuleName, sdk.MsgTypeURL(msg), "DataItem simulation not implemented"), nil, nil
 	}
 }

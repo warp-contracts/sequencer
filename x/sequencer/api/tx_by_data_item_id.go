@@ -48,10 +48,8 @@ func (h *txByDataItemIdHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	events := []string{
-		fmt.Sprintf("%s.%s='%s'", sdk.EventTypeTx, types.AttributeKeyDataItemId, request.DataItemId),
-	}
-	txs, err := tx.QueryTxsByEvents(h.ctx, events, query.DefaultPage, query.DefaultLimit, "")
+	eventQuery := fmt.Sprintf("%s.%s='%s'", sdk.EventTypeTx, types.AttributeKeyDataItemId, request.DataItemId)
+	txs, err := tx.QueryTxsByEvents(h.ctx, query.DefaultPage, query.DefaultLimit, eventQuery, "")
 	if err != nil {
 		InternalServerError(w, err, "query txs error")
 		return

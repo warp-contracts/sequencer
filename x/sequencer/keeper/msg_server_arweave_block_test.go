@@ -23,8 +23,8 @@ func keeperCtxAndSrv(t *testing.T) (*keeper.Keeper, sdk.Context, types.MsgServer
 	bi := ante.NewBlockInteractions()
 	bi.NewBlock()
 
-	srv := keeper.NewMsgServerImpl(*k, bi)
-	return k, ctx.WithBlockHeader(blockHeader), srv
+	srv := keeper.NewMsgServerImpl(k, bi)
+	return &k, ctx.WithBlockHeader(blockHeader), srv
 }
 
 func TestArweaveBlockMsgServer(t *testing.T) {

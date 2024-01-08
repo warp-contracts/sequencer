@@ -1,31 +1,17 @@
 package types
 
 import (
-	"cosmossdk.io/errors"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-)
+	"google.golang.org/protobuf/reflect/protoreflect"
 
-const (
-	TypeMsgArweaveBlock = "arweave_block"
+	"cosmossdk.io/errors"
+	"cosmossdk.io/x/tx/signing"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var _ sdk.Msg = &MsgArweaveBlock{}
 
-func (msg *MsgArweaveBlock) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgArweaveBlock) Type() string {
-	return TypeMsgArweaveBlock
-}
-
-func (msg *MsgArweaveBlock) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{}
-}
-
-func (msg *MsgArweaveBlock) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+func NewMsgArweaveBlock(creator string) *MsgArweaveBlock {
+	return &MsgArweaveBlock{}
 }
 
 func (msg *MsgArweaveBlock) ValidateBasic() error {
@@ -42,4 +28,11 @@ func (msg *MsgArweaveBlock) ValidateBasic() error {
 	}
 
 	return nil
+}
+
+func ProvideMsgArweaveBlockGetSingers() signing.CustomGetSigner {
+	return signing.CustomGetSigner{
+		MsgType: protoreflect.FullName("sequencer.sequencer.MsgArweaveBlock"),
+		Fn: nil,
+	}
 }

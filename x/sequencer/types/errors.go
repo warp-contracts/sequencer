@@ -24,7 +24,7 @@ var (
 	ErrNonZeroFee                  = errors.Register(ModuleName, 1113, "non-zero fee")
 	ErrNotEmptyFeePayer            = errors.Register(ModuleName, 1114, "not empty fee payer")
 	ErrNotEmptyFeeGranter          = errors.Register(ModuleName, 1115, "not empty fee granter")
-	ErrNotEmptyTip                 = errors.Register(ModuleName, 1116, "not empty tip")
+	ErrInvalidSigner               = errors.Register(ModuleName, 1116, "expected gov account as only signer for proposal message")
 	ErrBadArweaveHeight            = errors.Register(ModuleName, 1117, "invalid arweave block height")
 	ErrBadArweaveTimestamp         = errors.Register(ModuleName, 1118, "invalid arweave block timestamp")
 	ErrBadArweaveHash              = errors.Register(ModuleName, 1119, "invalid arweave block hash")

@@ -2,8 +2,11 @@ syntax = "proto3";
 
 package sequencer.sequencer;
 
-import "gogoproto/gogo.proto";
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
 import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "sequencer/sequencer/params.proto";
 import "sequencer/sequencer/arweave_block_info.proto";
 import "sequencer/sequencer/arweave_transaction_with_info.proto";
 
@@ -11,23 +14,45 @@ option go_package = "github.com/warp-contracts/sequencer/x/sequencer/types";
 
 // Msg defines the Msg service.
 service Msg {
-  rpc DataItem           (MsgDataItem    ) returns (MsgDataItemResponse    );
-  rpc ArweaveBlock       (MsgArweaveBlock) returns (MsgArweaveBlockResponse);
+  option (cosmos.msg.v1.service) = true;
+  
+  // UpdateParams defines a (governance) operation for updating the module
+  // parameters. The authority defaults to the x/gov module account.
+  rpc UpdateParams           (MsgUpdateParams          ) returns (MsgUpdateParamsResponse          );
+  rpc DataItem               (MsgDataItem              ) returns (MsgDataItemResponse              );
+  rpc ArweaveBlock           (MsgArweaveBlock          ) returns (MsgArweaveBlockResponse          );
 }
+// MsgUpdateParams is the Msg/UpdateParams request type.
+message MsgUpdateParams {
+  option (cosmos.msg.v1.signer) =                             "authority";
+  option           (amino.name) = "sequencer/x/sequencer/MsgUpdateParams";
+  
+  // authority is the address that controls the module (defaults to x/gov unless overwritten).
+  string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+
+  // params defines the module parameters to update.
+  
+  // NOTE: All parameters must be supplied.
+  Params params = 2 [(gogoproto.nullable) = false, (amino.dont_omitempty) = true];
+}
+
+// MsgUpdateParamsResponse defines the response structure for executing a
+// MsgUpdateParams message.
+message MsgUpdateParamsResponse {}
 
 // message with L2 interaction in the form of a data item
 message MsgDataItem {
-  bytes data_item = 1 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem", (gogoproto.nullable) = false];
-  string sort_key = 2;
+  bytes  data_item     = 1 [(gogoproto.customtype) = "github.com/warp-contracts/syncer/src/utils/bundlr.BundleItem", (gogoproto.nullable) = false];
+  string sort_key      = 2;
   string prev_sort_key = 3;
-  bytes random = 4;
+  bytes  random        = 4;
 }
 
 message MsgDataItemResponse {}
 
 // message with an Arweave block
 message MsgArweaveBlock {
-  ArweaveBlockInfo block_info = 1;
+           ArweaveBlockInfo           block_info   = 1;
   repeated ArweaveTransactionWithInfo transactions = 2;
 }
 

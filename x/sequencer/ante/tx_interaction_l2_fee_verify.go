@@ -1,12 +1,10 @@
 package ante
 
 import (
-	"bytes"
 	"cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/types/tx"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
@@ -30,27 +28,15 @@ func verifyFee(tx sdk.Tx, dataItem *types.MsgDataItem) error {
 		}
 	}
 
-	if !bytes.Equal(feeTx.FeePayer(), dataItem.GetSigners()[0]) {
+	if len(feeTx.FeePayer()) > 0 {
 		return errors.Wrapf(types.ErrNotEmptyFeePayer,
 			"transaction with data item cannot have fee payer: %s", feeTx.FeePayer())
 	}
 
-	if !feeTx.FeeGranter().Empty() {
+	if len(feeTx.FeeGranter()) > 0 {
 		return errors.Wrapf(types.ErrNotEmptyFeeGranter,
 			"transaction with data item cannot have fee granter: %s", feeTx.FeeGranter())
 	}
 
-	if err := verifyTip(tx); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func verifyTip(sdkTx sdk.Tx) error {
-	tipTx, ok := sdkTx.(tx.TipTx)
-	if ok && tipTx.GetTip() != nil {
-		return errors.Wrap(types.ErrNotEmptyTip, "transaction with data cannot have a tip")
-	}
 	return nil
 }

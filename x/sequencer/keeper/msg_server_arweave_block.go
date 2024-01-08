@@ -4,11 +4,10 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func (k *msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlock) (*types.MsgArweaveBlockResponse, error) {
+func (k msgServer) ArweaveBlock(goCtx context.Context, msg *types.MsgArweaveBlock) (*types.MsgArweaveBlockResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	k.setLastArweaveBlockInfo(ctx, msg)

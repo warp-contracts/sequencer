@@ -1,0 +1,176 @@
+Initializing logger
+Registering providers
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:84)
+  Registering resolver for simple type codec.Codec
+  Registering resolver for simple type *codec.LegacyAmino
+  Registering resolver for simple type *runtime.AppBuilder
+  Registering resolver for simple type *baseapp.MsgServiceRouter
+  Registering resolver for one-per-module type appmodule.AppModule
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Registering resolver for simple type protodesc.Resolver
+  Registering resolver for simple type protoregistry.MessageTypeResolver
+ Registering resolver for many-per-container type signing.CustomGetSigner
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:161)
+  Registering resolver for simple type types.InterfaceRegistry
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreKey (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:198)
+  Registering resolver for module-scoped type *types.KVStoreKey
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideTransientStoreKey (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:213)
+  Registering resolver for module-scoped type *types.TransientStoreKey
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideMemoryStoreKey (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:219)
+  Registering resolver for module-scoped type *types.MemoryStoreKey
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideGenesisTxHandler (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:226)
+  Registering resolver for simple type genesis.TxHandler
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideKVStoreService (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:229)
+  Registering resolver for module-scoped type store.KVStoreService
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideMemoryStoreService (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:234)
+  Registering resolver for module-scoped type store.MemoryStoreService
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/runtime.ProvideTransientStoreService (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:239)
+  Registering resolver for module-scoped type store.TransientStoreService
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideEventService (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:244)
+  Registering resolver for simple type event.Service
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideHeaderInfoService (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:253)
+  Registering resolver for simple type header.Service
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideCometInfoService (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:249)
+  Registering resolver for simple type comet.BlockInfoService
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideBasicManager (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:257)
+  Registering resolver for simple type module.BasicManager
+ Registering github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:281)
+  Registering resolver for simple type address.Codec
+  Registering resolver for simple type runtime.ValidatorAddressCodec
+  Registering resolver for simple type runtime.ConsensusAddressCodec
+ Registering github.com/cosmos/cosmos-sdk/x/auth.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/auth/module.go:209)
+  Registering resolver for simple type keeper.AccountKeeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Registering github.com/cosmos/cosmos-sdk/x/auth/vesting.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/auth/vesting/module.go:140)
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/bank.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/bank/module.go:227)
+  Registering resolver for simple type keeper.BaseKeeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/staking.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/staking/module.go:221)
+  Registering resolver for simple type *keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/slashing.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/slashing/module.go:230)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Registering resolver for one-per-module type types.StakingHooksWrapper
+  Found resolver for types.StakingHooksWrapper: *depinject.onePerModuleResolver
+ Registering github.com/cosmos/cosmos-sdk/x/params.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/params/module.go:129)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Registering resolver for many-per-container type v1beta1.HandlerRoute
+  Found resolver for v1beta1.HandlerRoute: *depinject.groupResolver
+ Registering resolver for one-per-module type types.KeyTable
+ Registering module-scoped provider: github.com/cosmos/cosmos-sdk/x/params.ProvideSubspace (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/params/module.go:146)
+  Registering resolver for module-scoped type types.Subspace
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type tx.BankKeeper
+ Implicitly registering resolver keeper.AccountKeeper for interface type ante.AccountKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/auth/tx/config.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/auth/tx/config/config.go:68)
+  Registering resolver for simple type client.TxConfig
+  Registering resolver for simple type tx.ConfigOptions
+  Registering resolver for many-per-container type runtime.BaseAppOption
+  Found resolver for runtime.BaseAppOption: *depinject.groupResolver
+ Registering github.com/cosmos/cosmos-sdk/x/auth/tx/config.ProvideProtoRegistry (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/auth/tx/config/config.go:65)
+  Registering resolver for simple type signing.ProtoFileResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/genutil.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/genutil/module.go:138)
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type authz.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type authz.BankKeeper
+ Implicitly registering resolver *baseapp.MsgServiceRouter for interface type baseapp.MessageRouter
+ Registering github.com/cosmos/cosmos-sdk/x/authz/module.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/authz/module/module.go:178)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Registering cosmossdk.io/x/upgrade.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/cosmossdk.io/x/upgrade@v0.1.1/module.go:194)
+  Registering resolver for simple type *keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Found resolver for runtime.BaseAppOption: *depinject.groupResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Implicitly registering resolver types.Subspace for interface type exported.Subspace
+ Registering github.com/cosmos/cosmos-sdk/x/distribution.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/distribution/module.go:232)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Found resolver for types.StakingHooksWrapper: *depinject.onePerModuleResolver
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Implicitly registering resolver keeper.Keeper for interface type types.SlashingKeeper
+ Registering cosmossdk.io/x/evidence.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/cosmossdk.io/x/evidence@v0.1.0/module.go:210)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver types.Subspace for interface type exported.Subspace
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/mint.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/mint/module.go:221)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type group.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type group.BankKeeper
+ Registering github.com/cosmos/cosmos-sdk/x/group/module.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/group/module/module.go:208)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type nft.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type nft.BankKeeper
+ Registering cosmossdk.io/x/nft/module.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/cosmossdk.io/x/nft@v0.1.0/module/module.go:183)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type feegrant.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type feegrant.BankKeeper
+ Registering cosmossdk.io/x/feegrant/module.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/cosmossdk.io/x/feegrant@v0.1.0/module/module.go:184)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.AccountKeeper for interface type types.AccountKeeper
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.BankKeeper
+ Implicitly registering resolver *keeper.Keeper for interface type types.StakingKeeper
+ Implicitly registering resolver keeper.Keeper for interface type types.DistributionKeeper
+ Implicitly registering resolver types.Subspace for interface type types.ParamSubspace
+ Registering github.com/cosmos/cosmos-sdk/x/gov.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/gov/module.go:189)
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Registering resolver for simple type *keeper.Keeper
+  Found resolver for v1beta1.HandlerRoute: *depinject.groupResolver
+ Registering github.com/cosmos/cosmos-sdk/x/gov.ProvideKeyTable (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/gov/module.go:218)
+  Found resolver for types.KeyTable: *depinject.onePerModuleResolver
+ Implicitly registering resolver keeper.BaseKeeper for interface type types.SupplyKeeper
+ Implicitly registering resolver types.Subspace for interface type exported.Subspace
+ Registering github.com/cosmos/cosmos-sdk/x/crisis.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/crisis/module.go:201)
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Registering resolver for simple type *keeper.Keeper
+ Registering github.com/cosmos/cosmos-sdk/x/consensus.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/x/consensus/module.go:117)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Found resolver for runtime.BaseAppOption: *depinject.groupResolver
+ Registering cosmossdk.io/x/circuit.ProvideModule (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/cosmossdk.io/x/circuit@v0.1.0/module.go:154)
+  Registering resolver for simple type keeper.Keeper
+  Found resolver for appmodule.AppModule: *depinject.onePerModuleResolver
+  Found resolver for runtime.BaseAppOption: *depinject.groupResolver
+Registering outputs
+ Implicitly registering resolver keeper.BaseKeeper for interface type keeper.Keeper
+ Registering cosmossdk.io/simapp.NewSimApp (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/cosmossdk.io/simapp@v0.0.0-20231211060251-d8fb76d4c267/app_v2.go:165)
+Building container
+Resolving dependencies for cosmossdk.io/simapp.NewSimApp (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/cosmossdk.io/simapp@v0.0.0-20231211060251-d8fb76d4c267/app_v2.go:165)
+ Providing *runtime.AppBuilder from github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:84) to cosmossdk.io/simapp.NewSimApp
+ Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideApp (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:84)
+  Providing types.InterfaceRegistry from github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:161) to github.com/cosmos/cosmos-sdk/runtime.ProvideApp
+  Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:161)
+   Providing address.Codec from github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:281) to github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry
+   Resolving dependencies for github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:281)
+    Supplying *modulev1.Module from cosmossdk.io/core/appconfig.Compose (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/cosmossdk.io/core@v0.11.0/appconfig/config.go:95) to github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec
+    Supplying *modulev1.Module from cosmossdk.io/core/appconfig.Compose (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/cosmossdk.io/core@v0.11.0/appconfig/config.go:95) to github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec
+    Providing zero value for optional dependency func() address.Codec
+    Providing zero value for optional dependency func() runtime.ValidatorAddressCodec
+    Providing zero value for optional dependency func() runtime.ConsensusAddressCodec
+   Calling github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:281)
+   Providing runtime.ValidatorAddressCodec from github.com/cosmos/cosmos-sdk/runtime.ProvideAddressCodec (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:281) to github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry
+   Providing many-per-container type slice []signing.CustomGetSigner to github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry from:
+  Calling github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:161)
+  Error: error calling provider github.com/cosmos/cosmos-sdk/runtime.ProvideInterfaceRegistry (/Users/michal/Projects/cosmos/cosmos-poc/sequencer50/.gopath~/pkg/mod/github.com/cosmos/cosmos-sdk@v0.50.2/runtime/module.go:161): no cosmos.msg.v1.signer option found for message sequencer.sequencer.MsgDataItem; use DefineCustomGetSigners to specify a custom getter
+no cosmos.msg.v1.signer option found for message sequencer.sequencer.MsgArweaveBlock; use DefineCustomGetSigners to specify a custom getter
+  Saved graph of container to /Users/michal/Projects/cosmos/cosmos-poc/sequencer50/x/sequencer/ante/debug_container.dot

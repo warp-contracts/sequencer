@@ -9,19 +9,22 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
-func (app *App) CheckTx(req abci.RequestCheckTx) abci.ResponseCheckTx {
+func (app *App) CheckTx(req *abci.RequestCheckTx) (res *abci.ResponseCheckTx, err error) {
 	if req.Type == abci.CheckTxType_Recheck {
 		ok, res := app.checkDataItemAlreadyInBlock(req.Tx)
 		if !ok {
-			return res
+			return res, nil
 		}
 	}
-	res := app.BaseApp.CheckTx(req)
+	res, err = app.BaseApp.CheckTx(req)
+	if err != nil {
+		return res, err
+	}
 	app.logInvalidDataItemAfterRecheck(req, res)
-	return res
+	return res, nil
 }
 
-func (app *App) checkDataItemAlreadyInBlock(txBytes []byte) (bool, abci.ResponseCheckTx) {
+func (app *App) checkDataItemAlreadyInBlock(txBytes []byte) (bool, *abci.ResponseCheckTx) {
 	tx, err := app.txConfig.TxDecoder()(txBytes)
 	if err != nil {
 		return false, sdkerrors.ResponseCheckTxWithEvents(err, 0, 0, nil, app.Trace())
@@ -35,10 +38,10 @@ func (app *App) checkDataItemAlreadyInBlock(txBytes []byte) (bool, abci.Response
 			"The data item has already been added to the block")
 		return false, sdkerrors.ResponseCheckTxWithEvents(err, 0, 0, nil, app.Trace())
 	}
-	return true, abci.ResponseCheckTx{}
+	return true, nil
 }
 
-func (app *App) logInvalidDataItemAfterRecheck(req abci.RequestCheckTx, res abci.ResponseCheckTx) {
+func (app *App) logInvalidDataItemAfterRecheck(req *abci.RequestCheckTx, res *abci.ResponseCheckTx) {
 	if req.Type != abci.CheckTxType_Recheck || res.Code == abci.CodeTypeOK {
 		return
 	}
