@@ -67,6 +67,13 @@ func (loader *GenesisConfigFileLoader) LoadArweaveBlock() *types.GenesisArweaveB
 		return nil
 	}
 
+	loader.
+		logger.
+		With("file", filePath).
+		With("last arweave block height", block.LastArweaveBlock.Height).
+		With("next arweave block height", block.NextArweaveBlock.BlockInfo.Height).
+		Info("Arweave block loaded from the file")
+
 	return &block
 }
 

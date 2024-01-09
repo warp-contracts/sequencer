@@ -1,7 +1,6 @@
 package ante
 
 import (
-	"fmt"
 	"strconv"
 	"testing"
 
@@ -24,9 +23,7 @@ import (
 )
 
 func appAndCtx(t *testing.T) (*simapp.SimApp, sdk.Context) {
-	fmt.Println("PRZED")
 	app := simapp.Setup(t, false)
-	fmt.Println("PO")
 	ctx := app.BaseApp.NewContext(false)
 	return app, ctx
 }

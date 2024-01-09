@@ -17,6 +17,7 @@ COPY .gopath~ .gopath~
 COPY Makefile .
 COPY go.mod .
 COPY go.sum .
+COPY api api
 COPY app app
 COPY crypto crypto
 COPY docs docs

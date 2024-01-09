@@ -1,7 +1,6 @@
 package proposal
 
 import (
-	"fmt"
 	"sync"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -56,11 +55,7 @@ func (v *BlockValidator) run() error {
 			txValidator := newTxValidator(block.ctx, v.provider)
 			result := newValidationResult(v.output)
 
-			fmt.Println("Validate input")
-			fmt.Println(result)
-
 			if len(block.txs) == 0 {
-				fmt.Println("Validate empty")
 				v.validateEmptyBlock(txValidator, result)
 			} else {
 				wg := &sync.WaitGroup{}
@@ -72,7 +67,6 @@ func (v *BlockValidator) run() error {
 				wg.Wait()
 			}
 
-			fmt.Println("sendIfNoError")
 			result.sendIfNoError()
 		}
 	}
@@ -116,8 +110,6 @@ func (v *BlockValidator) ValidateBlock(block *Block) error {
 	if v == nil {
 		return nil
 	}
-
-	fmt.Println("Validate block")
 
 	// sending the block to the input channel (with checking whether the task is not stopped)
 	select {

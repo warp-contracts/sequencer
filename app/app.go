@@ -67,7 +67,7 @@ import (
 )
 
 const (
-	AccountAddressPrefix = "cosmos"
+	AccountAddressPrefix = "warp"
 	Name                 = "sequencer"
 )
 
@@ -91,10 +91,11 @@ type App struct {
 	txConfig          client.TxConfig
 	interfaceRegistry codectypes.InterfaceRegistry
 
-	AnteHandler sdk.AnteHandler
-	PrepareProposalHandler sdk.PrepareProposalHandler
-	ProcessProposalHandler sdk.ProcessProposalHandler
-	BlockInteractions *sequencerante.BlockInteractions
+	AnteHandler             sdk.AnteHandler
+	PrepareProposalHandler  sdk.PrepareProposalHandler
+	ProcessProposalHandler  sdk.ProcessProposalHandler
+	BlockInteractions       *sequencerante.BlockInteractions
+	ArweaveBlocksController controller.ArweaveBlocksController
 
 	// keepers
 	AccountKeeper         authkeeper.AccountKeeper
@@ -176,7 +177,7 @@ func AppConfig() depinject.Config {
 			sequencertypes.ProvideMsgArweaveBlockGetSingers,
 			sequencermodule.ProvideGenesisLoader(DefaultNodeHome),
 			sequencerante.NewBlockInteractions,
-			controller.ProvideController(DefaultNodeHome),
+			controller.ProvideController,
 			sequencerproposal.NewBlockValidator,
 			sequencerproposal.NewPrepareProposalHandler,
 			sequencerproposal.NewProcessProposalHandler,
@@ -265,6 +266,7 @@ func New(
 		&app.PrepareProposalHandler,
 		&app.ProcessProposalHandler,
 		&app.BlockInteractions,
+		&app.ArweaveBlocksController,
 		&app.AccountKeeper,
 		&app.BankKeeper,
 		&app.StakingKeeper,
@@ -324,6 +326,7 @@ func New(
 	app.App.BaseApp.SetAnteHandler(app.AnteHandler)
 	app.App.BaseApp.SetPrepareProposal(app.PrepareProposalHandler)
 	app.App.BaseApp.SetProcessProposal(app.ProcessProposalHandler)
+	app.ArweaveBlocksController.Init(logger, DefaultNodeHome)
 
 	// Register legacy modules
 	app.registerIBCModules()
@@ -475,3 +478,5 @@ func BlockedAddresses() map[string]bool {
 	}
 	return result
 }
+
+// TODO Close()
