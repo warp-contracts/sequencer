@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/warp-contracts/sequencer/x/sequencer/types"
 	"github.com/warp-contracts/sequencer/x/sequencer/module"
+	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 // It validates the transaction and provides two methods for validation:

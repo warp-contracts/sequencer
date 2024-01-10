@@ -97,11 +97,13 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *r
 type AppModule struct {
 	AppModuleBasic
 
-	keeper            keeper.Keeper
-	accountKeeper     types.AccountKeeper
-	bankKeeper        types.BankKeeper
-	genesisLoader     GenesisLoader
-	blockInteractions *ante.BlockInteractions
+	keeper                  keeper.Keeper
+	accountKeeper           types.AccountKeeper
+	bankKeeper              types.BankKeeper
+	genesisLoader           GenesisLoader
+	blockInteractions       *ante.BlockInteractions
+	arweaveErrorsCounter    *controller.ArweaveBlockErrorsCounter
+	arweaveBlocksController controller.ArweaveBlocksController
 }
 
 func NewAppModule(
@@ -111,14 +113,18 @@ func NewAppModule(
 	bankKeeper types.BankKeeper,
 	genesisLoader GenesisLoader,
 	blockInteractions *ante.BlockInteractions,
+	arweaveBlocksController controller.ArweaveBlocksController,
+	arweaveErrorsCounter *controller.ArweaveBlockErrorsCounter,
 ) AppModule {
 	return AppModule{
-		AppModuleBasic:    NewAppModuleBasic(cdc),
-		keeper:            keeper,
-		accountKeeper:     accountKeeper,
-		bankKeeper:        bankKeeper,
-		genesisLoader:     genesisLoader,
-		blockInteractions: blockInteractions,
+		AppModuleBasic:          NewAppModuleBasic(cdc),
+		keeper:                  keeper,
+		accountKeeper:           accountKeeper,
+		bankKeeper:              bankKeeper,
+		genesisLoader:           genesisLoader,
+		blockInteractions:       blockInteractions,
+		arweaveBlocksController: arweaveBlocksController,
+		arweaveErrorsCounter:    arweaveErrorsCounter,
 	}
 }
 
@@ -154,13 +160,28 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block.
 // The begin block implementation is optional.
 func (am AppModule) BeginBlock(_ context.Context) error {
+	am.blockInteractions.NewBlock()
+	if am.arweaveErrorsCounter != nil {
+		am.arweaveErrorsCounter.Reset()
+	}
 	return nil
 }
 
 // EndBlock contains the logic that is automatically triggered at the end of each block.
 // The end block implementation is optional.
-func (am AppModule) EndBlock(_ context.Context) error {
+func (am AppModule) EndBlock(ctx context.Context) error {
+	am.startOrUpdateArweaveBlocksController(ctx)
 	return nil
+}
+
+// Starts the controller to fetch next Arweave blocks
+// or remove blocks that have already been added to the blockchain
+func (am AppModule) startOrUpdateArweaveBlocksController(ctx context.Context) {
+	if am.arweaveBlocksController == nil {
+		return
+	}
+	lastArweaveBlock := am.keeper.MustGetLastArweaveBlock(ctx)
+	am.arweaveBlocksController.SetLastAcceptedBlock(lastArweaveBlock.ArweaveBlock)
 }
 
 // IsOnePerModuleType implements the depinject.OnePerModuleType interface.
@@ -216,6 +237,8 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Logger,
 		authority.String(),
 	)
+	abp := NewArweaveBlockProvider(&k, in.ArweaveBlocksController, in.GenesisLoader)
+	abec := controller.NewArweaveBlockErrorsCounter(in.ArweaveBlocksController, k, in.Logger)
 	m := NewAppModule(
 		in.Cdc,
 		k,
@@ -223,10 +246,9 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.BankKeeper,
 		in.GenesisLoader,
 		in.BlockInteractions,
+		in.ArweaveBlocksController,
+		abec,
 	)
-
-	abp := NewArweaveBlockProvider(&k, in.ArweaveBlocksController, in.GenesisLoader)
-	abec := controller.NewArweaveBlockErrorsCounter(in.ArweaveBlocksController, k, in.Logger)
 
 	return ModuleOutputs{SequencerKeeper: k, Module: m, ArweaveBlockProvider: abp, ArweaveBlockErrorsCounter: abec}
 }
