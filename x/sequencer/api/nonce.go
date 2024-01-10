@@ -10,7 +10,6 @@ import (
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
@@ -18,7 +17,7 @@ import (
 )
 
 type AccountProvider interface {
-	GetAccount(address sdk.AccAddress) (authtypes.AccountI, error)
+	GetAccount(address sdk.AccAddress) (sdk.AccountI, error)
 }
 
 type nonceHandler struct {

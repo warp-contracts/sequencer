@@ -56,6 +56,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
 	sequencerante "github.com/warp-contracts/sequencer/x/sequencer/ante"
+	sequencerapi "github.com/warp-contracts/sequencer/x/sequencer/api"
 	"github.com/warp-contracts/sequencer/x/sequencer/controller"
 	sequencermodulekeeper "github.com/warp-contracts/sequencer/x/sequencer/keeper"
 	sequencermodule "github.com/warp-contracts/sequencer/x/sequencer/module"
@@ -449,6 +450,15 @@ func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig
 
 	// register app's OpenAPI routes.
 	docs.RegisterOpenAPIService(Name, apiSvr.Router)
+
+	// Register the route for sending data items
+	sequencerapi.RegisterDataItemAPIRoute(apiSvr.ClientCtx, apiSvr.Router)
+	// Register the route for retrieving nonce
+	sequencerapi.RegisterNonceAPIRoute(app, apiSvr.Router)
+	// Register the route for retrieving tx by sender and nonce
+	sequencerapi.RegisterTxBySenderNonceAPIRoute(apiSvr.ClientCtx, apiSvr.Router)
+	// Register the route for retrieving tx by data item id
+	sequencerapi.RegisterTxByDataItemIdAPIRoute(apiSvr.ClientCtx, apiSvr.Router)
 }
 
 // GetIBCKeeper returns the IBC keeper.
@@ -470,6 +480,15 @@ func GetMaccPerms() map[string][]string {
 		dup[perms.Account] = perms.Permissions
 	}
 	return dup
+}
+
+
+func (app *App) GetAccount(address sdk.AccAddress) (sdk.AccountI, error) {
+	ctx, err := app.CreateQueryContext(app.LastBlockHeight(), false)
+	if err != nil {
+		return nil, err
+	}
+	return app.AccountKeeper.GetAccount(ctx, address), nil
 }
 
 func (app *App) Close() error {
