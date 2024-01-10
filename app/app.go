@@ -24,6 +24,7 @@ import (
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	testdata_pulsar "github.com/cosmos/cosmos-sdk/testutil/testdata/testpb"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/mempool"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -95,6 +96,7 @@ type App struct {
 	PrepareProposalHandler  sdk.PrepareProposalHandler
 	ProcessProposalHandler  sdk.ProcessProposalHandler
 	BlockInteractions       *sequencerante.BlockInteractions
+	BlockValidator          *sequencerproposal.BlockValidator
 	ArweaveBlocksController controller.ArweaveBlocksController
 
 	// keepers
@@ -266,6 +268,7 @@ func New(
 		&app.PrepareProposalHandler,
 		&app.ProcessProposalHandler,
 		&app.BlockInteractions,
+		&app.BlockValidator,
 		&app.ArweaveBlocksController,
 		&app.AccountKeeper,
 		&app.BankKeeper,
@@ -323,10 +326,15 @@ func New(
 
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
 
-	app.App.BaseApp.SetAnteHandler(app.AnteHandler)
-	app.App.BaseApp.SetPrepareProposal(app.PrepareProposalHandler)
-	app.App.BaseApp.SetProcessProposal(app.ProcessProposalHandler)
+	app.App.SetMempool(mempool.NoOpMempool{})
+	app.App.SetAnteHandler(app.AnteHandler)
+	app.App.SetPrepareProposal(app.PrepareProposalHandler)
+	app.App.SetProcessProposal(app.ProcessProposalHandler)
 	app.ArweaveBlocksController.Init(logger, DefaultNodeHome)
+	err := app.BlockValidator.Start()
+	if err != nil {
+		panic(err)
+	}
 
 	// Register legacy modules
 	app.registerIBCModules()
@@ -464,6 +472,13 @@ func GetMaccPerms() map[string][]string {
 	return dup
 }
 
+func (app *App) Close() error {
+	app.BaseApp.Close()
+	app.ArweaveBlocksController.StopWait()
+	app.BlockValidator.StopWait()
+	return nil
+}
+
 // BlockedAddresses returns all the app's blocked account addresses.
 func BlockedAddresses() map[string]bool {
 	result := make(map[string]bool)
@@ -478,5 +493,3 @@ func BlockedAddresses() map[string]bool {
 	}
 	return result
 }
-
-// TODO Close()
