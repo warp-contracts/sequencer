@@ -1,17 +1,17 @@
 package types
 
 import (
+	"fmt"
 	"strconv"
 
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"cosmossdk.io/errors"
 	"cosmossdk.io/x/tx/signing"
-
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/warp-contracts/sequencer/api/sequencer/sequencer"
 	"github.com/warp-contracts/sequencer/crypto/keys/arweave"
 	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
 
@@ -22,7 +22,7 @@ import (
 
 var _ sdk.Msg = &MsgDataItem{}
 
-func (msg *MsgDataItem) GetCreator() sdk.AccAddress {
+func (msg *MsgDataItem) GetSenderAddress() sdk.AccAddress {
 	pubKey, err := msg.GetPublicKey()
 	if err != nil {
 		panic(err)
@@ -90,15 +90,29 @@ func (msg *MsgDataItem) GetInfo() DataItemInfo {
 	return DataItemInfo{
 		DataItemId: msg.DataItem.Id.Base64(),
 		Nonce:      nonce,
-		Sender:     msg.GetCreator().String(),
+		Sender:     msg.GetSenderAddress().String(),
 	}
 }
 
 func ProvideMsgDataItemGetSingers() signing.CustomGetSigner {
 	return signing.CustomGetSigner{
-		MsgType: protoreflect.FullName("sequencer.sequencer.MsgDataItem"),
+		MsgType: proto.MessageName(&sequencer.MsgDataItem{}),
 		Fn: func(msg proto.Message) ([][]byte, error) {
-			return [][]byte{{0x0}}, nil
+			msgDataItem, ok := msg.(*sequencer.MsgDataItem)
+			if !ok {
+				return nil, fmt.Errorf("Invalid message type: %T", msg)
+			}
+
+			bundleItem := new(bundlr.BundleItem)
+			err := bundleItem.Unmarshal(msgDataItem.DataItem)
+			if err != nil {
+				return nil, err
+			}
+			pubKey, err := GetPublicKey(bundleItem.SignatureType, bundleItem.Owner)
+			if err != nil {
+				return nil, err
+			}
+			return [][]byte{pubKey.Address()}, nil
 		},
 	}
 }

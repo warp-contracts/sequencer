@@ -29,7 +29,7 @@ func appAndCtx(t *testing.T) (*simapp.SimApp, sdk.Context) {
 }
 
 func addCreatorAccount(t *testing.T, app *simapp.SimApp, ctx sdk.Context, dataItem types.MsgDataItem) authtypes.AccountI {
-	acc := app.AccountKeeper.NewAccountWithAddress(ctx, dataItem.GetCreator())
+	acc := app.AccountKeeper.NewAccountWithAddress(ctx, dataItem.GetSenderAddress())
 
 	err := acc.SetSequence(5)
 	require.NoError(t, err)
@@ -53,7 +53,7 @@ var singleSignatureData = &signing.SingleSignatureData{
 }
 
 func createNonceTag(nonce int) bundlr.Tag {
-	return bundlr.Tag{Name: "Sequencer-Nonce", Value:  strconv.Itoa(nonce)}
+	return bundlr.Tag{Name: "Sequencer-Nonce", Value: strconv.Itoa(nonce)}
 }
 
 func createEmptyArweaveSignature(dataItem types.MsgDataItem, sequence uint64) signing.SignatureV2 {

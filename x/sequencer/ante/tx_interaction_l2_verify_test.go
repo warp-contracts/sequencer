@@ -42,7 +42,7 @@ func TestGetDataItemMsgTooManyDataItems(t *testing.T) {
 
 func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
 	dataItem := test.ArweaveL2Interaction(t)
-	msg := testdata.NewTestMsg(dataItem.GetCreator())
+	msg := testdata.NewTestMsg(dataItem.GetSenderAddress())
 	tx := test.CreateTxWithMsgs(t, &dataItem, msg)
 
 	result, err := GetL2Interaction(tx)
@@ -53,7 +53,7 @@ func TestGetDataItemMsgDataItemBeforeMsg(t *testing.T) {
 
 func TestGetDataItemMsgDataItemAfterMsg(t *testing.T) {
 	dataItem := test.ArweaveL2Interaction(t)
-	msg := testdata.NewTestMsg(dataItem.GetCreator())
+	msg := testdata.NewTestMsg(dataItem.GetSenderAddress())
 	tx := test.CreateTxWithMsgs(t, msg, &dataItem)
 
 	result, err := GetL2Interaction(tx)

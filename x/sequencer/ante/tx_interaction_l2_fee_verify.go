@@ -1,6 +1,8 @@
 package ante
 
 import (
+	"bytes"
+
 	"cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -28,9 +30,10 @@ func verifyFee(tx sdk.Tx, dataItem *types.MsgDataItem) error {
 		}
 	}
 
-	if len(feeTx.FeePayer()) > 0 {
+	feePayer := feeTx.FeePayer()
+	if len(feeTx.FeePayer()) > 0 && !bytes.Equal(feePayer, dataItem.GetSenderAddress().Bytes()) {
 		return errors.Wrapf(types.ErrNotEmptyFeePayer,
-			"transaction with data item cannot have fee payer: %s", feeTx.FeePayer())
+			"transaction with data item cannot have fee payer: %s", feePayer)
 	}
 
 	if len(feeTx.FeeGranter()) > 0 {

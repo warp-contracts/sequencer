@@ -2,11 +2,12 @@ package types
 
 import (
 	"google.golang.org/protobuf/proto"
-	"google.golang.org/protobuf/reflect/protoreflect"
 
 	"cosmossdk.io/errors"
 	"cosmossdk.io/x/tx/signing"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/warp-contracts/sequencer/api/sequencer/sequencer"
 )
 
 var _ sdk.Msg = &MsgArweaveBlock{}
@@ -33,9 +34,9 @@ func (msg *MsgArweaveBlock) ValidateBasic() error {
 
 func ProvideMsgArweaveBlockGetSingers() signing.CustomGetSigner {
 	return signing.CustomGetSigner{
-		MsgType: protoreflect.FullName("sequencer.sequencer.MsgArweaveBlock"),
+		MsgType: proto.MessageName(&sequencer.MsgArweaveBlock{}),
 		Fn: func(msg proto.Message) ([][]byte, error) {
-			return [][]byte{{0x0}}, nil
+			return [][]byte{{}}, nil
 		},
 	}
 }
