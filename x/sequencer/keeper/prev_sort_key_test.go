@@ -1,10 +1,10 @@
 package keeper_test
 
 import (
+	"context"
 	"strconv"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 	keepertest "github.com/warp-contracts/sequencer/testutil/keeper"
 	"github.com/warp-contracts/sequencer/testutil/nullify"
@@ -15,7 +15,7 @@ import (
 // Prevent strconv unused error
 var _ = strconv.IntSize
 
-func createNPrevSortKey(keeper *keeper.Keeper, ctx sdk.Context, n int) []types.PrevSortKey {
+func createNPrevSortKey(keeper keeper.Keeper, ctx context.Context, n int) []types.PrevSortKey {
 	items := make([]types.PrevSortKey, n)
 	for i := range items {
 		items[i].Contract = strconv.Itoa(i)

@@ -3,7 +3,7 @@ package controller
 import (
 	"os"
 
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
 
 	"github.com/sirupsen/logrus"
 	syncerlogger "github.com/warp-contracts/syncer/src/utils/logger"

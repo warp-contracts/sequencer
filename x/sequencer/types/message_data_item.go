@@ -1,47 +1,33 @@
 package types
 
 import (
-	"cosmossdk.io/errors"
+	"fmt"
 	"strconv"
 
+	"google.golang.org/protobuf/proto"
+
+	"cosmossdk.io/errors"
+	"cosmossdk.io/x/tx/signing"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/warp-contracts/sequencer/api/sequencer/sequencer"
 	"github.com/warp-contracts/sequencer/crypto/keys/arweave"
 	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
 
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
-	"github.com/warp-contracts/syncer/src/utils/warp"
 	"github.com/warp-contracts/syncer/src/utils/smartweave"
+	"github.com/warp-contracts/syncer/src/utils/warp"
 )
-
-const TypeMsgDataItem = "data_item"
 
 var _ sdk.Msg = &MsgDataItem{}
 
-func (msg *MsgDataItem) Route() string {
-	return RouterKey
-}
-
-func (msg *MsgDataItem) Type() string {
-	return TypeMsgDataItem
-}
-
-func (msg *MsgDataItem) GetCreator() sdk.AccAddress {
+func (msg *MsgDataItem) GetSenderAddress() sdk.AccAddress {
 	pubKey, err := msg.GetPublicKey()
 	if err != nil {
 		panic(err)
 	}
 	return sdk.AccAddress(pubKey.Address())
-}
-
-func (msg *MsgDataItem) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.GetCreator()}
-}
-
-func (msg *MsgDataItem) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
 }
 
 func (msg *MsgDataItem) ValidateBasic() (err error) {
@@ -104,6 +90,33 @@ func (msg *MsgDataItem) GetInfo() DataItemInfo {
 	return DataItemInfo{
 		DataItemId: msg.DataItem.Id.Base64(),
 		Nonce:      nonce,
-		Sender:     msg.GetCreator().String(),
+		Sender:     msg.GetSenderAddress().String(),
+	}
+}
+
+// FIXME 
+// In the function returning signers, an Unmarshal occurs. 
+// Check whether this could be avoided and why the MsgDataItem type from pulsar.go files is used here, 
+// and the type with the same name from pb.go in the ante handler.
+func ProvideMsgDataItemGetSingers() signing.CustomGetSigner {
+	return signing.CustomGetSigner{
+		MsgType: proto.MessageName(&sequencer.MsgDataItem{}),
+		Fn: func(msg proto.Message) ([][]byte, error) {
+			msgDataItem, ok := msg.(*sequencer.MsgDataItem)
+			if !ok {
+				return nil, fmt.Errorf("Invalid message type: %T", msg)
+			}
+
+			bundleItem := new(bundlr.BundleItem)
+			err := bundleItem.Unmarshal(msgDataItem.DataItem)
+			if err != nil {
+				return nil, err
+			}
+			pubKey, err := GetPublicKey(bundleItem.SignatureType, bundleItem.Owner)
+			if err != nil {
+				return nil, err
+			}
+			return [][]byte{pubKey.Address()}, nil
+		},
 	}
 }

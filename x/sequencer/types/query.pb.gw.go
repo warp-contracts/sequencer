@@ -382,13 +382,13 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2}, []string{"warp-contracts", "sequencer", "params"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2}, []string{"warp-contracts", "sequencer", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_LastArweaveBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2}, []string{"warp-contracts", "sequencer", "last_arweave_block"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_LastArweaveBlock_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2}, []string{"warp-contracts", "sequencer", "last_arweave_block"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_PrevSortKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"warp-contracts", "sequencer", "prev_sort_key", "contract"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_PrevSortKey_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"warp-contracts", "sequencer", "prev_sort_key", "contract"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_PrevSortKeyAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2}, []string{"warp-contracts", "sequencer", "prev_sort_key"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_PrevSortKeyAll_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1, 2, 2}, []string{"warp-contracts", "sequencer", "prev_sort_key"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

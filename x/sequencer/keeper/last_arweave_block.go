@@ -1,21 +1,25 @@
 package keeper
 
 import (
-	"github.com/cosmos/cosmos-sdk/store/prefix"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"context"
+
+	"cosmossdk.io/store/prefix"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 // SetLastArweaveBlock set lastArweaveBlock in the store
-func (k Keeper) SetLastArweaveBlock(ctx sdk.Context, lastArweaveBlock types.LastArweaveBlock) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LastArweaveBlockKey))
+func (k Keeper) SetLastArweaveBlock(ctx context.Context, lastArweaveBlock types.LastArweaveBlock) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.LastArweaveBlockKey))
 	b := k.cdc.MustMarshal(&lastArweaveBlock)
 	store.Set([]byte{0}, b)
 }
 
 // GetLastArweaveBlock returns lastArweaveBlock
-func (k Keeper) GetLastArweaveBlock(ctx sdk.Context) (val types.LastArweaveBlock, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LastArweaveBlockKey))
+func (k Keeper) GetLastArweaveBlock(ctx context.Context) (val types.LastArweaveBlock, found bool) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.LastArweaveBlockKey))
 
 	b := store.Get([]byte{0})
 	if b == nil {
@@ -26,7 +30,7 @@ func (k Keeper) GetLastArweaveBlock(ctx sdk.Context) (val types.LastArweaveBlock
 	return val, true
 }
 
-func (k Keeper) MustGetLastArweaveBlock(ctx sdk.Context) types.LastArweaveBlock {
+func (k Keeper) MustGetLastArweaveBlock(ctx context.Context) types.LastArweaveBlock {
 	lastArweaveBlock, found := k.GetLastArweaveBlock(ctx)
 	if !found {
 		panic("LastArweaveBlock must be set")
@@ -35,7 +39,8 @@ func (k Keeper) MustGetLastArweaveBlock(ctx sdk.Context) types.LastArweaveBlock 
 }
 
 // RemoveLastArweaveBlock removes lastArweaveBlock from the store
-func (k Keeper) RemoveLastArweaveBlock(ctx sdk.Context) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.LastArweaveBlockKey))
+func (k Keeper) RemoveLastArweaveBlock(ctx context.Context) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.LastArweaveBlockKey))
 	store.Delete([]byte{0})
 }

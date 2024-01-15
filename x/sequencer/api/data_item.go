@@ -24,6 +24,9 @@ func (h dataItemHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var msg types.MsgDataItem
 
 	// Parse DataItem from request body
+	// FIXME 
+	// Consider whether this unmarshalling is necessary, 
+	// since the `BroadcastDataItem` function is about to encode the transaction to bytes
 	err := msg.DataItem.UnmarshalFromReader(r.Body)
 	if err != nil {
 		BadRequestError(w, err, "parse data item error")

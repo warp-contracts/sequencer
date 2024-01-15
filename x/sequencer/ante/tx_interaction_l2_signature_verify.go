@@ -35,7 +35,7 @@ func verifySignaturesAndNonce(ctx sdk.Context, ak *authkeeper.AccountKeeper, tx 
 	}
 
 	sig := sigs[0]
-	signer := dataItem.GetSigners()[0]
+	signer := dataItem.GetSenderAddress()
 
 	if !ctx.IsReCheckTx() { // the signature does not need to be rechecked
 		if err := verifySingleSignature(sig, signer, dataItem); err != nil {

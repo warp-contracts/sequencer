@@ -1,14 +1,18 @@
 package keeper
 
 import (
-	"github.com/cosmos/cosmos-sdk/store/prefix"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"context"
+
+	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 // SetPrevSortKey set a specific prevSortKey in the store from its index
-func (k Keeper) SetPrevSortKey(ctx sdk.Context, prevSortKey types.PrevSortKey) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PrevSortKeyKeyPrefix))
+func (k Keeper) SetPrevSortKey(ctx context.Context, prevSortKey types.PrevSortKey) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PrevSortKeyKeyPrefix))
 	b := k.cdc.MustMarshal(&prevSortKey)
 	store.Set(types.PrevSortKeyKey(
 		prevSortKey.Contract,
@@ -17,11 +21,12 @@ func (k Keeper) SetPrevSortKey(ctx sdk.Context, prevSortKey types.PrevSortKey) {
 
 // GetPrevSortKey returns a prevSortKey from its index
 func (k Keeper) GetPrevSortKey(
-	ctx sdk.Context,
+	ctx context.Context,
 	contract string,
 
 ) (val types.PrevSortKey, found bool) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PrevSortKeyKeyPrefix))
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PrevSortKeyKeyPrefix))
 
 	b := store.Get(types.PrevSortKeyKey(
 		contract,
@@ -36,20 +41,22 @@ func (k Keeper) GetPrevSortKey(
 
 // RemovePrevSortKey removes a prevSortKey from the store
 func (k Keeper) RemovePrevSortKey(
-	ctx sdk.Context,
+	ctx context.Context,
 	contract string,
 
 ) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PrevSortKeyKeyPrefix))
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PrevSortKeyKeyPrefix))
 	store.Delete(types.PrevSortKeyKey(
 		contract,
 	))
 }
 
 // GetAllPrevSortKey returns all prevSortKey
-func (k Keeper) GetAllPrevSortKey(ctx sdk.Context) (list []types.PrevSortKey) {
-	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.KeyPrefix(types.PrevSortKeyKeyPrefix))
-	iterator := sdk.KVStorePrefixIterator(store, []byte{})
+func (k Keeper) GetAllPrevSortKey(ctx context.Context) (list []types.PrevSortKey) {
+	storeAdapter := runtime.KVStoreAdapter(k.storeService.OpenKVStore(ctx))
+	store := prefix.NewStore(storeAdapter, types.KeyPrefix(types.PrevSortKeyKeyPrefix))
+	iterator := storetypes.KVStorePrefixIterator(store, []byte{})
 
 	defer iterator.Close()
 

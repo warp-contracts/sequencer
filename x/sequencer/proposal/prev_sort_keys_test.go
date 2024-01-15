@@ -10,7 +10,7 @@ import (
 
 func TestGetPrevSortKeyNoKey(t *testing.T) {
 	k, ctx := keepertest.SequencerKeeper(t)
-	prevSortKeys := newPrevSortKeys(k, ctx)
+	prevSortKeys := newPrevSortKeys(&k, ctx)
 
 	key := prevSortKeys.getPrevSortKey("abc")
 
@@ -23,7 +23,7 @@ func TestGetPrevSortKeyKeyInStore(t *testing.T) {
 		Contract: "abc",
 		SortKey: "123",
 	})
-	prevSortKeys := newPrevSortKeys(k, ctx)
+	prevSortKeys := newPrevSortKeys(&k, ctx)
 
 	key := prevSortKeys.getPrevSortKey("abc")
 
@@ -32,7 +32,7 @@ func TestGetPrevSortKeyKeyInStore(t *testing.T) {
 
 func TestGetPrevSortKeyKeyInMemory(t *testing.T) {
 	k, ctx := keepertest.SequencerKeeper(t)
-	prevSortKeys := newPrevSortKeys(k, ctx)
+	prevSortKeys := newPrevSortKeys(&k, ctx)
 
 	key := prevSortKeys.getAndStorePrevSortKey("abc", "123")
 	require.Equal(t, "", key)
@@ -47,7 +47,7 @@ func TestGetPrevSortKeyKeyInMemoryAndStore(t *testing.T) {
 		Contract: "abc",
 		SortKey: "123",
 	})
-	prevSortKeys := newPrevSortKeys(k, ctx)
+	prevSortKeys := newPrevSortKeys(&k, ctx)
 
 	key := prevSortKeys.getAndStorePrevSortKey("abc", "456")
 	require.Equal(t, "123", key)

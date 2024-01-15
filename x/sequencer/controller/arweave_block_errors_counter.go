@@ -1,8 +1,7 @@
 package controller
 
 import (
-	"github.com/cometbft/cometbft/libs/log"
-
+	"cosmossdk.io/log"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/keeper"
@@ -17,10 +16,10 @@ type ArweaveBlockErrorsCounter struct {
 	consecutiveArweaveBlockErrors int
 }
 
-func NewArweaveBlockErrorsCounter(controller ArweaveBlocksController, keeper *keeper.Keeper, logger log.Logger) *ArweaveBlockErrorsCounter {
+func NewArweaveBlockErrorsCounter(controller ArweaveBlocksController, keeper keeper.Keeper, logger log.Logger) *ArweaveBlockErrorsCounter {
 	return &ArweaveBlockErrorsCounter{
 		controller:                    controller,
-		keeper:                        keeper,
+		keeper:                        &keeper,
 		logger:                        logger.With("module", "block-validator"),
 		consecutiveArweaveBlockErrors: 0,
 	}

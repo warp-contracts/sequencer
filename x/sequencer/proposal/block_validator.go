@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/controller"
+	sequencer "github.com/warp-contracts/sequencer/x/sequencer/module"
 	"github.com/warp-contracts/syncer/src/utils/task"
 )
 
@@ -20,13 +21,13 @@ type Block struct {
 type BlockValidator struct {
 	*task.Task
 
-	provider             *ArweaveBlockProvider
+	provider             *sequencer.ArweaveBlockProvider
 	input                chan *Block
 	output               chan *InvalidTxError
 	arweaveErrorsCounter *controller.ArweaveBlockErrorsCounter
 }
 
-func NewBlockValidator(provider *ArweaveBlockProvider, arweaveErrorsCounter *controller.ArweaveBlockErrorsCounter) *BlockValidator {
+func NewBlockValidator(provider *sequencer.ArweaveBlockProvider, arweaveErrorsCounter *controller.ArweaveBlockErrorsCounter) *BlockValidator {
 	validator := new(BlockValidator)
 	validator.provider = provider
 	validator.input = make(chan *Block)

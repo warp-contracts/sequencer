@@ -1,27 +1,28 @@
-package types
+package types_test
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {
-	for _, tc := range []struct {
+	tests := []struct {
 		desc     string
-		genState *GenesisState
+		genState *types.GenesisState
 		valid    bool
 	}{
 		{
 			desc:     "default is valid",
-			genState: DefaultGenesis(),
+			genState: types.DefaultGenesis(),
 			valid:    true,
 		},
 		{
 			desc: "valid genesis state",
-			genState: &GenesisState{
-
-				LastArweaveBlock: &LastArweaveBlock{},
-				PrevSortKeyList: []PrevSortKey{
+			genState: &types.GenesisState{
+				LastArweaveBlock: &types.LastArweaveBlock{},
+				PrevSortKeyList: []types.PrevSortKey{
 					{
 						Contract: "0",
 					},
@@ -35,8 +36,8 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		{
 			desc: "duplicated prevSortKey",
-			genState: &GenesisState{
-				PrevSortKeyList: []PrevSortKey{
+			genState: &types.GenesisState{
+				PrevSortKeyList: []types.PrevSortKey{
 					{
 						Contract: "0",
 					},
@@ -48,7 +49,8 @@ func TestGenesisState_Validate(t *testing.T) {
 			valid: false,
 		},
 		// this line is used by starport scaffolding # types/genesis/testcase
-	} {
+	}
+	for _, tc := range tests {
 		t.Run(tc.desc, func(t *testing.T) {
 			err := tc.genState.Validate()
 			if tc.valid {

@@ -6,7 +6,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"cosmossdk.io/depinject"
 	"cosmossdk.io/simapp"
+
 	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -20,18 +22,22 @@ import (
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	"github.com/warp-contracts/syncer/src/utils/bundlr"
-
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 )
 
 func appAndCtx(t *testing.T) (*simapp.SimApp, sdk.Context) {
+	simapp.AppConfig = depinject.Configs(simapp.AppConfig,
+		depinject.Provide(
+			types.ProvideMsgDataItemGetSingers,
+			types.ProvideMsgArweaveBlockGetSingers,
+		))
 	app := simapp.Setup(t, false)
-	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
+	types.RegisterInterfaces(app.InterfaceRegistry())
+	ctx := app.BaseApp.NewContext(false)
 	return app, ctx
 }
 
 func addCreatorAccount(t *testing.T, app *simapp.SimApp, ctx sdk.Context, dataItem types.MsgDataItem) authtypes.AccountI {
-	acc := app.AccountKeeper.NewAccountWithAddress(ctx, dataItem.GetCreator())
+	acc := app.AccountKeeper.NewAccountWithAddress(ctx, dataItem.GetSenderAddress())
 
 	err := acc.SetSequence(5)
 	require.NoError(t, err)
@@ -55,7 +61,7 @@ var singleSignatureData = &signing.SingleSignatureData{
 }
 
 func createNonceTag(nonce int) bundlr.Tag {
-	return bundlr.Tag{Name: "Sequencer-Nonce", Value:  strconv.Itoa(nonce)}
+	return bundlr.Tag{Name: "Sequencer-Nonce", Value: strconv.Itoa(nonce)}
 }
 
 func createEmptyArweaveSignature(dataItem types.MsgDataItem, sequence uint64) signing.SignatureV2 {
@@ -216,7 +222,7 @@ func TestVerifySignaturesArweaveSignature(t *testing.T) {
 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.NoError(t, err)
-	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetCreator()).GetSequence(), uint64(6))
+	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetSenderAddress()).GetSequence(), uint64(6))
 }
 
 func TestVerifySignaturesEthereumSignature(t *testing.T) {
@@ -229,7 +235,7 @@ func TestVerifySignaturesEthereumSignature(t *testing.T) {
 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.NoError(t, err)
-	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetCreator()).GetSequence(), uint64(6))
+	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetSenderAddress()).GetSequence(), uint64(6))
 }
 
 func TestVerifySignaturesNoSignerAccount(t *testing.T) {
@@ -241,5 +247,5 @@ func TestVerifySignaturesNoSignerAccount(t *testing.T) {
 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
 	require.NoError(t, err)
-	require.True(t, app.AccountKeeper.HasAccount(ctx, dataItem.GetCreator()))
+	require.True(t, app.AccountKeeper.HasAccount(ctx, dataItem.GetSenderAddress()))
 }

@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 
 	"github.com/warp-contracts/sequencer/x/sequencer/test"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
@@ -21,7 +21,7 @@ func newTxBuilderWithDataItem(t *testing.T) (client.TxBuilder, *types.MsgDataIte
 	return txBuilder, &dataItem
 }
 
-var WARP_COIN = sdk.NewCoins(sdk.NewCoin("warptest", sdk.NewInt(1)))
+var WARP_COIN = sdk.NewCoins(sdk.NewCoin("warptest", math.NewInt(1)))
 
 func TestVerifyFeeTx(t *testing.T) {
 	txBuilder, dataItem := newTxBuilderWithDataItem(t)
@@ -64,12 +64,12 @@ func TestVerifyFeeTxWithFeePayer(t *testing.T) {
 }
 
 func TestVerifyFeeTxWithFeeGranter(t *testing.T) {
-	tip := &txtypes.Tip{Tipper: "cosmos1xq823wxewwv6elykrn8savrx53f5s0cqt05kms", Amount: WARP_COIN}
+	feeGranter, _ := sdk.AccAddressFromBech32("cosmos1ex86m6j6r48ee2ptwlmpmfws6ral6pxehv6508")
 	txBuilder, dataItem := newTxBuilderWithDataItem(t)
-	txBuilder.SetTip(tip)
+	txBuilder.SetFeeGranter(feeGranter)
 	tx := txBuilder.GetTx()
 
 	err := verifyFee(tx, dataItem)
 
-	require.ErrorIs(t, err, types.ErrNotEmptyTip)
+	require.ErrorIs(t, err, types.ErrNotEmptyFeeGranter)
 }

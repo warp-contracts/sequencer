@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"cosmossdk.io/log"
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 )
 
@@ -13,6 +14,10 @@ func (mock ArweaveBlocksControllerMock) SetLastAcceptedBlock(*types.ArweaveBlock
 
 func (mock ArweaveBlocksControllerMock) GetNextArweaveBlock(height uint64) *types.NextArweaveBlock {
 	return mock.block
+}
+
+func (mock ArweaveBlocksControllerMock) Init(log log.Logger, homePath string) error {
+	return nil
 }
 
 func (mock ArweaveBlocksControllerMock) StopWait() {

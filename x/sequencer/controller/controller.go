@@ -7,13 +7,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/cometbft/cometbft/libs/log"
 	"github.com/sirupsen/logrus"
+
+	"cosmossdk.io/log"
+
 	"github.com/warp-contracts/sequencer/x/sequencer/types"
 
 	"github.com/warp-contracts/syncer/src/utils/arweave"
 	"github.com/warp-contracts/syncer/src/utils/config"
 	"github.com/warp-contracts/syncer/src/utils/listener"
+
 	"github.com/warp-contracts/syncer/src/utils/monitoring"
 	monitor_syncer "github.com/warp-contracts/syncer/src/utils/monitoring/syncer"
 	"github.com/warp-contracts/syncer/src/utils/task"
@@ -26,6 +29,9 @@ type ArweaveBlocksController interface {
 
 	// Returns the fetched Arweave block with the given height
 	GetNextArweaveBlock(height uint64) *types.NextArweaveBlock
+
+	// Initialization and launch of controller tasks
+	Init(log log.Logger, homePath string) error
 
 	// Gracefully stops the controller, waits for all tasks to finish
 	StopWait()
@@ -49,8 +55,11 @@ type SyncerController struct {
 	store           *Store
 }
 
-func NewController(log log.Logger, homePath string) (out ArweaveBlocksController, err error) {
-	self := new(SyncerController)
+func ProvideController() ArweaveBlocksController {
+	return new(SyncerController)
+}
+
+func (self *SyncerController) Init(log log.Logger, homePath string) error {
 	InitLogger(log, logrus.InfoLevel.String())
 
 	// Load configuration from path, env or defaults
@@ -60,9 +69,10 @@ func NewController(log log.Logger, homePath string) (out ArweaveBlocksController
 		filepath = ""
 	}
 
+	var err error
 	self.config, err = config.Load(filepath)
 	if err != nil {
-		return
+		return err
 	}
 
 	// Setup the tasks
@@ -136,14 +146,7 @@ func NewController(log log.Logger, homePath string) (out ArweaveBlocksController
 		WithConditionalSubtask(self.config.Syncer.Enabled, self.watchdog.Task)
 
 	// Starts all the tasks, but downloading new block will be blocked until lastAcceptedArweaveHeight is set
-	err = self.Start()
-	if err != nil {
-		return
-	}
-
-	out = self
-
-	return
+	return self.Start()
 }
 
 func (self *SyncerController) isRunning() bool {
