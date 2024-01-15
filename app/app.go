@@ -290,7 +290,7 @@ func New(
 		&app.SequencerKeeper,
 		// this line is used by starport scaffolding # stargate/app/keeperDefinition
 	); err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// Below we could construct and set an application specific mempool and
@@ -331,10 +331,13 @@ func New(
 	app.App.SetAnteHandler(app.AnteHandler)
 	app.App.SetPrepareProposal(app.PrepareProposalHandler)
 	app.App.SetProcessProposal(app.ProcessProposalHandler)
-	app.ArweaveBlocksController.Init(logger, DefaultNodeHome)
-	err := app.BlockValidator.Start()
+	err := app.ArweaveBlocksController.Init(logger, DefaultNodeHome)
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+	err = app.BlockValidator.Start()
+	if err != nil {
+		return nil, err
 	}
 
 	// Register legacy modules

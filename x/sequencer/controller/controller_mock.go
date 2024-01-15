@@ -16,7 +16,8 @@ func (mock ArweaveBlocksControllerMock) GetNextArweaveBlock(height uint64) *type
 	return mock.block
 }
 
-func (mock ArweaveBlocksControllerMock) Init(log log.Logger, homePath string) {
+func (mock ArweaveBlocksControllerMock) Init(log log.Logger, homePath string) error {
+	return nil
 }
 
 func (mock ArweaveBlocksControllerMock) StopWait() {

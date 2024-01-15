@@ -22,7 +22,6 @@ type HandlerOptions struct {
 	TxFeeChecker           ante.TxFeeChecker
 }
 
-// TODO
 func NewAnteHandler(AccountKeeper authkeeper.AccountKeeper,
 	BankKeeper authtypes.BankKeeper,
 	FeegrantKeeper ante.FeegrantKeeper,

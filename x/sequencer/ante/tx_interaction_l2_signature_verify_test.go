@@ -6,10 +6,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"cosmossdk.io/depinject"
 	"cosmossdk.io/simapp"
-	// "github.com/cosmos/cosmos-sdk/testutil/testdata"
+
+	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	// sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -23,7 +25,13 @@ import (
 )
 
 func appAndCtx(t *testing.T) (*simapp.SimApp, sdk.Context) {
+	simapp.AppConfig = depinject.Configs(simapp.AppConfig,
+		depinject.Provide(
+			types.ProvideMsgDataItemGetSingers,
+			types.ProvideMsgArweaveBlockGetSingers,
+		))
 	app := simapp.Setup(t, false)
+	types.RegisterInterfaces(app.InterfaceRegistry())
 	ctx := app.BaseApp.NewContext(false)
 	return app, ctx
 }
@@ -83,163 +91,161 @@ func createTxWithSignatures(t *testing.T, dataItem types.MsgDataItem, signatures
 	return txBuilder.GetTx()
 }
 
-// func TestVerifySignaturesNoSignatures(t *testing.T) {
-// 	appAndCtx(t)
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t)
-// 	addCreatorAccount(t, app, ctx, dataItem)
-// 	createTxWithSignatures(t, dataItem)
-// 	tx := createTxWithSignatures(t, dataItem)
+func TestVerifySignaturesNoSignatures(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t)
+	addCreatorAccount(t, app, ctx, dataItem)
+	tx := createTxWithSignatures(t, dataItem)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.ErrorIs(t, err, types.ErrNotSingleSignature)
-// }
+	require.ErrorIs(t, err, types.ErrNotSingleSignature)
+}
 
-// func TestVerifySignaturesTooManySignatures(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t)
-// 	acc := addCreatorAccount(t, app, ctx, dataItem)
-// 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
-// 	tx := createTxWithSignatures(t, dataItem, sig, sig)
+func TestVerifySignaturesTooManySignatures(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t)
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
+	tx := createTxWithSignatures(t, dataItem, sig, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.ErrorIs(t, err, types.ErrNotSingleSignature)
-// }
+	require.ErrorIs(t, err, types.ErrNotSingleSignature)
+}
 
-// func TestVerifySignaturesInvalidSignMode(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t, createNonceTag(5))
-// 	acc := addCreatorAccount(t, app, ctx, dataItem)
-// 	sigData := &signing.SingleSignatureData{
-// 		SignMode:  signing.SignMode_SIGN_MODE_UNSPECIFIED,
-// 		Signature: nil,
-// 	}
-// 	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
-// 	tx := createTxWithSignatures(t, dataItem, sig)
+func TestVerifySignaturesInvalidSignMode(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t, createNonceTag(5))
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	sigData := &signing.SingleSignatureData{
+		SignMode:  signing.SignMode_SIGN_MODE_UNSPECIFIED,
+		Signature: nil,
+	}
+	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
+	tx := createTxWithSignatures(t, dataItem, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.ErrorIs(t, err, types.ErrInvalidSignMode)
-// }
+	require.ErrorIs(t, err, types.ErrInvalidSignMode)
+}
 
-// func TestVerifySignaturesNotEmptySignature(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t, createNonceTag(5))
-// 	acc := addCreatorAccount(t, app, ctx, dataItem)
-// 	sigData := &signing.SingleSignatureData{
-// 		SignMode:  signing.SignMode_SIGN_MODE_DIRECT,
-// 		Signature: []byte("signature"),
-// 	}
-// 	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
-// 	tx := createTxWithSignatures(t, dataItem, sig)
+func TestVerifySignaturesNotEmptySignature(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t, createNonceTag(5))
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	sigData := &signing.SingleSignatureData{
+		SignMode:  signing.SignMode_SIGN_MODE_DIRECT,
+		Signature: []byte("signature"),
+	}
+	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
+	tx := createTxWithSignatures(t, dataItem, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.ErrorIs(t, err, types.ErrNotEmptySignature)
-// }
+	require.ErrorIs(t, err, types.ErrNotEmptySignature)
+}
 
-// func TestVerifySignaturesMultiSignature(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t, createNonceTag(5))
-// 	acc := addCreatorAccount(t, app, ctx, dataItem)
-// 	sigData := &signing.MultiSignatureData{}
-// 	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
-// 	tx := createTxWithSignatures(t, dataItem, sig)
+func TestVerifySignaturesMultiSignature(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t, createNonceTag(5))
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	sigData := &signing.MultiSignatureData{}
+	sig := createArweaveSignature(dataItem, acc.GetSequence(), sigData)
+	tx := createTxWithSignatures(t, dataItem, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.ErrorIs(t, err, types.ErrTooManySigners)
-// }
+	require.ErrorIs(t, err, types.ErrTooManySigners)
+}
 
-// func TestVerifySignaturesPublicKeyMismatch(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t, createNonceTag(5))
-// 	acc := addCreatorAccount(t, app, ctx, dataItem)
-// 	_, pubKey, _ := testdata.KeyTestPubAddr()
-// 	sig := signing.SignatureV2{
-// 		PubKey:   pubKey,
-// 		Sequence: acc.GetSequence(),
-// 		Data:     singleSignatureData,
-// 	}
-// 	tx := createTxWithSignatures(t, dataItem, sig)
+func TestVerifySignaturesPublicKeyMismatch(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t, createNonceTag(5))
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	_, pubKey, _ := testdata.KeyTestPubAddr()
+	sig := signing.SignatureV2{
+		PubKey:   pubKey,
+		Sequence: acc.GetSequence(),
+		Data:     singleSignatureData,
+	}
+	tx := createTxWithSignatures(t, dataItem, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.ErrorIs(t, err, types.ErrPublicKeyMismatch)
-// }
+	require.ErrorIs(t, err, types.ErrPublicKeyMismatch)
+}
 
-// func TestVerifySignaturesWrongSequence(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t)
-// 	acc := addCreatorAccount(t, app, ctx, dataItem)
-// 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence()+1)
-// 	tx := createTxWithSignatures(t, dataItem, sig)
+func TestVerifySignaturesWrongSequence(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t)
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence()+1)
+	tx := createTxWithSignatures(t, dataItem, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.ErrorIs(t, err, sdkerrors.ErrWrongSequence)
-// }
+	require.ErrorIs(t, err, sdkerrors.ErrWrongSequence)
+}
 
-// func TestVerifySignaturesNoSequencerNonceTag(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t)
-// 	acc := addCreatorAccount(t, app, ctx, dataItem)
-// 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
-// 	tx := createTxWithSignatures(t, dataItem, sig)
+func TestVerifySignaturesNoSequencerNonceTag(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t)
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
+	tx := createTxWithSignatures(t, dataItem, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.ErrorIs(t, err, types.ErrNoSequencerNonceTag)
-// }
+	require.ErrorIs(t, err, types.ErrNoSequencerNonceTag)
+}
 
-// func TestVerifySignaturesSequencerNonceMismatch(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t, createNonceTag(1))
-// 	acc := addCreatorAccount(t, app, ctx, dataItem)
-// 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
-// 	tx := createTxWithSignatures(t, dataItem, sig)
+func TestVerifySignaturesSequencerNonceMismatch(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t, createNonceTag(1))
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
+	tx := createTxWithSignatures(t, dataItem, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.ErrorIs(t, err, types.ErrSequencerNonceMismatch)
-// }
+	require.ErrorIs(t, err, types.ErrSequencerNonceMismatch)
+}
 
-// func TestVerifySignaturesArweaveSignature(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t, createNonceTag(5))
-// 	acc := addCreatorAccount(t, app, ctx, dataItem)
-// 	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
-// 	tx := createTxWithSignatures(t, dataItem, sig)
+func TestVerifySignaturesArweaveSignature(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t, createNonceTag(5))
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	sig := createEmptyArweaveSignature(dataItem, acc.GetSequence())
+	tx := createTxWithSignatures(t, dataItem, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.NoError(t, err)
-// 	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetCreator()).GetSequence(), uint64(6))
-// }
+	require.NoError(t, err)
+	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetSenderAddress()).GetSequence(), uint64(6))
+}
 
-// func TestVerifySignaturesEthereumSignature(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.EthereumL2Interaction(t, createNonceTag(5))
-// 	acc := addCreatorAccount(t, app, ctx, dataItem)
-// 	sig := createEmptyEthereumSignature(t, dataItem, acc.GetSequence())
-// 	tx := createTxWithSignatures(t, dataItem, sig)
+func TestVerifySignaturesEthereumSignature(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.EthereumL2Interaction(t, createNonceTag(5))
+	acc := addCreatorAccount(t, app, ctx, dataItem)
+	sig := createEmptyEthereumSignature(t, dataItem, acc.GetSequence())
+	tx := createTxWithSignatures(t, dataItem, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.NoError(t, err)
-// 	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetCreator()).GetSequence(), uint64(6))
-// }
+	require.NoError(t, err)
+	require.Equal(t, app.AccountKeeper.GetAccount(ctx, dataItem.GetSenderAddress()).GetSequence(), uint64(6))
+}
 
-// func TestVerifySignaturesNoSignerAccount(t *testing.T) {
-// 	app, ctx := appAndCtx(t)
-// 	dataItem := test.ArweaveL2Interaction(t, createNonceTag(0))
-// 	sig := createEmptyArweaveSignature(dataItem, 0)
-// 	tx := createTxWithSignatures(t, dataItem, sig)
+func TestVerifySignaturesNoSignerAccount(t *testing.T) {
+	app, ctx := appAndCtx(t)
+	dataItem := test.ArweaveL2Interaction(t, createNonceTag(0))
+	sig := createEmptyArweaveSignature(dataItem, 0)
+	tx := createTxWithSignatures(t, dataItem, sig)
 
-// 	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
+	err := verifySignaturesAndNonce(ctx, &app.AccountKeeper, tx, &dataItem)
 
-// 	require.NoError(t, err)
-// 	require.True(t, app.AccountKeeper.HasAccount(ctx, dataItem.GetCreator()))
-// }
+	require.NoError(t, err)
+	require.True(t, app.AccountKeeper.HasAccount(ctx, dataItem.GetSenderAddress()))
+}

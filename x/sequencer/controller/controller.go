@@ -31,7 +31,7 @@ type ArweaveBlocksController interface {
 	GetNextArweaveBlock(height uint64) *types.NextArweaveBlock
 
 	// Initialization and launch of controller tasks
-	Init(log log.Logger, homePath string)
+	Init(log log.Logger, homePath string) error
 
 	// Gracefully stops the controller, waits for all tasks to finish
 	StopWait()
@@ -59,7 +59,7 @@ func ProvideController() ArweaveBlocksController {
 	return new(SyncerController)
 }
 
-func (self *SyncerController) Init(log log.Logger, homePath string) {
+func (self *SyncerController) Init(log log.Logger, homePath string) error {
 	InitLogger(log, logrus.InfoLevel.String())
 
 	// Load configuration from path, env or defaults
@@ -72,7 +72,7 @@ func (self *SyncerController) Init(log log.Logger, homePath string) {
 	var err error
 	self.config, err = config.Load(filepath)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	// Setup the tasks
@@ -146,10 +146,7 @@ func (self *SyncerController) Init(log log.Logger, homePath string) {
 		WithConditionalSubtask(self.config.Syncer.Enabled, self.watchdog.Task)
 
 	// Starts all the tasks, but downloading new block will be blocked until lastAcceptedArweaveHeight is set
-	err = self.Start()
-	if err != nil {
-		panic(err)
-	}
+	return self.Start()
 }
 
 func (self *SyncerController) isRunning() bool {
