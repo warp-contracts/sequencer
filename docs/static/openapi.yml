@@ -18910,125 +18910,6 @@ paths:
               parameters.
       tags:
         - Msg
-  /sequencer.sequencer.Msg/ArweaveBlock:
-    post:
-      operationId: SequencerSequencerMsg_ArweaveBlock
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            type: object
-            properties:
-              block_info:
-                type: object
-                properties:
-                  height:
-                    type: string
-                    format: uint64
-                  timestamp:
-                    type: string
-                    format: uint64
-                  hash:
-                    type: string
-                title: Contains basic info about Arweave block
-              transactions:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    transaction:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        contract:
-                          type: string
-                        sort_key:
-                          type: string
-                      description: >-
-                        Store basic information about L1 interaction needed for
-                        calculating sort_key and prev_sort_key.
-                    prev_sort_key:
-                      type: string
-                    random:
-                      type: string
-                      format: byte
-                  title: >-
-                    L1 interaction with a sort key value from the previous
-                    interaction with the contract
-            title: message with an Arweave block
-      tags:
-        - Msg
-  /sequencer.sequencer.Msg/DataItem:
-    post:
-      operationId: SequencerSequencerMsg_DataItem
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    '@type':
-                      type: string
-                  additionalProperties: {}
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            type: object
-            properties:
-              data_item:
-                type: string
-                format: byte
-              sort_key:
-                type: string
-              prev_sort_key:
-                type: string
-              random:
-                type: string
-                format: byte
-            title: message with L2 interaction in the form of a data item
-      tags:
-        - Msg
   /sequencer.sequencer.Msg/UpdateParams:
     post:
       summary: |-
@@ -19082,6 +18963,258 @@ paths:
             description: MsgUpdateParams is the Msg/UpdateParams request type.
       tags:
         - Msg
+  /warp-contracts/sequencer/sequencer/last_arweave_block:
+    get:
+      summary: Queries a LastArweaveBlock by index.
+      operationId: SequencerSequencerQuery_LastArweaveBlock
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              LastArweaveBlock:
+                type: object
+                properties:
+                  arweave_block:
+                    type: object
+                    properties:
+                      height:
+                        type: string
+                        format: uint64
+                      timestamp:
+                        type: string
+                        format: uint64
+                      hash:
+                        type: string
+                    title: Contains basic info about Arweave block
+                  sequencer_block_height:
+                    type: string
+                    format: int64
+                title: >-
+                  Information about the latest Arweave block added to the
+                  blockchain
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /warp-contracts/sequencer/sequencer/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: SequencerSequencerQuery_Params
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /warp-contracts/sequencer/sequencer/prev_sort_key:
+    get:
+      operationId: SequencerSequencerQuery_PrevSortKeyAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              prevSortKey:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    contract:
+                      type: string
+                    sortKey:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /warp-contracts/sequencer/sequencer/prev_sort_key/{contract}:
+    get:
+      summary: Queries a list of PrevSortKey items.
+      operationId: SequencerSequencerQuery_PrevSortKey
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              prevSortKey:
+                type: object
+                properties:
+                  contract:
+                    type: string
+                  sortKey:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: contract
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
 definitions:
   cosmos.auth.v1beta1.MsgUpdateParams:
     type: object
@@ -26717,112 +26850,6 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
-  sequencer.sequencer.ArweaveBlockInfo:
-    type: object
-    properties:
-      height:
-        type: string
-        format: uint64
-      timestamp:
-        type: string
-        format: uint64
-      hash:
-        type: string
-    title: Contains basic info about Arweave block
-  sequencer.sequencer.ArweaveTransaction:
-    type: object
-    properties:
-      id:
-        type: string
-      contract:
-        type: string
-      sort_key:
-        type: string
-    description: >-
-      Store basic information about L1 interaction needed for calculating
-      sort_key and prev_sort_key.
-  sequencer.sequencer.ArweaveTransactionWithInfo:
-    type: object
-    properties:
-      transaction:
-        type: object
-        properties:
-          id:
-            type: string
-          contract:
-            type: string
-          sort_key:
-            type: string
-        description: >-
-          Store basic information about L1 interaction needed for calculating
-          sort_key and prev_sort_key.
-      prev_sort_key:
-        type: string
-      random:
-        type: string
-        format: byte
-    title: >-
-      L1 interaction with a sort key value from the previous interaction with
-      the contract
-  sequencer.sequencer.MsgArweaveBlock:
-    type: object
-    properties:
-      block_info:
-        type: object
-        properties:
-          height:
-            type: string
-            format: uint64
-          timestamp:
-            type: string
-            format: uint64
-          hash:
-            type: string
-        title: Contains basic info about Arweave block
-      transactions:
-        type: array
-        items:
-          type: object
-          properties:
-            transaction:
-              type: object
-              properties:
-                id:
-                  type: string
-                contract:
-                  type: string
-                sort_key:
-                  type: string
-              description: >-
-                Store basic information about L1 interaction needed for
-                calculating sort_key and prev_sort_key.
-            prev_sort_key:
-              type: string
-            random:
-              type: string
-              format: byte
-          title: >-
-            L1 interaction with a sort key value from the previous interaction
-            with the contract
-    title: message with an Arweave block
-  sequencer.sequencer.MsgArweaveBlockResponse:
-    type: object
-  sequencer.sequencer.MsgDataItem:
-    type: object
-    properties:
-      data_item:
-        type: string
-        format: byte
-      sort_key:
-        type: string
-      prev_sort_key:
-        type: string
-      random:
-        type: string
-        format: byte
-    title: message with L2 interaction in the form of a data item
-  sequencer.sequencer.MsgDataItemResponse:
-    type: object
   sequencer.sequencer.MsgUpdateParams:
     type: object
     properties:
@@ -26843,3 +26870,195 @@ definitions:
   sequencer.sequencer.Params:
     type: object
     description: Params defines the parameters for the module.
+  cosmos.base.query.v1beta1.PageRequest:
+    type: object
+    properties:
+      key:
+        type: string
+        format: byte
+        description: |-
+          key is a value returned in PageResponse.next_key to begin
+          querying the next page most efficiently. Only one of offset or key
+          should be set.
+      offset:
+        type: string
+        format: uint64
+        description: |-
+          offset is a numeric offset that can be used when key is unavailable.
+          It is less efficient than using key. Only one of offset or key should
+          be set.
+      limit:
+        type: string
+        format: uint64
+        description: >-
+          limit is the total number of results to be returned in the result
+          page.
+
+          If left empty it will default to a value to be set by each app.
+      count_total:
+        type: boolean
+        description: >-
+          count_total is set to true  to indicate that the result set should
+          include
+
+          a count of the total number of items available for pagination in UIs.
+
+          count_total is only respected when offset is used. It is ignored when
+          key
+
+          is set.
+      reverse:
+        type: boolean
+        description: >-
+          reverse is set to true if results are to be returned in the descending
+          order.
+
+
+          Since: cosmos-sdk 0.43
+    description: |-
+      message SomeRequest {
+               Foo some_parameter = 1;
+               PageRequest pagination = 2;
+       }
+    title: |-
+      PageRequest is to be embedded in gRPC request messages for efficient
+      pagination. Ex:
+  cosmos.base.query.v1beta1.PageResponse:
+    type: object
+    properties:
+      next_key:
+        type: string
+        format: byte
+        description: |-
+          next_key is the key to be passed to PageRequest.key to
+          query the next page most efficiently. It will be empty if
+          there are no more results.
+      total:
+        type: string
+        format: uint64
+        title: |-
+          total is total number of results available if PageRequest.count_total
+          was set, its value is undefined otherwise
+    description: |-
+      PageResponse is to be embedded in gRPC response messages where the
+      corresponding request message has used PageRequest.
+
+       message SomeResponse {
+               repeated Bar results = 1;
+               PageResponse page = 2;
+       }
+  sequencer.sequencer.ArweaveBlockInfo:
+    type: object
+    properties:
+      height:
+        type: string
+        format: uint64
+      timestamp:
+        type: string
+        format: uint64
+      hash:
+        type: string
+    title: Contains basic info about Arweave block
+  sequencer.sequencer.LastArweaveBlock:
+    type: object
+    properties:
+      arweave_block:
+        type: object
+        properties:
+          height:
+            type: string
+            format: uint64
+          timestamp:
+            type: string
+            format: uint64
+          hash:
+            type: string
+        title: Contains basic info about Arweave block
+      sequencer_block_height:
+        type: string
+        format: int64
+    title: Information about the latest Arweave block added to the blockchain
+  sequencer.sequencer.PrevSortKey:
+    type: object
+    properties:
+      contract:
+        type: string
+      sortKey:
+        type: string
+  sequencer.sequencer.QueryAllPrevSortKeyResponse:
+    type: object
+    properties:
+      prevSortKey:
+        type: array
+        items:
+          type: object
+          properties:
+            contract:
+              type: string
+            sortKey:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  sequencer.sequencer.QueryGetLastArweaveBlockResponse:
+    type: object
+    properties:
+      LastArweaveBlock:
+        type: object
+        properties:
+          arweave_block:
+            type: object
+            properties:
+              height:
+                type: string
+                format: uint64
+              timestamp:
+                type: string
+                format: uint64
+              hash:
+                type: string
+            title: Contains basic info about Arweave block
+          sequencer_block_height:
+            type: string
+            format: int64
+        title: Information about the latest Arweave block added to the blockchain
+  sequencer.sequencer.QueryGetPrevSortKeyResponse:
+    type: object
+    properties:
+      prevSortKey:
+        type: object
+        properties:
+          contract:
+            type: string
+          sortKey:
+            type: string
+  sequencer.sequencer.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.

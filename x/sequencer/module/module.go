@@ -225,6 +225,9 @@ type ModuleOutputs struct {
 	ArweaveBlockErrorsCounter *controller.ArweaveBlockErrorsCounter
 }
 
+// FIXME 
+// ArweaveBlockProvider and ArweaveBlockErrorsCounter are created here because they depend on Keeper. 
+// Check if it would be possible to register these 2 components directly in depinject.
 func ProvideModule(in ModuleInputs) ModuleOutputs {
 	// default to governance authority if not provided
 	authority := authtypes.NewModuleAddress(govtypes.ModuleName)

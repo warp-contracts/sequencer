@@ -94,6 +94,10 @@ func (msg *MsgDataItem) GetInfo() DataItemInfo {
 	}
 }
 
+// FIXME 
+// In the function returning signers, an Unmarshal occurs. 
+// Check whether this could be avoided and why the MsgDataItem type from pulsar.go files is used here, 
+// and the type with the same name from pb.go in the ante handler.
 func ProvideMsgDataItemGetSingers() signing.CustomGetSigner {
 	return signing.CustomGetSigner{
 		MsgType: proto.MessageName(&sequencer.MsgDataItem{}),

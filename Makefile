@@ -119,6 +119,15 @@ endif
 	DOCKER_BUILDKIT=0 VERSION=$(VERSION) ENV=$(ENV) \
 	docker buildx bake genesis -f docker-bake.hcl --progress=plain --push
 
+.PHONY: docker-build-genesis
+docker-build-genesis: all | ; $(info $(M) build docker container as the genesis image) @ 
+ifeq (IS_VERSION_SEMVER,)
+	$(error Version has to be semver, have you released a new version? Version is $(VERSION))
+endif
+	docker login
+	DOCKER_BUILDKIT=0 VERSION=$(VERSION) ENV=$(ENV) \
+	docker buildx bake genesis -f docker-bake.hcl --progress=plain --load
+
 .PHONY: docker-run
 docker-run:  | ; $(info $(M) running docker container) @ 
 	docker compose --profile sequencer build

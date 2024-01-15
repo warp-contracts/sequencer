@@ -44,18 +44,6 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
 				},
-				{
-					RpcMethod:      "DataItem",
-					Use:            "data-item",
-					Short:          "Send a data-item tx",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
-				},
-				{
-					RpcMethod:      "ArweaveBlock",
-					Use:            "arweave-block",
-					Short:          "Send a arweave-block tx",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{},
-				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},
