@@ -14,7 +14,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/warp-contracts/sequencer/crypto/keys/arweave"
 	"github.com/warp-contracts/sequencer/crypto/keys/ethereum"
@@ -36,7 +35,7 @@ func appAndCtx(t *testing.T) (*simapp.SimApp, sdk.Context) {
 	return app, ctx
 }
 
-func addCreatorAccount(t *testing.T, app *simapp.SimApp, ctx sdk.Context, dataItem types.MsgDataItem) authtypes.AccountI {
+func addCreatorAccount(t *testing.T, app *simapp.SimApp, ctx sdk.Context, dataItem types.MsgDataItem) sdk.AccountI {
 	acc := app.AccountKeeper.NewAccountWithAddress(ctx, dataItem.GetSenderAddress())
 
 	err := acc.SetSequence(5)

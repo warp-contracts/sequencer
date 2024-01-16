@@ -30,9 +30,8 @@ func keeperCtxAndSrv(t *testing.T) (*keeper.Keeper, sdk.Context, types.MsgServer
 func TestArweaveBlockMsgServer(t *testing.T) {
 	expected := test.ArweaveBlock()
 	k, ctx, srv := keeperCtxAndSrv(t)
-	wctx := sdk.WrapSDKContext(ctx)
 
-	_, err := srv.ArweaveBlock(wctx, &expected)
+	_, err := srv.ArweaveBlock(ctx, &expected)
 	require.NoError(t, err)
 
 	result, found := k.GetLastArweaveBlock(ctx)

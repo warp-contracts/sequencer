@@ -23,10 +23,10 @@ var (
 )
 
 const (
-	opWeightMsgDataItem = "op_weight_msg_data_item"
+	opWeightMsgDataItem          = "op_weight_msg_data_item"
 	defaultWeightMsgDataItem int = 100
 
-	opWeightMsgArweaveBlock = "op_weight_msg_arweave_block"
+	opWeightMsgArweaveBlock          = "op_weight_msg_arweave_block"
 	defaultWeightMsgArweaveBlock int = 100
 
 	// this line is used by starport scaffolding # simapp/module/const
@@ -49,7 +49,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 func (am AppModule) RegisterStoreDecoder(_ simtypes.StoreDecoderRegistry) {}
 
 // ProposalContents doesn't return any content functions for governance proposals.
-func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent {
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalMsg {
 	return nil
 }
 
