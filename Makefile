@@ -12,7 +12,7 @@ DATE    ?= $(shell date +%FT%T%z)
 
 # Build variables
 ENV	         ?= devnet
-FROM_VERSION ?= v0.0.70
+FROM_VERSION ?= v0.0.87
 
 # Tools
 VERSION_REGEX     := ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$
@@ -142,6 +142,6 @@ B = git checkout $1 -b _build-$1 && \
 
 .PHONY: build-all-updates
 build-all-updates: | ; $(info $(M) build every major update) @ 
-	$(call B,v0.0.70)
-	@mv bin/upgrades/v0.0.70 bin/genesis
+	$(call B,v0.0.87)
+	@mv bin/upgrades/v0.0.87 bin/genesis
 
