@@ -116,7 +116,7 @@ func (self *SyncerController) Init(log log.Logger, homePath string) error {
 			WithInputChannel(self.blockDownloader.Output).
 			WithMonitor(monitor).
 			WithBackoff(0, self.config.Syncer.TransactionMaxInterval).
-			WithFilterInteractions()
+			WithFilterInteractions(false)
 
 		self.store = NewStore(self.config).
 			WithInputChannel(transactionDownloader.Output).

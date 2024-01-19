@@ -1331,8 +1331,8 @@ github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijb
 github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtXRu0=
 github.com/vbatts/tar-split v0.11.5 h1:3bHCTIheBm1qFTcgh9oPu+nNBtX+XJIupG/vacinCts=
 github.com/vbatts/tar-split v0.11.5/go.mod h1:yZbwRsSeGjusneWgA781EKej9HF8vme8okylkAeNKLk=
-github.com/warp-contracts/syncer v0.2.104 h1:f+DrA+jI7H+GkMhkSGJyf/PMeaT/6Q49+t502sGbiNY=
-github.com/warp-contracts/syncer v0.2.104/go.mod h1:ShjRy+vkKqVLNv3kRW6IjvhzQhpAslQsbm3+oWC2aJo=
+github.com/warp-contracts/syncer v0.2.164 h1:/LpNOUeiGSfk6cK0bNx84AUQfLNVQ2sF+6+k2ZbC+qc=
+github.com/warp-contracts/syncer v0.2.164/go.mod h1:rlDIrfAz4kkTxs+VdI+V5M8GMduczJPgivPUUf4GVpg=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
 github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:aYKd//L2LvnjZzWKhF00oedf4jCCReLcmhLdhm1A27Q=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
